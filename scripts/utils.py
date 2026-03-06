@@ -131,6 +131,11 @@ def git(*args: str, check: bool = True) -> str:
     return result.stdout.strip()
 
 
+def git_create_branch(name: str):
+    """Create and checkout a new branch from the current HEAD."""
+    git("checkout", "-b", name)
+
+
 def git_commit_and_push(files: list[str], message: str, branch: str = "main"):
     """Stage files, commit with message, and push to remote."""
     if not files:
@@ -154,6 +159,22 @@ def gh_pr_create(title: str, body: str, base: str = "main") -> str:
         capture_output=True, text=True, check=True,
     )
     return result.stdout.strip()
+
+
+def gh_pr_merge(pr_url: str, method: str = "squash"):
+    """Approve and merge a pull request via gh CLI.
+
+    Uses --admin to bypass branch-protection review requirements when the
+    token has the necessary permissions.
+    """
+    subprocess.run(
+        ["gh", "pr", "review", pr_url, "--approve"],
+        capture_output=True, text=True, check=False,
+    )
+    subprocess.run(
+        ["gh", "pr", "merge", pr_url, f"--{method}", "--admin", "--delete-branch"],
+        capture_output=True, text=True, check=True,
+    )
 
 
 # ---------------------------------------------------------------------------

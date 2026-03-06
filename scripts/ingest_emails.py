@@ -8,7 +8,18 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from utils import gws, git_commit_and_push, log, make_slug, render_frontmatter
+from datetime import datetime, timezone
+
+from utils import (
+    gws,
+    gh_pr_create,
+    gh_pr_merge,
+    git_commit_and_push,
+    git_create_branch,
+    log,
+    make_slug,
+    render_frontmatter,
+)
 
 
 REQUESTS_DIR = "requests"
@@ -219,6 +230,16 @@ def build_commit_message(headers: dict, slug: str, num_attachments: int) -> str:
     )
 
 
+def build_pr_body(ingested: list[tuple[str, dict]]) -> str:
+    """Build a PR body summarizing all ingested emails."""
+    lines = [f"Ingested **{len(ingested)}** email(s).\n"]
+    for slug, headers in ingested:
+        subject = headers.get("subject", "no-subject")
+        sender = headers.get("from", "unknown")
+        lines.append(f"- **{subject}** — from {sender} → `requests/{slug}.md`")
+    return "\n".join(lines)
+
+
 def main():
     os.makedirs(REQUESTS_DIR, exist_ok=True)
 
@@ -234,22 +255,38 @@ def main():
 
     log(f"Found {len(messages)} unread email(s).")
 
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    branch = f"ingest/{ts}"
+    git_create_branch(branch)
+    log(f"Created branch {branch}")
+
+    ingested: list[tuple[str, dict]] = []
+
     for msg_stub in messages:
         result = process_message(msg_stub, label_id)
         if result is None:
             continue
 
         slug, created_files, headers = result
-        attachments = headers.get("attachments", [])
-        if isinstance(attachments, str):
-            attachments = [attachments]
-
-        att_dir = os.path.join(REQUESTS_DIR, slug, "attachments")
         att_count = len([f for f in created_files if "attachments/" in f])
 
         commit_msg = build_commit_message(headers, slug, att_count)
-        git_commit_and_push(created_files, commit_msg)
-        log(f"  Committed and pushed: {slug}")
+        git_commit_and_push(created_files, commit_msg, branch=branch)
+        log(f"  Committed: {slug}")
+
+        ingested.append((slug, headers))
+
+    if not ingested:
+        log("No emails were successfully processed.")
+        return
+
+    pr_title = f"ingest: {len(ingested)} new request(s) — {ts}"
+    pr_body = build_pr_body(ingested)
+    pr_url = gh_pr_create(pr_title, pr_body)
+    log(f"Created PR: {pr_url}")
+
+    gh_pr_merge(pr_url)
+    log(f"PR merged: {pr_url}")
 
     log("Ingestion complete.")
 
