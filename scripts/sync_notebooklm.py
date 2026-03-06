@@ -78,7 +78,7 @@ def add_source(notebook_id: str, filepath: str) -> str:
 def remove_source(notebook_id: str, source_id: str):
     """Remove a source from NotebookLM by ID."""
     notebooklm("use", notebook_id)
-    notebooklm("source", "delete", source_id)
+    notebooklm("source", "delete", source_id, "--yes")
 
 
 def update_metadata_source(notebook_id: str, manifest: dict[str, str]):

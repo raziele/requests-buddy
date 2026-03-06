@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Reset script: clean NotebookLM sources, delete request files, and open a PR."""
 
-import json
 import os
+import subprocess
 import sys
 from datetime import datetime, timezone
 from glob import glob
@@ -10,9 +10,7 @@ from glob import glob
 sys.path.insert(0, os.path.dirname(__file__))
 
 from sync_notebooklm import (
-    get_notebook_id,
     load_manifest,
-    notebooklm,
     save_manifest,
     MANIFEST_FILE,
     SYNC_LOG_FILE,
@@ -20,6 +18,38 @@ from sync_notebooklm import (
 from utils import git, git_commit_and_push, gh_pr_create, log
 
 REQUESTS_DIR = "requests"
+SECRETS_DIR = ".secrets"
+NOTEBOOKLM_TIMEOUT = 60
+
+
+def get_notebook_id() -> str:
+    """Resolve notebook ID from env var or local secrets file."""
+    nb_id = os.environ.get("NOTEBOOKLM_NOTEBOOK_ID")
+    if nb_id:
+        return nb_id
+
+    secrets_path = os.path.join(SECRETS_DIR, "notebooklm-notebook-id")
+    if os.path.exists(secrets_path):
+        with open(secrets_path) as f:
+            nb_id = f.read().strip()
+        if nb_id:
+            return nb_id
+
+    raise RuntimeError(
+        "NOTEBOOKLM_NOTEBOOK_ID not set and .secrets/notebooklm-notebook-id not found"
+    )
+
+
+def notebooklm_delete(notebook_id: str, source_id: str):
+    """Delete a single source, passing --yes to skip the confirmation prompt."""
+    cmd = ["notebooklm", "source", "delete", source_id, "-n", notebook_id, "--yes"]
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, check=False, timeout=NOTEBOOKLM_TIMEOUT,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"notebooklm source delete failed (exit {result.returncode}): {result.stderr.strip()}"
+        )
 
 
 def remove_all_sources(notebook_id: str, manifest: dict[str, str]) -> tuple[int, int]:
@@ -27,16 +57,14 @@ def remove_all_sources(notebook_id: str, manifest: dict[str, str]) -> tuple[int,
 
     Returns (success_count, failure_count).
     """
-    notebooklm("use", notebook_id)
-
     succeeded, failed = 0, 0
     for key, source_id in sorted(manifest.items()):
         label = key if key != "__sync_metadata__" else "sync-metadata"
         log(f"  Deleting source: {label} ({source_id})")
         try:
-            notebooklm("source", "delete", source_id)
+            notebooklm_delete(notebook_id, source_id)
             succeeded += 1
-        except RuntimeError as e:
+        except (RuntimeError, subprocess.TimeoutExpired) as e:
             log(f"  Failed to delete {label}: {e}")
             failed += 1
 
