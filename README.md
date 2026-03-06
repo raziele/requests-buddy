@@ -61,6 +61,12 @@ uv run python scripts/deduplicate.py
 uv run python scripts/sync_notebooklm.py
 ```
 
+To reset the project (clean NotebookLM sources, delete all requests, open a PR):
+
+```bash
+uv run python scripts/reset.py
+```
+
 For one-off tools (e.g. linters), use `uvx`: `uvx ruff check .`
 
 ## Troubleshooting
@@ -96,6 +102,7 @@ scripts/
   ingest_emails.py        # Process 1: email ingestion
   deduplicate.py          # Process 2: AI deduplication
   sync_notebooklm.py      # Process 3: NotebookLM sync
+  reset.py                # Reset: clean notebook + delete requests
   utils.py                # Shared helpers
 requests/                  # Ingested request Markdown files
 logs/                      # NotebookLM sync logs and source manifest
