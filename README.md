@@ -13,7 +13,7 @@ Automated pipeline that ingests email requests from Gmail, deduplicates them usi
 ### Prerequisites
 
 - **Node.js 18+**
-- **Python 3.12+**
+- **uv** — [install](https://docs.astral.sh/uv/getting-started/installation/) (Python 3.12+ is installed automatically)
 - **GitHub CLI** (`gh`) — authenticated with `gh auth login`
 - **Google Cloud project** with the Gmail API enabled
 - **Google NotebookLM** account with an existing notebook
@@ -23,8 +23,8 @@ Automated pipeline that ingests email requests from Gmail, deduplicates them usi
 
 ```bash
 npm install -g @googleworkspace/cli
-pip install "notebooklm-py[browser]"
-playwright install chromium
+uv sync
+uv run playwright install chromium
 ```
 
 ### 2. Clone and run first-time setup
@@ -37,7 +37,7 @@ cd requests-buddy
 
 The setup script walks you through:
 
-- Gmail OAuth authentication (opens browser)
+- **Gmail OAuth** (opens browser) — Use the **Gmail scope only**: `gws auth login -s gmail`. That scope covers reading mail, attachments, and modifying/creating labels; no Drive/Calendar/Sheets. Using `-s gmail` also helps stay under the ~25-scope limit for unverified (testing) apps.
 - NotebookLM login (opens browser)
 - Entering your OpenRouter API key and NotebookLM notebook ID
 - Uploading all credentials as GitHub Actions secrets
@@ -50,6 +50,30 @@ Go to the [Actions tab](https://github.com/raziele/requests-buddy/actions) and t
 ### 4. Done
 
 All three processes now run unattended on their schedules. Email ingestion runs every hour, deduplication runs daily at 06:00 UTC, and NotebookLM sync triggers whenever new files are pushed to `requests/`.
+
+## Running scripts locally
+
+Use `uv run` so scripts use the project environment:
+
+```bash
+uv run python scripts/ingest_emails.py
+uv run python scripts/deduplicate.py
+uv run python scripts/sync_notebooklm.py
+```
+
+For one-off tools (e.g. linters), use `uvx`: `uvx ruff check .`
+
+## Troubleshooting
+
+### "Error 403: access_denied" or "app is being tested, only developer-approved testers"
+
+Your GCP OAuth app is in **Testing** mode. Only accounts listed as **Test users** can sign in.
+
+**Fix:** In [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **OAuth consent screen** → **Test users** → **Add users** → add the Gmail address you use for `gws auth login`. Then try again.
+
+### "Google hasn't verified this app"
+
+Expected when the app is in testing mode. Click **Advanced** → **Go to &lt;app&gt; (unsafe)** to continue. Safe for personal use.
 
 ## Updating Credentials
 

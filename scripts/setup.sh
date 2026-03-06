@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd "$(git rev-parse --show-toplevel)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+cd "$REPO_ROOT"
 
 SECRETS_DIR=".secrets"
 mkdir -p "$SECRETS_DIR"
@@ -11,13 +13,37 @@ echo "  Requests Buddy — First-Time Setup"
 echo "============================================"
 echo ""
 
-# --- Prerequisites check ---
-for cmd in gws notebooklm gh git; do
+# --- Prerequisites: uv, gh, git (required) ---
+for cmd in uv gh git; do
   if ! command -v "$cmd" &>/dev/null; then
     echo "ERROR: '$cmd' is not installed. See README.md for prerequisites."
     exit 1
   fi
 done
+
+# --- Install gws if missing ---
+if ! command -v gws &>/dev/null; then
+  echo "Installing gws (Google Workspace CLI)..."
+  npm install -g @googleworkspace/cli
+  echo "Installed gws."
+else
+  echo "gws already installed."
+fi
+
+# --- Install opencode if missing ---
+if ! command -v opencode &>/dev/null; then
+  echo "Installing opencode..."
+  npm install -g @opencode-ai/cli
+  echo "Installed opencode."
+else
+  echo "opencode already installed."
+fi
+echo ""
+
+# --- Ensure project venv exists (uv sync) ---
+echo "Ensuring virtual environment (uv sync)..."
+uv sync
+echo ""
 
 # --- Step 1: Gmail auth ---
 echo "--- Step 1/6: Gmail Authentication ---"
@@ -25,6 +51,12 @@ if [[ -f "$SECRETS_DIR/gws-credentials.json" ]]; then
   echo "Found existing $SECRETS_DIR/gws-credentials.json — skipping."
 else
   echo "This will open a browser for Google OAuth consent."
+  echo "We use the Gmail scope only (-s gmail): read mail, attachments, and modify/create labels."
+  echo "No Drive/Calendar/Sheets; this also helps with unverified app scope limits."
+  echo ""
+  echo "If you get '403 access_denied': add your Gmail as a Test user in GCP:"
+  echo "  OAuth consent screen → Test users → Add users → your-email@gmail.com"
+  echo ""
   echo "If you haven't set up a GCP project yet, run: gws auth setup"
   read -rp "Press Enter to start Gmail login (or Ctrl-C to abort)..."
   gws auth login -s gmail
@@ -41,7 +73,7 @@ if [[ -d "$SECRETS_DIR/notebooklm-credentials" ]]; then
 else
   echo "This will open a browser for Google login."
   read -rp "Press Enter to start NotebookLM login (or Ctrl-C to abort)..."
-  notebooklm login
+  uv run notebooklm login
   if [[ -d "$HOME/.notebooklm" ]]; then
     cp -r "$HOME/.notebooklm" "$SECRETS_DIR/notebooklm-credentials"
     echo "Copied credentials to $SECRETS_DIR/notebooklm-credentials/"
@@ -51,12 +83,12 @@ else
 fi
 echo ""
 
-# --- Step 3: OpenRouter API key ---
-echo "--- Step 3/6: OpenRouter API Key ---"
+# --- Step 3: OpenRouter API key (for opencode) ---
+echo "--- Step 3/6: OpenRouter API Key (opencode) ---"
 if [[ -f "$SECRETS_DIR/openrouter-api-key" ]]; then
   echo "Found existing $SECRETS_DIR/openrouter-api-key — skipping."
 else
-  echo "Get your key at https://openrouter.ai/keys"
+  echo "Get your key at https://openrouter.ai/settings/keys"
   read -rp "Paste your OpenRouter API key: " api_key
   echo -n "$api_key" > "$SECRETS_DIR/openrouter-api-key"
   echo "Saved to $SECRETS_DIR/openrouter-api-key"

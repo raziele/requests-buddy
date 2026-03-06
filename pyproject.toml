@@ -1,0 +1,14 @@
+[project]
+name = "requests-buddy"
+version = "0.1.0"
+description = "Automated email ingestion, deduplication, and NotebookLM sync"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "python-frontmatter",
+    "pyyaml",
+    "notebooklm-py[browser]",
+]
+
+[project.optional-dependencies]
+dev = []

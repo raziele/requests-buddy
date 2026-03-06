@@ -54,34 +54,43 @@ def make_slug(date_str: str, subject: str, max_len: int = 80) -> str:
 
 
 # ---------------------------------------------------------------------------
-# OpenRouter API
+# OpenCode CLI
 # ---------------------------------------------------------------------------
 
-def openrouter_chat(messages: list[dict], model: str = "qwen/qwen3-next-80b-a3b-instruct:free",
-                    temperature: float = 0.2) -> str:
-    """Send a chat completion request to OpenRouter and return the response text."""
-    import requests as http
+def opencode_run(prompt: str, model: str | None = None) -> str:
+    """Run a prompt through the opencode CLI and return the response text.
 
-    api_key = os.environ.get("OPENROUTER_API_KEY")
-    if not api_key:
-        raise RuntimeError("OPENROUTER_API_KEY environment variable is not set")
+    Uses ``opencode run`` in non-interactive mode.  A temporary file is used
+    to pass the prompt so we avoid command-line length limits with large
+    payloads.
+    """
+    import tempfile
 
-    resp = http.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-        json={
-            "model": model,
-            "temperature": temperature,
-            "messages": messages,
-        },
-        timeout=120,
-    )
-    resp.raise_for_status()
-    data = resp.json()
-    return data["choices"][0]["message"]["content"]
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".md", delete=False
+    ) as tmp:
+        tmp.write(prompt)
+        tmp_path = tmp.name
+
+    try:
+        cmd = ["opencode", "run", "--file", tmp_path]
+        if model:
+            cmd.extend(["--model", model])
+        cmd.append(
+            "Follow the instructions in the attached file. "
+            "Return ONLY the requested output — no explanations, no tool use."
+        )
+
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, check=False, timeout=300,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"opencode run failed (exit {result.returncode}):\n{result.stderr}"
+            )
+        return result.stdout.strip()
+    finally:
+        os.unlink(tmp_path)
 
 
 # ---------------------------------------------------------------------------

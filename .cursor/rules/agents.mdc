@@ -17,7 +17,7 @@ Three independent processes, each with a dedicated script and workflow:
 | **Dedup** | `scripts/deduplicate.py` | `deduplicate.yml` | Daily 06:00 UTC |
 | **Sync** | `scripts/sync_notebooklm.py` | `sync-notebooklm.yml` | Push to `requests/**` on main |
 
-All three share `scripts/utils.py` for frontmatter parsing, git ops, OpenRouter calls, `gws` CLI wrapper, and logging.
+All three share `scripts/utils.py` for frontmatter parsing, git ops, opencode CLI wrapper, `gws` CLI wrapper, and logging.
 
 ## Key Directories
 
@@ -67,6 +67,7 @@ Frontmatter is handled by `utils.parse_frontmatter` / `utils.render_frontmatter`
 | CLI | Install | Purpose |
 |-----|---------|---------|
 | `gws` | `npm i -g @googleworkspace/cli` | Gmail API (list, get, modify messages) |
+| `opencode` | `npm i -g opencode` | LLM calls for dedup detection and merging |
 | `notebooklm` | `pip install notebooklm-py[browser]` | NotebookLM source management |
 | `gh` | Preinstalled in CI | PRs and GitHub secret management |
 
@@ -78,13 +79,13 @@ All CLI wrappers raise `RuntimeError` on non-zero exit. The `gws` wrapper auto-p
 |------------------|---------|
 | `GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE` | Ingest |
 | `GWS_CREDENTIALS` (GitHub secret) | Ingest workflow |
-| `OPENROUTER_API_KEY` | Dedup (OpenRouter chat completions) |
+| `OPENROUTER_API_KEY` | Dedup (opencode CLI via OpenRouter provider) |
 | `NOTEBOOKLM_NOTEBOOK_ID` | Sync |
 | `NOTEBOOKLM_CREDENTIALS` (GitHub secret, tar+base64) | Sync workflow |
 
 ## LLM Usage
 
-`utils.openrouter_chat()` calls OpenRouter with `openai/gpt-4o-mini` at `temperature=0.2`. Used in dedup for duplicate detection (returns JSON array of groups) and merging (returns unified Markdown). Both prompts expect and strip markdown code fences from responses.
+`utils.opencode_run()` calls the `opencode` CLI in non-interactive mode (`opencode run`). Prompts are written to a temp file and attached via `--file` to avoid command-line length limits. Used in dedup for duplicate detection (returns JSON array of groups) and merging (returns unified Markdown). Both prompts expect and strip markdown code fences from responses. The model/provider is configured via opencode's OpenRouter provider — `OPENROUTER_API_KEY` env var or `~/.local/share/opencode/auth.json`.
 
 ## Error Handling
 

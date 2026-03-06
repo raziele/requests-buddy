@@ -2,12 +2,15 @@
 set -euo pipefail
 
 REPO="raziele/requests-buddy"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 SECRETS_DIR=".secrets"
 
-cd "$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
 
 echo "=== Upload secrets to GitHub ==="
 echo "Target repo: $REPO"
+echo "Looking for .secrets in: $REPO_ROOT"
 echo ""
 
 missing=0
@@ -23,7 +26,10 @@ if [[ ! -d "$SECRETS_DIR/notebooklm-credentials" ]]; then
 fi
 if [[ $missing -eq 1 ]]; then
   echo ""
-  echo "Run scripts/setup.sh first to generate local credential files."
+  echo "Run setup.sh from the requests-buddy repo to generate these files:"
+  echo "  cd $REPO_ROOT && ./scripts/setup.sh"
+  echo ""
+  echo "If you already ran setup, check that the files are in $REPO_ROOT/.secrets/"
   exit 1
 fi
 

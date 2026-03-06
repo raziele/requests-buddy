@@ -15,7 +15,7 @@ from utils import (
     git_commit_and_push,
     gh_pr_create,
     log,
-    openrouter_chat,
+    opencode_run,
     parse_frontmatter,
     render_frontmatter,
 )
@@ -23,6 +23,7 @@ from utils import (
 
 REQUESTS_DIR = "requests"
 MARKER_FILE = "logs/last-dedup-marker"
+PROMPTS_DIR = "prompts"
 
 
 def get_new_files(marker_path: str) -> tuple[list[str], list[str]]:
@@ -79,29 +80,32 @@ def summarize_file(path: str, full: bool = False) -> dict:
     return summary
 
 
+def load_prompt(name: str, **kwargs: str) -> str:
+    """Load a prompt template from prompts/ and fill in {{placeholder}} values."""
+    path = os.path.join(PROMPTS_DIR, f"{name}.md")
+    with open(path) as f:
+        template = f.read()
+    for key, value in kwargs.items():
+        template = template.replace(f"{{{{{key}}}}}", value)
+    return template
+
+
 def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict]) -> list[list[str]]:
-    """Use OpenRouter to find duplicate groups between new and existing files.
+    """Use opencode to find duplicate groups between new and existing files.
 
     Returns a list of groups, where each group is a list of file paths.
     """
     if not new_summaries:
         return []
 
-    prompt = (
-        "You are analyzing incoming requests to detect duplicates.\n\n"
-        "Below are NEW requests (just arrived) and EXISTING requests (already in the system).\n"
-        "Identify which NEW requests are semantically duplicate or near-duplicate of EXISTING ones.\n"
-        "Two requests are duplicates if they are about the same topic/ask from the same or different senders.\n\n"
-        "Return ONLY valid JSON — an array of groups. Each group is an array of file paths that should be merged.\n"
-        "Each group must contain at least one NEW file and at least one EXISTING file.\n"
-        "If no duplicates are found, return an empty array: []\n\n"
-        f"=== NEW REQUESTS ===\n{json.dumps(new_summaries, indent=2)}\n\n"
-        f"=== EXISTING REQUESTS ===\n{json.dumps(existing_summaries, indent=2)}\n"
+    prompt = load_prompt(
+        "detect-duplicates",
+        new_requests=json.dumps(new_summaries, indent=2),
+        existing_requests=json.dumps(existing_summaries, indent=2),
     )
 
-    response = openrouter_chat([{"role": "user", "content": prompt}])
+    response = opencode_run(prompt)
 
-    # Extract JSON from response (may be wrapped in markdown code block)
     text = response.strip()
     if text.startswith("```"):
         lines = text.splitlines()
@@ -120,26 +124,18 @@ def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict])
 
 
 def merge_group(group_files: list[str]) -> tuple[str, str]:
-    """Use OpenRouter to merge a group of duplicate files into one unified document.
+    """Use opencode to merge a group of duplicate files into one unified document.
 
     Returns (merged_markdown, suggested_filename).
     """
-    contents = {}
+    documents_block = ""
     for path in group_files:
         with open(path) as f:
-            contents[path] = f.read()
+            documents_block += f"=== {path} ===\n{f.read()}\n\n"
 
-    prompt = (
-        "Merge the following duplicate request documents into a single unified Markdown document.\n"
-        "Preserve ALL unique information from each document.\n"
-        "Use the same frontmatter format (YAML between --- delimiters).\n"
-        "In the frontmatter, set 'merged_from' as a list of the original file paths.\n"
-        "Keep the body well-organized — combine content, remove redundancy, note any differences.\n\n"
-    )
-    for path, content in contents.items():
-        prompt += f"=== {path} ===\n{content}\n\n"
+    prompt = load_prompt("merge-duplicates", documents=documents_block)
 
-    merged = openrouter_chat([{"role": "user", "content": prompt}])
+    merged = opencode_run(prompt)
 
     # Strip markdown code fences if present
     text = merged.strip()
