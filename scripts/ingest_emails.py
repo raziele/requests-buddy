@@ -25,7 +25,7 @@ from utils import (
 
 
 REQUESTS_DIR = "requests"
-SPLIT_PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "split-requests.md")
+NORMALIZE_PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "normalize-request.md")
 
 
 def ensure_processed_label() -> str:
@@ -102,27 +102,38 @@ def decode_body(payload: dict) -> str:
     return ""
 
 
-def split_requests(subject: str, body: str) -> list[dict]:
-    """Use opencode to clean the email body and split into individual requests.
+def normalize_requests(subject: str, body: str, attachments: list[str]) -> list[dict]:
+    """Use opencode to clean the email and produce normalized request documents.
 
-    Returns a list of dicts with 'title' and 'content' keys.
-    Falls back to returning the original body as a single request on any error.
+    Returns a list of dicts with all template fields populated.
+    Falls back to a minimal dict with just 'organization' and 'summary' on error.
     """
-    fallback = [{"title": subject, "content": body}]
+    fallback = [{
+        "organization": subject,
+        "summary": body[:2000],
+        "context": body[:4000],
+        "_fallback": True,
+    }]
 
     try:
-        with open(SPLIT_PROMPT_PATH) as f:
+        with open(NORMALIZE_PROMPT_PATH) as f:
             template = f.read()
     except OSError as e:
-        log(f"  Could not load split-requests prompt: {e}")
+        log(f"  Could not load normalize-request prompt: {e}")
         return fallback
 
-    prompt = template.replace("{{subject}}", subject).replace("{{body}}", body)
+    att_str = ", ".join(attachments) if attachments else "(none)"
+    prompt = (
+        template
+        .replace("{{subject}}", subject)
+        .replace("{{body}}", body)
+        .replace("{{attachments}}", att_str)
+    )
 
     try:
         raw = opencode_run(prompt)
     except RuntimeError as e:
-        log(f"  opencode failed, skipping split: {e}")
+        log(f"  opencode failed, skipping normalize: {e}")
         return fallback
 
     raw = raw.strip()
@@ -142,11 +153,11 @@ def split_requests(subject: str, body: str) -> list[dict]:
         return fallback
 
     for req in requests:
-        if not isinstance(req, dict) or "title" not in req or "content" not in req:
+        if not isinstance(req, dict) or "summary" not in req:
             log("  opencode returned malformed request entry, using fallback")
             return fallback
 
-    log(f"  Split email into {len(requests)} request(s)")
+    log(f"  Normalized email into {len(requests)} request(s)")
     return requests
 
 
@@ -198,31 +209,106 @@ def mark_processed(msg_id: str, label_id: str):
     )
 
 
-def build_markdown(headers: dict, body: str, attachments: list[str]) -> str:
-    """Build a structured Markdown document from email data."""
+def build_normalized_markdown(req: dict, headers: dict, seq: int) -> str:
+    """Render a normalized request dict into the standard template."""
+
+    org = req.get("organization") or headers.get("subject", "Unknown")
+    summary = req.get("summary") or ""
+    req_id = f"REQ-{headers.get('date', '')[:10]}-{seq:03d}"
+
     meta = {
-        "id": headers.get("message-id", ""),
-        "from": headers.get("from", ""),
-        "subject": headers.get("subject", ""),
-        "date": headers.get("date", ""),
+        "id": req_id,
+        "source_email_id": headers.get("message-id", ""),
+        "date_received": headers.get("date", "")[:25],
+        "status": "new",
     }
-    if attachments:
-        meta["attachments"] = attachments
 
-    sections = ["## Content", "", body.strip()]
+    def val(key: str, default: str = "—") -> str:
+        v = req.get(key)
+        if v is None or v == "null" or v == "":
+            return default
+        return str(v)
 
-    if attachments:
-        sections += ["", "## Attachments", ""]
-        for fname in attachments:
-            sections.append(f"- [{fname}](attachments/{fname})")
+    lines = [
+        f"# {org} — {val('request_type', 'Request').replace('_', ' ').title()}",
+        "",
+        "## Quick Reference",
+        "",
+        "| Field | Value |",
+        "|---|---|",
+        f"| **Organization** | {org} |",
+        f"| **Contact** | {val('contact_name')} — {val('contact_role')} |",
+        f"| **Contact Email** | {val('contact_email')} |",
+        f"| **Contact Phone** | {val('contact_phone')} |",
+        f"| **Website** | {val('website')} |",
+        f"| **Original Date** | {val('original_date', headers.get('date', '—'))} |",
+        f"| **Forwarded By** | {headers.get('from', '—')} |",
+        "",
+        "## Classification",
+        "",
+        "| Field | Value |",
+        "|---|---|",
+        f"| **Request Type** | {val('request_type')} |",
+        f"| **Urgency** | {val('urgency')} |",
+        f"| **Sector** | {val('sector')} |",
+        f"| **Target Population** | {val('target_population')} |",
+        f"| **Geographic Focus** | {val('geographic_focus')} |",
+        f"| **Language** | {val('language')} |",
+        "",
+        "## The Ask",
+        "",
+        summary,
+        "",
+        f"**Funding Requested:** {val('funding_requested', 'Not specified')}",
+    ]
 
-    return render_frontmatter(meta, "\n".join(sections))
+    breakdown = req.get("funding_breakdown")
+    if isinstance(breakdown, list) and breakdown:
+        lines.append("")
+        lines.append("**Funding Breakdown:**")
+        for item in breakdown:
+            if isinstance(item, dict):
+                lines.append(f"- {item.get('item', '?')}: {item.get('amount', '?')}")
+
+    nfa = req.get("non_financial_ask")
+    if nfa and nfa != "null":
+        lines.append("")
+        lines.append(f"**Non-Financial Ask:** {nfa}")
+
+    lines.extend([
+        "",
+        "## Context & Background",
+        "",
+        val("context", summary),
+        "",
+        "## Attachments",
+        "",
+    ])
+
+    att_list = req.get("attachments")
+    if isinstance(att_list, list) and att_list:
+        lines.append("| Filename | Description |")
+        lines.append("|---|---|")
+        for att in att_list:
+            if isinstance(att, dict):
+                lines.append(f"| {att.get('filename', '?')} | {att.get('description', '—')} |")
+    else:
+        lines.append("(none)")
+
+    lines.extend([
+        "",
+        "## Internal Notes",
+        "",
+        "_To be filled by reviewer._",
+    ])
+
+    return render_frontmatter(meta, "\n".join(lines))
 
 
 def process_message(msg_stub: dict, label_id: str) -> list[tuple[str, list[str], dict[str, str]]]:
-    """Process a single message, splitting into one or more requests.
+    """Process a single message: download attachments, normalize via LLM, write docs.
 
-    Returns a list of (slug, created_files, headers) tuples — one per split request.
+    Returns a list of (slug, created_files, headers) tuples — one per normalized request.
     Returns an empty list on failure.
     """
     msg_id = msg_stub["id"]
@@ -239,53 +325,40 @@ def process_message(msg_stub: dict, label_id: str) -> list[tuple[str, list[str],
     date = headers.get("date", "")
 
     body = decode_body(msg.get("payload", {}))
-    requests = split_requests(subject, body)
 
-    first_slug = None
-    att_dir = None
-    attachments: list[str] = []
+    base_slug = make_slug(date, subject)
+    att_dir = os.path.join(REQUESTS_DIR, base_slug, "attachments")
+    attachment_filenames = extract_attachments(msg, att_dir)
+
+    normalized = normalize_requests(subject, body, attachment_filenames)
+
     results: list[tuple[str, list[str], dict[str, str]]] = []
 
-    for i, req in enumerate(requests):
-        title = req["title"]
-        content = req["content"]
-
-        slug = make_slug(date, title)
+    for i, req in enumerate(normalized):
+        org = req.get("organization") or subject
+        slug = make_slug(date, org)
         md_path = os.path.join(REQUESTS_DIR, f"{slug}.md")
 
         if os.path.exists(md_path):
             slug = f"{slug}-{msg_id[:8]}"
             md_path = os.path.join(REQUESTS_DIR, f"{slug}.md")
 
-        if i == 0:
-            first_slug = slug
-            att_dir = os.path.join(REQUESTS_DIR, slug, "attachments")
-            attachments = extract_attachments(msg, att_dir)
-
-        req_headers = {**headers, "subject": title}
-        if i == 0:
-            req_attachments = attachments
-        elif attachments:
-            req_headers["attachments_ref"] = f"{first_slug}/attachments"
-            req_attachments = []
-        else:
-            req_attachments = []
-
-        if len(requests) > 1:
+        req_headers = {**headers}
+        if len(normalized) > 1:
             req_headers["split_from"] = headers.get("message-id", msg_id)
             req_headers["split_index"] = i + 1
-            req_headers["split_total"] = len(requests)
+            req_headers["split_total"] = len(normalized)
 
-        markdown = build_markdown(req_headers, content, req_attachments)
+        markdown = build_normalized_markdown(req, req_headers, seq=i + 1)
 
-        os.makedirs(os.path.dirname(md_path), exist_ok=True)
+        os.makedirs(os.path.dirname(md_path) if os.path.dirname(md_path) else ".", exist_ok=True)
         with open(md_path, "w") as f:
             f.write(markdown)
         log(f"  Wrote {md_path}")
 
         created_files = [md_path]
         if i == 0:
-            for fname in attachments:
+            for fname in attachment_filenames:
                 created_files.append(os.path.join(att_dir, fname))
 
         results.append((slug, created_files, req_headers))
