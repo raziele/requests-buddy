@@ -4,6 +4,7 @@
 import base64
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -18,11 +19,13 @@ from utils import (
     git_create_branch,
     log,
     make_slug,
+    opencode_run,
     render_frontmatter,
 )
 
 
 REQUESTS_DIR = "requests"
+SPLIT_PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "split-requests.md")
 
 
 def ensure_processed_label() -> str:
@@ -99,6 +102,54 @@ def decode_body(payload: dict) -> str:
     return ""
 
 
+def split_requests(subject: str, body: str) -> list[dict]:
+    """Use opencode to clean the email body and split into individual requests.
+
+    Returns a list of dicts with 'title' and 'content' keys.
+    Falls back to returning the original body as a single request on any error.
+    """
+    fallback = [{"title": subject, "content": body}]
+
+    try:
+        with open(SPLIT_PROMPT_PATH) as f:
+            template = f.read()
+    except OSError as e:
+        log(f"  Could not load split-requests prompt: {e}")
+        return fallback
+
+    prompt = template.replace("{{subject}}", subject).replace("{{body}}", body)
+
+    try:
+        raw = opencode_run(prompt)
+    except RuntimeError as e:
+        log(f"  opencode failed, skipping split: {e}")
+        return fallback
+
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = re.sub(r"^```\w*\n?", "", raw)
+        raw = re.sub(r"\n?```$", "", raw)
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as e:
+        log(f"  Could not parse opencode JSON response: {e}")
+        return fallback
+
+    requests = data.get("requests")
+    if not isinstance(requests, list) or not requests:
+        log("  opencode returned empty or invalid requests list")
+        return fallback
+
+    for req in requests:
+        if not isinstance(req, dict) or "title" not in req or "content" not in req:
+            log("  opencode returned malformed request entry, using fallback")
+            return fallback
+
+    log(f"  Split email into {len(requests)} request(s)")
+    return requests
+
+
 def extract_attachments(msg: dict, dest_dir: str) -> list[str]:
     """Download attachments and return list of filenames."""
     msg_id = msg["id"]
@@ -168,8 +219,12 @@ def build_markdown(headers: dict, body: str, attachments: list[str]) -> str:
     return render_frontmatter(meta, "\n".join(sections))
 
 
-def process_message(msg_stub: dict, label_id: str) -> tuple[str, list[str], dict[str, str]] | None:
-    """Process a single message. Returns (slug, created_files, headers) or None on failure."""
+def process_message(msg_stub: dict, label_id: str) -> list[tuple[str, list[str], dict[str, str]]]:
+    """Process a single message, splitting into one or more requests.
+
+    Returns a list of (slug, created_files, headers) tuples — one per split request.
+    Returns an empty list on failure.
+    """
     msg_id = msg_stub["id"]
     log(f"Processing message {msg_id}...")
 
@@ -177,38 +232,68 @@ def process_message(msg_stub: dict, label_id: str) -> tuple[str, list[str], dict
         msg = get_message(msg_id)
     except RuntimeError as e:
         log(f"  Failed to fetch message: {e}")
-        return None
+        return []
 
     headers = extract_headers(msg)
     subject = headers.get("subject", "no-subject")
     date = headers.get("date", "")
 
-    slug = make_slug(date, subject)
-    md_path = os.path.join(REQUESTS_DIR, f"{slug}.md")
+    body = decode_body(msg.get("payload", {}))
+    requests = split_requests(subject, body)
 
-    if os.path.exists(md_path):
-        slug = f"{slug}-{msg_id[:8]}"
+    first_slug = None
+    att_dir = None
+    attachments: list[str] = []
+    results: list[tuple[str, list[str], dict[str, str]]] = []
+
+    for i, req in enumerate(requests):
+        title = req["title"]
+        content = req["content"]
+
+        slug = make_slug(date, title)
         md_path = os.path.join(REQUESTS_DIR, f"{slug}.md")
 
-    att_dir = os.path.join(REQUESTS_DIR, slug, "attachments")
-    attachments = extract_attachments(msg, att_dir)
+        if os.path.exists(md_path):
+            slug = f"{slug}-{msg_id[:8]}"
+            md_path = os.path.join(REQUESTS_DIR, f"{slug}.md")
 
-    body = decode_body(msg.get("payload", {}))
-    markdown = build_markdown(headers, body, attachments)
+        if i == 0:
+            first_slug = slug
+            att_dir = os.path.join(REQUESTS_DIR, slug, "attachments")
+            attachments = extract_attachments(msg, att_dir)
 
-    os.makedirs(os.path.dirname(md_path), exist_ok=True)
-    with open(md_path, "w") as f:
-        f.write(markdown)
-    log(f"  Wrote {md_path}")
+        req_headers = {**headers, "subject": title}
+        if i == 0:
+            req_attachments = attachments
+        elif attachments:
+            req_headers["attachments_ref"] = f"{first_slug}/attachments"
+            req_attachments = []
+        else:
+            req_attachments = []
 
-    created_files = [md_path]
-    for fname in attachments:
-        created_files.append(os.path.join(att_dir, fname))
+        if len(requests) > 1:
+            req_headers["split_from"] = headers.get("message-id", msg_id)
+            req_headers["split_index"] = i + 1
+            req_headers["split_total"] = len(requests)
+
+        markdown = build_markdown(req_headers, content, req_attachments)
+
+        os.makedirs(os.path.dirname(md_path), exist_ok=True)
+        with open(md_path, "w") as f:
+            f.write(markdown)
+        log(f"  Wrote {md_path}")
+
+        created_files = [md_path]
+        if i == 0:
+            for fname in attachments:
+                created_files.append(os.path.join(att_dir, fname))
+
+        results.append((slug, created_files, req_headers))
 
     mark_processed(msg_id, label_id)
     log(f"  Marked as processed")
 
-    return slug, created_files, headers
+    return results
 
 
 def build_commit_message(headers: dict, slug: str, num_attachments: int) -> str:
@@ -263,18 +348,26 @@ def main():
     ingested: list[tuple[str, dict]] = []
 
     for msg_stub in messages:
-        result = process_message(msg_stub, label_id)
-        if result is None:
+        results = process_message(msg_stub, label_id)
+        if not results:
             continue
 
-        slug, created_files, headers = result
-        att_count = len([f for f in created_files if "attachments/" in f])
+        all_files = []
+        for slug, created_files, headers in results:
+            all_files.extend(created_files)
+            ingested.append((slug, headers))
 
-        commit_msg = build_commit_message(headers, slug, att_count)
-        git_commit_and_push(created_files, commit_msg, branch=branch)
-        log(f"  Committed: {slug}")
+        first_slug = results[0][0]
+        first_headers = results[0][2]
+        att_count = len([f for f in all_files if "attachments/" in f])
 
-        ingested.append((slug, headers))
+        commit_msg = build_commit_message(first_headers, first_slug, att_count)
+        if len(results) > 1:
+            extra_slugs = ", ".join(s for s, _, _ in results[1:])
+            commit_msg += f"\nAlso: {extra_slugs}"
+
+        git_commit_and_push(all_files, commit_msg, branch=branch)
+        log(f"  Committed {len(results)} request(s) from message {msg_stub['id']}")
 
     if not ingested:
         log("No emails were successfully processed.")
