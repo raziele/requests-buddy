@@ -27,8 +27,15 @@ jobs:
           uv run playwright install chromium
 
       - name: Restore NotebookLM credentials
+        env:
+          NOTEBOOKLM_CREDS: ${{ secrets.NOTEBOOKLM_CREDENTIALS }}
         run: |
-          echo '${{ secrets.NOTEBOOKLM_CREDENTIALS }}' | base64 -d | tar -xz -C ~/
+          if [ -z "$NOTEBOOKLM_CREDS" ]; then
+            echo "::error::NOTEBOOKLM_CREDENTIALS secret is empty. Run scripts/setup.sh to configure."
+            exit 1
+          fi
+          mkdir -p ~/.notebooklm
+          echo "$NOTEBOOKLM_CREDS" | base64 -d > ~/.notebooklm/storage_state.json
 
       - name: Configure git
         run: |

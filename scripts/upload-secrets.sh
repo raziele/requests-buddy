@@ -20,8 +20,8 @@ for f in gws-credentials.json openrouter-api-key notebooklm-notebook-id; do
     missing=1
   fi
 done
-if [[ ! -d "$SECRETS_DIR/notebooklm-credentials" ]]; then
-  echo "ERROR: Missing directory $SECRETS_DIR/notebooklm-credentials/"
+if [[ ! -f "$SECRETS_DIR/notebooklm-credentials/storage_state.json" ]]; then
+  echo "ERROR: Missing $SECRETS_DIR/notebooklm-credentials/storage_state.json"
   missing=1
 fi
 if [[ $missing -eq 1 ]]; then
@@ -49,8 +49,8 @@ gh secret set OPENROUTER_API_KEY -R "$REPO" < "$SECRETS_DIR/openrouter-api-key"
 echo "Uploading NOTEBOOKLM_NOTEBOOK_ID..."
 gh secret set NOTEBOOKLM_NOTEBOOK_ID -R "$REPO" < "$SECRETS_DIR/notebooklm-notebook-id"
 
-echo "Uploading NOTEBOOKLM_CREDENTIALS (tar + base64)..."
-tar -cz -C "$SECRETS_DIR" notebooklm-credentials | base64 | \
+echo "Uploading NOTEBOOKLM_CREDENTIALS (storage_state.json only)..."
+base64 < "$SECRETS_DIR/notebooklm-credentials/storage_state.json" | \
   gh secret set NOTEBOOKLM_CREDENTIALS -R "$REPO"
 
 echo ""
