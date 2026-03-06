@@ -1,0 +1,4 @@
+requests
+python-frontmatter
+notebooklm-py
+pyyaml

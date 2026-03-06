@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO="raziele/requests-buddy"
+SECRETS_DIR=".secrets"
+
+cd "$(git rev-parse --show-toplevel)"
+
+echo "=== Upload secrets to GitHub ==="
+echo "Target repo: $REPO"
+echo ""
+
+missing=0
+for f in gws-credentials.json openrouter-api-key notebooklm-notebook-id; do
+  if [[ ! -f "$SECRETS_DIR/$f" ]]; then
+    echo "ERROR: Missing $SECRETS_DIR/$f"
+    missing=1
+  fi
+done
+if [[ ! -d "$SECRETS_DIR/notebooklm-credentials" ]]; then
+  echo "ERROR: Missing directory $SECRETS_DIR/notebooklm-credentials/"
+  missing=1
+fi
+if [[ $missing -eq 1 ]]; then
+  echo ""
+  echo "Run scripts/setup.sh first to generate local credential files."
+  exit 1
+fi
+
+read -rp "Upload secrets to $REPO? [y/N] " confirm
+if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+  echo "Aborted."
+  exit 0
+fi
+
+echo ""
+echo "Uploading GWS_CREDENTIALS..."
+gh secret set GWS_CREDENTIALS -R "$REPO" < "$SECRETS_DIR/gws-credentials.json"
+
+echo "Uploading OPENROUTER_API_KEY..."
+gh secret set OPENROUTER_API_KEY -R "$REPO" < "$SECRETS_DIR/openrouter-api-key"
+
+echo "Uploading NOTEBOOKLM_NOTEBOOK_ID..."
+gh secret set NOTEBOOKLM_NOTEBOOK_ID -R "$REPO" < "$SECRETS_DIR/notebooklm-notebook-id"
+
+echo "Uploading NOTEBOOKLM_CREDENTIALS (tar + base64)..."
+tar -cz -C "$SECRETS_DIR" notebooklm-credentials | base64 | \
+  gh secret set NOTEBOOKLM_CREDENTIALS -R "$REPO"
+
+echo ""
+echo "All secrets uploaded to $REPO."

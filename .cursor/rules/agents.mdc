@@ -1,0 +1,100 @@
+---
+description: Codebase architecture, conventions, and guidance for requests-buddy
+alwaysApply: true
+---
+
+# Requests Buddy
+
+Automated pipeline that ingests Gmail emails into structured Markdown, deduplicates them with an LLM, and syncs them to NotebookLM. Orchestrated entirely via GitHub Actions.
+
+## Architecture
+
+Three independent processes, each with a dedicated script and workflow:
+
+| Process | Script | Workflow | Trigger |
+|---------|--------|----------|---------|
+| **Ingest** | `scripts/ingest_emails.py` | `ingest-emails.yml` | Hourly cron |
+| **Dedup** | `scripts/deduplicate.py` | `deduplicate.yml` | Daily 06:00 UTC |
+| **Sync** | `scripts/sync_notebooklm.py` | `sync-notebooklm.yml` | Push to `requests/**` on main |
+
+All three share `scripts/utils.py` for frontmatter parsing, git ops, OpenRouter calls, `gws` CLI wrapper, and logging.
+
+## Key Directories
+
+- `requests/` — Ingested Markdown files (one per email). Attachments go under `requests/{slug}/attachments/`.
+- `logs/` — Runtime state: `last-dedup-marker` (SHA), `notebooklm-sources.json` (manifest), `notebooklm-sync.log`.
+- `scripts/` — All Python scripts and shell helpers.
+- `.secrets/` — Local-only credentials (gitignored). Created by `scripts/setup.sh`.
+- `plans/` — Architecture spec with Mermaid diagram.
+
+## Markdown File Format
+
+Every request file uses YAML frontmatter between `---` delimiters:
+
+```markdown
+---
+id: <Message-ID>
+from: sender@example.com
+subject: Request title
+date: RFC 2822 date
+attachments:          # optional
+  - filename.pdf
+merged_from:          # only on dedup-merged files
+  - requests/old-a.md
+  - requests/old-b.md
+---
+
+## Content
+(email body)
+
+## Attachments
+- [filename.pdf](attachments/filename.pdf)
+```
+
+Frontmatter is handled by `utils.parse_frontmatter` / `utils.render_frontmatter` using PyYAML (not `python-frontmatter`).
+
+## Conventions
+
+- **Python files**: `snake_case.py`, functions `snake_case`, constants `UPPER_SNAKE_CASE`.
+- **Shell scripts**: `kebab-case.sh`.
+- **Commit prefixes**: `ingest:`, `dedup:`, `sync:` — always use the matching prefix.
+- **Git identity**: `requests-buddy[bot]` in CI.
+- **Dedup branches**: `dedup/YYYY-MM-DD-{hash}` — always create a PR, never merge directly.
+- **Imports**: Scripts use `sys.path.insert(0, os.path.dirname(__file__))` to import `utils` — no package structure.
+
+## External CLIs
+
+| CLI | Install | Purpose |
+|-----|---------|---------|
+| `gws` | `npm i -g @googleworkspace/cli` | Gmail API (list, get, modify messages) |
+| `notebooklm` | `pip install notebooklm-py[browser]` | NotebookLM source management |
+| `gh` | Preinstalled in CI | PRs and GitHub secret management |
+
+All CLI wrappers raise `RuntimeError` on non-zero exit. The `gws` wrapper auto-parses JSON output.
+
+## Environment & Secrets
+
+| Env Var / Secret | Used By |
+|------------------|---------|
+| `GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE` | Ingest |
+| `GWS_CREDENTIALS` (GitHub secret) | Ingest workflow |
+| `OPENROUTER_API_KEY` | Dedup (OpenRouter chat completions) |
+| `NOTEBOOKLM_NOTEBOOK_ID` | Sync |
+| `NOTEBOOKLM_CREDENTIALS` (GitHub secret, tar+base64) | Sync workflow |
+
+## LLM Usage
+
+`utils.openrouter_chat()` calls OpenRouter with `openai/gpt-4o-mini` at `temperature=0.2`. Used in dedup for duplicate detection (returns JSON array of groups) and merging (returns unified Markdown). Both prompts expect and strip markdown code fences from responses.
+
+## Error Handling
+
+- Scripts continue on per-item errors (log and skip), but raise `RuntimeError` for infrastructure failures (missing env vars, CLI crashes).
+- `log()` writes timestamped messages to stderr.
+- `append_sync_log()` writes to `logs/notebooklm-sync.log` for audit trail.
+
+## Gotchas
+
+- `python-frontmatter` is in `requirements.txt` but unused — frontmatter is handled manually via PyYAML in `utils.py`.
+- The ingest workflow writes `GWS_CREDENTIALS` to `/tmp/gws/credentials.json` using shell echo — make sure the secret value is valid JSON.
+- Dedup tracks "what's new" via `logs/last-dedup-marker` (a commit SHA) — if this file is lost or stale, all files are treated as new.
+- NotebookLM sync uses a `__sync_metadata__` key in the manifest for its own metadata source — don't treat it as a real file entry.

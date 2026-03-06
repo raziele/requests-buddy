@@ -1,0 +1,47 @@
+name: Ingest Emails
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          npm install -g @googleworkspace/cli
+          pip install -r requirements.txt
+
+      - name: Restore GWS credentials
+        run: |
+          mkdir -p /tmp/gws
+          echo '${{ secrets.GWS_CREDENTIALS }}' > /tmp/gws/credentials.json
+        env:
+          GWS_CREDENTIALS: ${{ secrets.GWS_CREDENTIALS }}
+
+      - name: Configure git
+        run: |
+          git config user.name "requests-buddy[bot]"
+          git config user.email "requests-buddy[bot]@users.noreply.github.com"
+
+      - name: Run ingestion
+        env:
+          GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE: /tmp/gws/credentials.json
+        run: python scripts/ingest_emails.py

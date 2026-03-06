@@ -1,0 +1,42 @@
+name: Sync NotebookLM
+
+on:
+  push:
+    branches: [main]
+    paths: ['requests/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install "notebooklm-py[browser]"
+          playwright install chromium
+
+      - name: Restore NotebookLM credentials
+        run: |
+          echo '${{ secrets.NOTEBOOKLM_CREDENTIALS }}' | base64 -d | tar -xz -C ~/
+
+      - name: Configure git
+        run: |
+          git config user.name "requests-buddy[bot]"
+          git config user.email "requests-buddy[bot]@users.noreply.github.com"
+
+      - name: Run sync
+        env:
+          NOTEBOOKLM_NOTEBOOK_ID: ${{ secrets.NOTEBOOKLM_NOTEBOOK_ID }}
+        run: python scripts/sync_notebooklm.py
