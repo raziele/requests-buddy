@@ -32,30 +32,53 @@ from utils import (
 RAW_DIR = "raw_emails"
 
 
-def ensure_processed_label() -> str:
-    """Return the label ID for 'processed', creating it if necessary."""
+def _today_label_name() -> str:
+    return datetime.now(timezone.utc).strftime("%y_%m_%d_processed")
+
+
+def _list_all_labels() -> list[dict]:
     result = gws("gmail", "users", "labels", "list", "--params", '{"userId": "me"}')
-    labels = result.get("labels", [])
+    return result.get("labels", [])
+
+
+def ensure_processed_label() -> str:
+    """Return the label ID for today's YY_MM_DD_processed label, creating it if needed."""
+    label_name = _today_label_name()
+    labels = _list_all_labels()
     for label in labels:
-        if label.get("name") == "processed":
+        if label.get("name") == label_name:
             return label["id"]
 
-    log("Creating 'processed' label...")
+    log(f"Creating '{label_name}' label...")
     created = gws(
         "gmail", "users", "labels", "create",
         "--params", '{"userId": "me"}',
-        "--json", '{"name": "processed", "labelListVisibility": "labelShow", "messageListVisibility": "show"}',
+        "--json", json.dumps({
+            "name": label_name,
+            "labelListVisibility": "labelShow",
+            "messageListVisibility": "show",
+        }),
     )
     return created["id"]
 
 
 def list_unread_emails() -> list[dict]:
-    """Return list of unread, unprocessed message stubs."""
+    """Return list of unread messages not yet labeled with any *_processed label."""
+    labels = _list_all_labels()
+    processed_names = [
+        l["name"] for l in labels
+        if l.get("name", "") == "processed"
+        or l.get("name", "").endswith("_processed")
+    ]
+    exclude = " ".join(f"-label:{name}" for name in processed_names)
+    q = f"is:unread {exclude}".strip()
+    log(f"  Gmail query: {q}")
+
     result = gws(
         "gmail", "users", "messages", "list",
         "--params", json.dumps({
             "userId": "me",
-            "q": "is:unread -label:processed",
+            "q": q,
         }),
     )
     return result.get("messages", [])
@@ -142,7 +165,7 @@ def extract_attachments(msg: dict, dest_dir: str) -> list[str]:
 
 
 def mark_processed(msg_id: str, label_id: str):
-    """Remove UNREAD label and add 'processed' label."""
+    """Remove UNREAD label and add today's dated processed label."""
     gws(
         "gmail", "users", "messages", "modify",
         "--params", json.dumps({"userId": "me", "id": msg_id}),
@@ -233,19 +256,21 @@ def build_commit_message(headers: dict, slug: str, num_attachments: int) -> str:
     )
 
 
-def build_pr_body(ingested: list[tuple[str, dict]]) -> str:
+def build_pr_body(ingested: list[tuple[str, dict]], normalized_count: int = 0) -> str:
     lines = [f"Ingested **{len(ingested)}** email(s) into `raw_emails/`.\n"]
     for slug, headers in ingested:
         subject = headers.get("subject", "no-subject")
         sender = headers.get("from", "unknown")
         lines.append(f"- **{subject}** — from {sender} → `raw_emails/{slug}/`")
+    if normalized_count:
+        lines.append(f"\nNormalized into **{normalized_count}** request document(s) in `requests/`.")
     return "\n".join(lines)
 
 
 def main():
     os.makedirs(RAW_DIR, exist_ok=True)
 
-    log("Ensuring 'processed' label exists...")
+    log("Ensuring processed label exists...")
     label_id = ensure_processed_label()
 
     log("Fetching unread emails...")
@@ -281,8 +306,24 @@ def main():
         log("No emails were successfully processed.")
         return
 
+    from normalize_requests import process_folder as normalize_folder
+
+    normalized_files: list[str] = []
+    for slug, _headers in ingested:
+        folder = os.path.join(RAW_DIR, slug)
+        created = normalize_folder(folder)
+        normalized_files.extend(created)
+
+    if normalized_files:
+        git_commit_and_push(
+            normalized_files,
+            f"normalize: {len(normalized_files)} request document(s)",
+            branch=branch,
+        )
+        log(f"Committed {len(normalized_files)} normalized file(s)")
+
     pr_title = f"ingest: {len(ingested)} new email(s) — {ts}"
-    pr_body = build_pr_body(ingested)
+    pr_body = build_pr_body(ingested, len(normalized_files))
     pr_url = gh_pr_create(pr_title, pr_body)
     log(f"Created PR: {pr_url}")
 
