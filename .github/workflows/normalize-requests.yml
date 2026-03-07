@@ -1,6 +1,11 @@
 name: Normalize Requests
 
 on:
+  push:
+    branches:
+      - 'ingest/**'
+    paths:
+      - 'raw_emails/**'
   workflow_dispatch:
     inputs:
       branch:
@@ -22,8 +27,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch }}
+          ref: ${{ inputs.branch || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive run parameters
+        id: params
+        run: |
+          if [ -n "${{ inputs.run_folder }}" ]; then
+            echo "run_folder=${{ inputs.run_folder }}" >> "$GITHUB_OUTPUT"
+            echo "branch=${{ inputs.branch }}" >> "$GITHUB_OUTPUT"
+          else
+            BRANCH="${{ github.ref_name }}"
+            RUN_FOLDER="${BRANCH#ingest/}"
+            echo "run_folder=${RUN_FOLDER}" >> "$GITHUB_OUTPUT"
+            echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/setup-node@v4
         with:
@@ -50,5 +68,5 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           uv run python scripts/normalize_requests.py
-          --run-folder "${{ inputs.run_folder }}"
-          --branch "${{ inputs.branch }}"
+          --run-folder "${{ steps.params.outputs.run_folder }}"
+          --branch "${{ steps.params.outputs.branch }}"

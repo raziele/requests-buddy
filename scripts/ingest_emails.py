@@ -11,7 +11,6 @@ Each ingestion run creates a timestamped folder:
 import base64
 import json
 import os
-import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -20,8 +19,9 @@ from datetime import datetime, timezone
 
 from utils import (
     gws,
-    git_commit_and_push,
+    git_commit,
     git_create_branch,
+    git_push,
     log,
     make_slug,
     render_frontmatter,
@@ -255,15 +255,6 @@ def build_commit_message(headers: dict, run_ts: str, slug: str, num_attachments:
     )
 
 
-def trigger_normalize(branch: str, run_folder: str):
-    """Trigger the normalize-requests workflow via GitHub CLI."""
-    log(f"Triggering normalize workflow for branch={branch} run_folder={run_folder}")
-    subprocess.run(
-        ["gh", "workflow", "run", "normalize-requests.yml",
-         "-f", f"branch={branch}", "-f", f"run_folder={run_folder}"],
-        check=True,
-    )
-
 
 def main():
     log("Ensuring processed label exists...")
@@ -297,7 +288,7 @@ def main():
         att_count = len(created_files) - 1
 
         commit_msg = build_commit_message(headers, ts, slug, att_count)
-        git_commit_and_push(created_files, commit_msg, branch=branch)
+        git_commit(created_files, commit_msg)
         ingested.append((slug, headers))
         log(f"  Committed raw_emails/{ts}/{slug}/")
 
@@ -305,8 +296,8 @@ def main():
         log("No emails were successfully processed.")
         return
 
-    trigger_normalize(branch, ts)
-    log("Ingestion complete.")
+    git_push(branch)
+    log("Ingestion complete — normalize will run automatically on push.")
 
 
 if __name__ == "__main__":
