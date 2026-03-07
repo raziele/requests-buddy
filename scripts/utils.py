@@ -54,43 +54,124 @@ def make_slug(date_str: str, subject: str, max_len: int = 80) -> str:
 
 
 # ---------------------------------------------------------------------------
-# OpenCode CLI
+# OpenRouter API
 # ---------------------------------------------------------------------------
 
-def opencode_run(message: str, model: str | None = None) -> str:
-    """Run a short instruction through the opencode CLI and return the response.
+OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+DEFAULT_MODEL = os.environ.get("OPENROUTER_MODEL", "google/gemma-3-27b-it")
 
-    The *message* should be a short instruction using @file references to
-    point opencode at the relevant files, e.g.:
 
-        "Read @prompts/normalize-request.md and apply on @requests/email.md"
+def openrouter_chat(
+    system_prompt: str,
+    user_content: str | list,
+    *,
+    model: str | None = None,
+    temperature: float = 0.1,
+) -> str:
+    """Call the OpenRouter chat API directly and return the assistant message.
 
-    The message is written to a temp file inside the project directory
-    (avoiding external-directory permission prompts) and passed as a
-    positional arg — opencode reads file-path positionals as messages.
+    *system_prompt* is the system-level instruction.
+    *user_content* is either a plain string or a list of content parts
+    (text, file objects) per the OpenRouter multimodal spec.
     """
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    tmp_path = os.path.join(project_root, ".opencode-prompt.tmp.md")
+    import requests as _requests
 
-    try:
-        with open(tmp_path, "w") as f:
-            f.write(message)
+    api_key = os.environ.get("OPENROUTER_API_KEY", "")
+    if not api_key:
+        raise RuntimeError("OPENROUTER_API_KEY not set")
 
-        cmd = ["opencode", "run", tmp_path]
-        if model:
-            cmd.extend(["--model", model])
+    if isinstance(user_content, str):
+        user_content = [{"type": "text", "text": user_content}]
 
-        result = subprocess.run(
-            cmd, capture_output=True, text=True, check=False, timeout=300,
+    has_files = any(
+        isinstance(p, dict) and p.get("type") == "file" for p in user_content
+    )
+
+    payload: dict = {
+        "model": model or DEFAULT_MODEL,
+        "temperature": temperature,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_content},
+        ],
+    }
+    if has_files:
+        payload["plugins"] = [
+            {"id": "file-parser", "pdf": {"engine": "pdf-text"}}
+        ]
+
+    resp = _requests.post(
+        OPENROUTER_API_URL,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=300,
+    )
+    resp.raise_for_status()
+
+    data = resp.json()
+    choices = data.get("choices")
+    if not choices:
+        raise RuntimeError(f"OpenRouter returned no choices: {data}")
+
+    content = choices[0]["message"].get("content")
+    if content is None:
+        raise RuntimeError("OpenRouter returned null content")
+    return content.strip()
+
+
+# ---------------------------------------------------------------------------
+# OpenCode CLI (Gemini)
+# ---------------------------------------------------------------------------
+
+GEMINI_MODEL = os.environ.get("OPENCODE_GEMINI_MODEL", "google/gemini-2.5-flash-lite")
+
+
+def opencode_run(
+    message: str,
+    *,
+    files: list[str],
+    agent: str = "normalize",
+    model: str | None = None,
+    cwd: str | None = None,
+    env: dict | None = None,
+) -> str:
+    """Run opencode CLI with the given message and file attachments.
+
+    Requires GEMINI_API_KEY in env (or in *env*) so opencode can use Google/Gemini.
+    """
+    cmd = ["opencode", "run", "--agent", agent]
+    if model:
+        cmd.extend(["--model", model])
+    for fp in files:
+        cmd.extend(["--file", fp])
+    cmd.append("--")
+    cmd.append(message)
+
+    run_env = os.environ.copy()
+    if env:
+        run_env.update(env)
+
+    result = subprocess.run(
+        cmd,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=300,
+        stdin=subprocess.DEVNULL,
+        cwd=cwd,
+        env=run_env,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"opencode run failed (exit {result.returncode}):\n{result.stderr}"
         )
-        if result.returncode != 0:
-            raise RuntimeError(
-                f"opencode run failed (exit {result.returncode}):\n{result.stderr}"
-            )
-        return result.stdout.strip()
-    finally:
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+    out = (result.stdout or "").strip()
+    if not out:
+        raise RuntimeError("opencode run produced no output")
+    return out
 
 
 # ---------------------------------------------------------------------------

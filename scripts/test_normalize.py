@@ -44,7 +44,7 @@ def test_folder(folder: str, out=None):
     p(f"{'='*60}")
     p(f"\n--- Running opencode normalize ---\n")
 
-    results = normalize_email(email_path)
+    results = normalize_email(folder)
 
     p(f"\nGot {len(results)} request(s):\n")
     for i, req in enumerate(results):
