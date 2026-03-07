@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Process 3: Sync requests/ folder with NotebookLM notebook sources."""
+"""Process 3: Sync requests/ folder with NotebookLM notebook sources.
+
+Recursively discovers .md files and attachment files (PDFs, images) under
+requests/ and uploads them as NotebookLM sources.
+"""
 
 import json
 import os
 import subprocess
 import sys
 from datetime import datetime, timezone
-from glob import glob
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -16,6 +19,7 @@ from utils import git_commit_and_push, log
 REQUESTS_DIR = "requests"
 MANIFEST_FILE = "logs/notebooklm-sources.json"
 SYNC_LOG_FILE = "logs/notebooklm-sync.log"
+SYNCABLE_EXTENSIONS = {".md", ".pdf", ".png", ".jpg", ".jpeg", ".gif", ".webp"}
 
 
 def get_notebook_id() -> str:
@@ -114,11 +118,21 @@ def update_metadata_source(notebook_id: str, manifest: dict[str, str]):
         log(f"Failed to update metadata source: {e}")
 
 
+def discover_syncable_files() -> set[str]:
+    """Recursively walk requests/ and return paths with syncable extensions."""
+    files: set[str] = set()
+    for dirpath, _, filenames in os.walk(REQUESTS_DIR):
+        for fname in filenames:
+            if os.path.splitext(fname)[1].lower() in SYNCABLE_EXTENSIONS:
+                files.add(os.path.join(dirpath, fname))
+    return files
+
+
 def main():
     notebook_id = get_notebook_id()
     manifest = load_manifest()
 
-    repo_files = set(glob(os.path.join(REQUESTS_DIR, "*.md")))
+    repo_files = discover_syncable_files()
     manifest_files = {k for k in manifest if k != "__sync_metadata__"}
 
     new_files = repo_files - manifest_files

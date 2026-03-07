@@ -46,7 +46,7 @@ uv sync
 echo ""
 
 # --- Step 1: Gmail auth ---
-echo "--- Step 1/6: Gmail Authentication ---"
+echo "--- Step 1/8: Gmail Authentication ---"
 if [[ -f "$SECRETS_DIR/gws-credentials.json" ]]; then
   echo "Found existing $SECRETS_DIR/gws-credentials.json — skipping."
 else
@@ -67,7 +67,7 @@ fi
 echo ""
 
 # --- Step 2: NotebookLM auth ---
-echo "--- Step 2/6: NotebookLM Authentication ---"
+echo "--- Step 2/8: NotebookLM Authentication ---"
 if [[ -d "$SECRETS_DIR/notebooklm-credentials" ]]; then
   echo "Found existing $SECRETS_DIR/notebooklm-credentials/ — skipping."
 else
@@ -84,7 +84,7 @@ fi
 echo ""
 
 # --- Step 3: OpenRouter API key (for opencode) ---
-echo "--- Step 3/6: OpenRouter API Key (opencode) ---"
+echo "--- Step 3/8: OpenRouter API Key (opencode) ---"
 if [[ -f "$SECRETS_DIR/openrouter-api-key" ]]; then
   echo "Found existing $SECRETS_DIR/openrouter-api-key — skipping."
 else
@@ -95,8 +95,20 @@ else
 fi
 echo ""
 
-# --- Step 4: NotebookLM notebook ID ---
-echo "--- Step 4/6: NotebookLM Notebook ID ---"
+# --- Step 4: Gemini API key (for opencode normalize agent) ---
+echo "--- Step 4/8: Gemini API Key ---"
+if [[ -f "$SECRETS_DIR/gemini-api-key" ]]; then
+  echo "Found existing $SECRETS_DIR/gemini-api-key — skipping."
+else
+  echo "Get your key at https://aistudio.google.com/apikey"
+  read -rp "Paste your Gemini API key: " gemini_key
+  echo -n "$gemini_key" > "$SECRETS_DIR/gemini-api-key"
+  echo "Saved to $SECRETS_DIR/gemini-api-key"
+fi
+echo ""
+
+# --- Step 5: NotebookLM notebook ID ---
+echo "--- Step 5/8: NotebookLM Notebook ID ---"
 if [[ -f "$SECRETS_DIR/notebooklm-notebook-id" ]]; then
   echo "Found existing $SECRETS_DIR/notebooklm-notebook-id — skipping."
 else
@@ -107,13 +119,34 @@ else
 fi
 echo ""
 
-# --- Step 5: Upload secrets to GitHub ---
-echo "--- Step 5/6: Upload Secrets to GitHub ---"
+# --- Step 6 (optional): Langfuse observability ---
+echo "--- Step 6/8: Langfuse Observability (optional) ---"
+if [[ -f "$SECRETS_DIR/langfuse-public-key" && -f "$SECRETS_DIR/langfuse-secret-key" ]]; then
+  echo "Found existing Langfuse keys — skipping."
+else
+  echo "Langfuse provides LLM observability for OpenCode sessions."
+  echo "Sign up at https://cloud.langfuse.com and go to Settings → API Keys."
+  read -rp "Set up Langfuse? [y/N] " langfuse_confirm
+  if [[ "$langfuse_confirm" == "y" || "$langfuse_confirm" == "Y" ]]; then
+    read -rp "Paste your Langfuse public key (pk-lf-...): " lf_public
+    echo -n "$lf_public" > "$SECRETS_DIR/langfuse-public-key"
+    echo "Saved to $SECRETS_DIR/langfuse-public-key"
+    read -rp "Paste your Langfuse secret key (sk-lf-...): " lf_secret
+    echo -n "$lf_secret" > "$SECRETS_DIR/langfuse-secret-key"
+    echo "Saved to $SECRETS_DIR/langfuse-secret-key"
+  else
+    echo "Skipped — you can set this up later by adding keys to .secrets/"
+  fi
+fi
+echo ""
+
+# --- Step 7: Upload secrets to GitHub ---
+echo "--- Step 7/8: Upload Secrets to GitHub ---"
 bash scripts/upload-secrets.sh
 echo ""
 
-# --- Step 6: Create Gmail "processed" label ---
-echo "--- Step 6/6: Create Gmail 'processed' Label ---"
+# --- Step 8: Create Gmail "processed" label ---
+echo "--- Step 8/8: Create Gmail 'processed' Label ---"
 echo "Creating label (will fail harmlessly if it already exists)..."
 gws gmail users labels create \
   --params '{"userId": "me"}' \

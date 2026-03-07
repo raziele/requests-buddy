@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Process 1: Fetch unread Gmail messages and convert to structured Markdown."""
+"""Step 1: Fetch unread Gmail messages and save raw emails to raw_emails/.
+
+Each email gets its own folder:
+    raw_emails/<slug>/
+        email.md          # frontmatter + raw body
+        attachment1.pdf    # any attachments
+        attachment2.png
+"""
 
 import base64
 import json
@@ -22,7 +29,7 @@ from utils import (
 )
 
 
-REQUESTS_DIR = "requests"
+RAW_DIR = "raw_emails"
 
 
 def ensure_processed_label() -> str:
@@ -87,7 +94,6 @@ def decode_body(payload: dict) -> str:
         if part.get("mimeType") == "text/plain" and "data" in part.get("body", {}):
             return base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8", errors="replace")
 
-    # Fallback: try html or nested parts
     for part in payload.get("parts", []):
         result = decode_body(part)
         if result:
@@ -100,7 +106,7 @@ def decode_body(payload: dict) -> str:
 
 
 def extract_attachments(msg: dict, dest_dir: str) -> list[str]:
-    """Download attachments and return list of filenames."""
+    """Download attachments into dest_dir and return list of filenames."""
     msg_id = msg["id"]
     filenames = []
 
@@ -147,8 +153,8 @@ def mark_processed(msg_id: str, label_id: str):
     )
 
 
-def build_markdown(headers: dict, body: str, attachments: list[str]) -> str:
-    """Build a structured Markdown document from email data."""
+def build_raw_markdown(headers: dict, body: str, attachments: list[str]) -> str:
+    """Build a raw Markdown document from email data."""
     meta = {
         "id": headers.get("message-id", ""),
         "from": headers.get("from", ""),
@@ -163,13 +169,16 @@ def build_markdown(headers: dict, body: str, attachments: list[str]) -> str:
     if attachments:
         sections += ["", "## Attachments", ""]
         for fname in attachments:
-            sections.append(f"- [{fname}](attachments/{fname})")
+            sections.append(f"- [{fname}]({fname})")
 
     return render_frontmatter(meta, "\n".join(sections))
 
 
 def process_message(msg_stub: dict, label_id: str) -> tuple[str, list[str], dict[str, str]] | None:
-    """Process a single message. Returns (slug, created_files, headers) or None on failure."""
+    """Fetch a single message and save it to raw_emails/<slug>/.
+
+    Returns (slug, created_files, headers) or None on failure.
+    """
     msg_id = msg_stub["id"]
     log(f"Processing message {msg_id}...")
 
@@ -182,37 +191,31 @@ def process_message(msg_stub: dict, label_id: str) -> tuple[str, list[str], dict
     headers = extract_headers(msg)
     subject = headers.get("subject", "no-subject")
     date = headers.get("date", "")
+    body = decode_body(msg.get("payload", {}))
 
     slug = make_slug(date, subject)
-    md_path = os.path.join(REQUESTS_DIR, f"{slug}.md")
+    folder = os.path.join(RAW_DIR, slug)
+    os.makedirs(folder, exist_ok=True)
 
-    if os.path.exists(md_path):
-        slug = f"{slug}-{msg_id[:8]}"
-        md_path = os.path.join(REQUESTS_DIR, f"{slug}.md")
+    attachment_filenames = extract_attachments(msg, folder)
 
-    att_dir = os.path.join(REQUESTS_DIR, slug, "attachments")
-    attachments = extract_attachments(msg, att_dir)
-
-    body = decode_body(msg.get("payload", {}))
-    markdown = build_markdown(headers, body, attachments)
-
-    os.makedirs(os.path.dirname(md_path), exist_ok=True)
-    with open(md_path, "w") as f:
-        f.write(markdown)
-    log(f"  Wrote {md_path}")
-
-    created_files = [md_path]
-    for fname in attachments:
-        created_files.append(os.path.join(att_dir, fname))
+    email_path = os.path.join(folder, "email.md")
+    raw_md = build_raw_markdown(headers, body, attachment_filenames)
+    with open(email_path, "w") as f:
+        f.write(raw_md)
+    log(f"  Wrote {email_path}")
 
     mark_processed(msg_id, label_id)
     log(f"  Marked as processed")
+
+    created_files = [email_path]
+    for fname in attachment_filenames:
+        created_files.append(os.path.join(folder, fname))
 
     return slug, created_files, headers
 
 
 def build_commit_message(headers: dict, slug: str, num_attachments: int) -> str:
-    """Build a structured commit message for the ingestion log."""
     subject = headers.get("subject", "no-subject")
     sender = headers.get("from", "unknown")
     date = headers.get("date", "unknown")
@@ -226,22 +229,21 @@ def build_commit_message(headers: dict, slug: str, num_attachments: int) -> str:
         f"From: {sender}\n"
         f"Date: {date}\n"
         f"Message-ID: {msg_id}\n"
-        f"File: requests/{slug}.md"
+        f"File: raw_emails/{slug}/"
     )
 
 
 def build_pr_body(ingested: list[tuple[str, dict]]) -> str:
-    """Build a PR body summarizing all ingested emails."""
-    lines = [f"Ingested **{len(ingested)}** email(s).\n"]
+    lines = [f"Ingested **{len(ingested)}** email(s) into `raw_emails/`.\n"]
     for slug, headers in ingested:
         subject = headers.get("subject", "no-subject")
         sender = headers.get("from", "unknown")
-        lines.append(f"- **{subject}** — from {sender} → `requests/{slug}.md`")
+        lines.append(f"- **{subject}** — from {sender} → `raw_emails/{slug}/`")
     return "\n".join(lines)
 
 
 def main():
-    os.makedirs(REQUESTS_DIR, exist_ok=True)
+    os.makedirs(RAW_DIR, exist_ok=True)
 
     log("Ensuring 'processed' label exists...")
     label_id = ensure_processed_label()
@@ -264,23 +266,22 @@ def main():
 
     for msg_stub in messages:
         result = process_message(msg_stub, label_id)
-        if result is None:
+        if not result:
             continue
 
         slug, created_files, headers = result
-        att_count = len([f for f in created_files if "attachments/" in f])
+        att_count = len(created_files) - 1
 
         commit_msg = build_commit_message(headers, slug, att_count)
         git_commit_and_push(created_files, commit_msg, branch=branch)
-        log(f"  Committed: {slug}")
-
         ingested.append((slug, headers))
+        log(f"  Committed raw_emails/{slug}/")
 
     if not ingested:
         log("No emails were successfully processed.")
         return
 
-    pr_title = f"ingest: {len(ingested)} new request(s) — {ts}"
+    pr_title = f"ingest: {len(ingested)} new email(s) — {ts}"
     pr_body = build_pr_body(ingested)
     pr_url = gh_pr_create(pr_title, pr_body)
     log(f"Created PR: {pr_url}")

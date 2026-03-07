@@ -1,9 +1,40 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  "model": "arcee-ai/trinity-mini:free",
   "provider": {
     "openrouter": {
       "models": {
-        "qwen/qwen3-next-80b-a3b-instruct:free": {}
+        "arcee-ai/trinity-mini:free": {}
+      },
+      "options": {
+        "apiKey": "{file:.secrets/openrouter-api-key}",
+        "baseURL": "https://openrouter.ai/api/v1"
+      }
+    },
+    "google": {
+      "models": {
+        "gemini-2.5-flash-lite": {}
+      },
+      "options": {
+        "apiKey": "{file:.secrets/gemini-api-key}"
+      }
+    }
+  },
+  "experimental": {
+    "openTelemetry": true
+  },
+  "plugin": ["opencode-plugin-langfuse"],
+  "agent": {
+    "normalize": {
+      "description": "Normalizes raw email requests into structured JSON. Reads email.md and attachments (PDFs, etc.) from a folder and extracts organization details, classification, funding info, and context.",
+      "mode": "primary",
+      "model": "google/gemini-2.5-flash-lite",
+      "prompt": "{file:./prompts/opencode-normalize.md}",
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
       }
     }
   }
