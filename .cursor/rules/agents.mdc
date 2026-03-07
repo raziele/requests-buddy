@@ -79,13 +79,13 @@ All CLI wrappers raise `RuntimeError` on non-zero exit. The `gws` wrapper auto-p
 |------------------|---------|
 | `GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE` | Ingest |
 | `GWS_CREDENTIALS` (GitHub secret) | Ingest workflow |
-| `OPENROUTER_API_KEY` | Dedup (opencode CLI via OpenRouter provider) |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Normalize, dedup (opencode + Gemini) |
 | `NOTEBOOKLM_NOTEBOOK_ID` | Sync |
 | `NOTEBOOKLM_CREDENTIALS` (GitHub secret, tar+base64) | Sync workflow |
 
 ## LLM Usage
 
-`utils.opencode_run()` calls the `opencode` CLI in non-interactive mode (`opencode run`). Prompts are written to a temp file and attached via `--file` to avoid command-line length limits. Used in dedup for duplicate detection (returns JSON array of groups) and merging (returns unified Markdown). Both prompts expect and strip markdown code fences from responses. The model/provider is configured via opencode's OpenRouter provider — `OPENROUTER_API_KEY` env var or `~/.local/share/opencode/auth.json`.
+`utils.opencode_run()` calls the `opencode` CLI in non-interactive mode (`opencode run`). Prompts are written to a temp file and attached via `--file` to avoid command-line length limits. Used in dedup for duplicate detection (returns JSON array of groups) and merging (returns unified Markdown). Both prompts expect and strip markdown code fences from responses. The model/provider is configured via opencode (e.g. Gemini in `opencode.json`); set `GOOGLE_GENERATIVE_AI_API_KEY` for normalize and dedup.
 
 ## Error Handling
 
