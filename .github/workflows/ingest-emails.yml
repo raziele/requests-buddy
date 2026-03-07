@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install -g @googleworkspace/cli opencode
+          npm install -g @googleworkspace/cli opencode-ai
           uv sync
 
       - name: Restore GWS credentials
