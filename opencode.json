@@ -4,21 +4,9 @@
   "model": "google/gemini-2.5-flash-lite",
   "default_agent": "normalize",
   "provider": {
-    "openrouter": {
-      "models": {
-        "arcee-ai/trinity-mini:free": {}
-      },
-      "options": {
-        "apiKey": "{env:OPENROUTER_API_KEY}",
-        "baseURL": "https://openrouter.ai/api/v1"
-      }
-    },
     "google": {
       "models": {
         "gemini-2.5-flash-lite": {}
-      },
-      "options": {
-        "apiKey": "{env:GEMINI_API_KEY}"
       }
     }
   },
@@ -33,8 +21,8 @@
       "model": "google/gemini-2.5-flash-lite",
       "prompt": "{file:./prompts/opencode-normalize.md}",
       "tools": {
-        "write": false,
-        "edit": false,
+        "write": true,
+        "edit": true,
         "bash": false
       }
     }

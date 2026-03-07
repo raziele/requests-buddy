@@ -59,7 +59,10 @@ Use `uv run` so scripts use the project environment:
 uv run python scripts/ingest_emails.py
 uv run python scripts/deduplicate.py
 uv run python scripts/sync_notebooklm.py
+uv run python scripts/test_normalize.py raw_emails/some-folder
 ```
+
+Scripts load `.env` from the repo root; set `GOOGLE_GENERATIVE_AI_API_KEY` (or `GEMINI_API_KEY`) there for opencode normalize.
 
 To reset the project (clean NotebookLM sources, delete all requests, open a PR):
 

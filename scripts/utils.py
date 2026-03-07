@@ -9,6 +9,12 @@ from datetime import datetime, timezone
 
 import yaml
 
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv(*args, **kwargs):
+        pass
+
 
 # ---------------------------------------------------------------------------
 # Frontmatter helpers
@@ -140,8 +146,13 @@ def opencode_run(
 ) -> str:
     """Run opencode CLI with the given message and file attachments.
 
-    Requires GEMINI_API_KEY in env (or in *env*) so opencode can use Google/Gemini.
+    Requires GOOGLE_GENERATIVE_AI_API_KEY in env (or in *env*) so opencode can use Google/Gemini.
     """
+    # Load .env so vars are in os.environ before we copy to subprocess (e.g. when run via uv run)
+    _scripts_dir = os.path.dirname(os.path.abspath(__file__))
+    _repo_root = os.path.join(_scripts_dir, "..")
+    load_dotenv(os.path.join(_repo_root, ".env"))
+
     cmd = ["opencode", "run", "--agent", agent]
     if model:
         cmd.extend(["--model", model])
@@ -169,8 +180,14 @@ def opencode_run(
             f"opencode run failed (exit {result.returncode}):\n{result.stderr}"
         )
     out = (result.stdout or "").strip()
+    # Known opencode behavior: run output sometimes goes to stderr (e.g. issue #369)
+    if not out and (result.stderr or "").strip():
+        out = (result.stderr or "").strip()
     if not out:
-        raise RuntimeError("opencode run produced no output")
+        raise RuntimeError(
+            "opencode run produced no output"
+            + (f"; stderr: {result.stderr[:500]!r}" if result.stderr else "")
+        )
     return out
 
 
