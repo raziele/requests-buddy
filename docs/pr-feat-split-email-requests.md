@@ -14,7 +14,7 @@ This branch extends the request-normalization pipeline with OpenRouter API suppo
 
 - **Normalize pipeline**
   - Call OpenRouter chat API directly for normalization (with `OPENROUTER_API_KEY`), sending email + PDFs as multimodal content.
-  - Optional **Gemini** path: when `GEMINI_API_KEY` is set, use opencode CLI with Gemini first; fall back to OpenRouter on failure.
+  - **Gemini** path: when `GOOGLE_GENERATIVE_AI_API_KEY` is set, use opencode CLI with Gemini.
   - Copy raw-email attachments into each request’s output folder (e.g. `requests/2026-03-05-org/` next to `requests/2026-03-05-org.md`).
   - Output includes an **Extracted Data** section from PDF content when the model returns `extracted_data`.
 
@@ -24,7 +24,7 @@ This branch extends the request-normalization pipeline with OpenRouter API suppo
 
 - **Setup & secrets**
   - Setup script extended to 8 steps with an optional **Langfuse** step (public + secret key in `.secrets/`).
-  - `upload-secrets.sh` uploads `GEMINI_API_KEY`, `LANGFUSE_PUBLIC_KEY`, and `LANGFUSE_SECRET_KEY` to GitHub when present.
+  - `upload-secrets.sh` uploads `GOOGLE_GENERATIVE_AI_API_KEY`, `LANGFUSE_PUBLIC_KEY`, and `LANGFUSE_SECRET_KEY` to GitHub when present.
 
 - **Config & tooling**
   - **opencode.json**: Multiple providers (OpenAI/OpenRouter, Google), optional Langfuse plugin, OpenTelemetry.

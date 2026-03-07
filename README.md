@@ -20,7 +20,6 @@ Four processes run as separate GitHub Actions workflows:
 - **GitHub CLI** (`gh`) — authenticated with `gh auth login`
 - **Google Cloud project** with the Gmail API enabled
 - **Google NotebookLM** account with an existing notebook
-- **OpenRouter** API key — get one at [openrouter.ai](https://openrouter.ai)
 
 ### 1. Install CLI tools
 
@@ -78,7 +77,7 @@ uv run python scripts/deduplicate.py
 uv run python scripts/test_normalize.py raw_emails/20260307-120000/some-folder
 ```
 
-Scripts load `.env` from the repo root; set `GOOGLE_GENERATIVE_AI_API_KEY` (or `GEMINI_API_KEY`) there for opencode normalize.
+Scripts load `.env` from the repo root; set `GOOGLE_GENERATIVE_AI_API_KEY` there for opencode normalize.
 
 To reset the project (clean NotebookLM sources, delete all requests, open a PR):
 

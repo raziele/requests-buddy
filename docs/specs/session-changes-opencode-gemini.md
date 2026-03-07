@@ -34,7 +34,7 @@ Summary of changes made to get opencode using Gemini for the normalize step and 
 
 ## 3. `scripts/normalize_requests.py`
 
-- **Key source:** Use `GOOGLE_GENERATIVE_AI_API_KEY` or, if unset, `GEMINI_API_KEY` for the Google key.
+- **Key source:** Use `GOOGLE_GENERATIVE_AI_API_KEY` for the Google key.
 - **Export before opencode:** Set `os.environ["GOOGLE_GENERATIVE_AI_API_KEY"] = google_key` before calling `opencode_run` so the subprocess sees it.
 - **Parse-failure logging:** When opencode returns something that doesn’t parse as JSON, log “opencode returned but parse failed (raw length …), falling back to OpenRouter”. If the raw string is short and contains `"Error:"`, also log that string (e.g. API key errors).
 
@@ -42,7 +42,7 @@ Summary of changes made to get opencode using Gemini for the normalize step and 
 
 ## 4. `.github/workflows/ingest-emails.yml`
 
-- **Env for Run ingestion step:** Set `GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GEMINI_API_KEY }}` (no `GEMINI_API_KEY`). OpenCode reads `GOOGLE_GENERATIVE_AI_API_KEY`; secret name stays `GEMINI_API_KEY` in GitHub.
+- **Env for Run ingestion step:** Set `GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}`. OpenCode reads `GOOGLE_GENERATIVE_AI_API_KEY`.
 
 ---
 
@@ -54,7 +54,7 @@ Summary of changes made to get opencode using Gemini for the normalize step and 
 
 ## 6. `README.md`
 
-- **Running locally:** Instructions use `uv run python scripts/...` and note that scripts load `.env` from the repo root; set `GOOGLE_GENERATIVE_AI_API_KEY` (or `GEMINI_API_KEY`) there for opencode normalize.
+- **Running locally:** Instructions use `uv run python scripts/...` and note that scripts load `.env` from the repo root; set `GOOGLE_GENERATIVE_AI_API_KEY` there for opencode normalize.
 
 ---
 
@@ -74,4 +74,4 @@ Summary of changes made to get opencode using Gemini for the normalize step and 
 
 ## Deduplicate workflow note
 
-- **`deduplicate.yml`** still sets only `OPENROUTER_API_KEY` for the run step. OpenRouter is no longer in `opencode.json`, so opencode there will use the default (Google). To avoid failures in CI, the deduplicate job should also get the Gemini key, e.g. add `GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GEMINI_API_KEY }}` to the “Run deduplication” step env (same as ingest).
+- **`deduplicate.yml`** should set `GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}` to the “Run deduplication” step env (same as ingest).

@@ -2,8 +2,7 @@
 """Process 2: Normalize raw emails into structured request documents.
 
 Reads raw email folders, sends the email + PDF attachments to the
-normalize agent (opencode/Gemini or OpenRouter), and writes the
-result to requests/.
+normalize agent (opencode + Gemini), and writes the result to requests/.
 
 When invoked with --run-folder, operates on a specific ingest run,
 commits results, creates a PR, and auto-merges it to main.
@@ -15,9 +14,7 @@ Usage:
 """
 
 import argparse
-import base64
 import json
-import mimetypes
 import os
 import re
 import shutil
@@ -37,7 +34,6 @@ from utils import (
     log,
     make_slug,
     opencode_run,
-    openrouter_chat,
     parse_frontmatter,
     render_frontmatter,
 )
@@ -46,12 +42,6 @@ RAW_DIR = "raw_emails"
 REQUESTS_DIR = "requests"
 SCRIPT_DIR = os.path.dirname(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
-PROMPT_PATH = os.path.join(PROJECT_ROOT, "prompts", "normalize-request.md")
-
-
-def _load_system_prompt() -> str:
-    with open(PROMPT_PATH) as f:
-        return f.read()
 
 
 def _folder_file_paths(folder: str) -> list[str]:
@@ -69,53 +59,8 @@ def _folder_file_paths(folder: str) -> list[str]:
     return paths
 
 
-def _build_user_content(folder: str) -> list[dict]:
-    """Build the OpenRouter multimodal content array from a raw email folder.
-
-    Includes the email.md text and any PDF attachments as base64 file parts.
-    """
-    parts: list[dict] = []
-
-    email_path = os.path.join(folder, "email.md")
-    with open(email_path) as f:
-        email_text = f.read()
-    parts.append({"type": "text", "text": email_text})
-
-    for fname in sorted(os.listdir(folder)):
-        if fname == "email.md":
-            continue
-        fpath = os.path.join(folder, fname)
-        if not os.path.isfile(fpath):
-            continue
-
-        mime, _ = mimetypes.guess_type(fname)
-        if mime == "application/pdf":
-            with open(fpath, "rb") as f:
-                b64 = base64.b64encode(f.read()).decode("ascii")
-            parts.append({
-                "type": "file",
-                "file": {
-                    "filename": fname,
-                    "file_data": f"data:application/pdf;base64,{b64}",
-                },
-            })
-            log(f"  Attached PDF: {fname}")
-        else:
-            try:
-                with open(fpath) as f:
-                    text = f.read()
-                parts.append({
-                    "type": "text",
-                    "text": f"--- Attachment: {fname} ---\n{text}",
-                })
-            except (UnicodeDecodeError, OSError):
-                log(f"  Skipping binary attachment: {fname}")
-
-    return parts
-
-
 def _parse_normalize_response(raw: str) -> list[dict] | None:
-    """Parse opencode/OpenRouter JSON response into requests list or None."""
+    """Parse opencode JSON response into requests list or None."""
     raw = raw.strip()
     json_str = raw
     if "```" in raw:
@@ -140,7 +85,7 @@ def _parse_normalize_response(raw: str) -> list[dict] | None:
 
 
 def normalize_email(folder: str) -> list[dict]:
-    """Normalize raw email folder: try opencode+Gemini if Google API key set, else OpenRouter."""
+    """Normalize raw email folder via opencode + Gemini."""
     fallback = [{"_fallback": True}]
 
     email_path = os.path.join(folder, "email.md")
@@ -148,52 +93,38 @@ def normalize_email(folder: str) -> list[dict]:
         log(f"  No email.md in {folder}")
         return fallback
 
-    # Prefer opencode with Gemini when GOOGLE_GENERATIVE_AI_API_KEY (or GEMINI_API_KEY) is set
-    google_key = (
-        os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY", "").strip()
-        or os.environ.get("GEMINI_API_KEY", "").strip()
-    )
-    if google_key:
-        file_paths = _folder_file_paths(folder)
-        if file_paths:
-            file_names = ", ".join(os.path.basename(p) for p in file_paths)
-            message = f"Normalize the attached email and any attachments ({file_names}). Return only the JSON."
-            try:
-                log("  Trying opencode (Gemini)...")
-                os.environ["GOOGLE_GENERATIVE_AI_API_KEY"] = google_key
-                raw = opencode_run(
-                    message,
-                    files=file_paths,
-                    agent="normalize",
-                    model=GEMINI_MODEL,
-                    cwd=PROJECT_ROOT,
-                )
-                parsed = _parse_normalize_response(raw)
-                if parsed:
-                    log(f"  Normalized into {len(parsed)} request(s) via opencode (Gemini)")
-                    return parsed
-                log(f"  opencode returned but parse failed (raw length {len(raw)}), falling back to OpenRouter")
-                if len(raw) < 500 and "Error:" in raw:
-                    log(f"  opencode message: {raw.strip()}")
-            except Exception as e:
-                log(f"  opencode failed: {e}, falling back to OpenRouter")
+    google_key = os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY", "").strip()
+    if not google_key:
+        log("  GOOGLE_GENERATIVE_AI_API_KEY not set; skipping")
+        return fallback
 
-    # OpenRouter path (or fallback)
-    system_prompt = _load_system_prompt()
-    user_content = _build_user_content(folder)
+    file_paths = _folder_file_paths(folder)
+    if not file_paths:
+        return fallback
+
+    file_names = ", ".join(os.path.basename(p) for p in file_paths)
+    message = f"Normalize the attached email and any attachments ({file_names}). Return only the JSON."
     try:
-        raw = openrouter_chat(system_prompt, user_content)
+        log("  Running opencode (Gemini)...")
+        os.environ["GOOGLE_GENERATIVE_AI_API_KEY"] = google_key
+        raw = opencode_run(
+            message,
+            files=file_paths,
+            agent="normalize",
+            model=GEMINI_MODEL,
+            cwd=PROJECT_ROOT,
+        )
+        parsed = _parse_normalize_response(raw)
+        if parsed:
+            log(f"  Normalized into {len(parsed)} request(s)")
+            return parsed
+        log(f"  opencode returned but parse failed (raw length {len(raw)})")
+        if len(raw) < 500 and "Error:" in raw:
+            log(f"  opencode message: {raw.strip()}")
     except Exception as e:
-        log(f"  OpenRouter call failed: {e}")
-        return fallback
+        log(f"  opencode failed: {e}")
 
-    parsed = _parse_normalize_response(raw)
-    if not parsed:
-        log(f"  Could not parse JSON from OpenRouter")
-        log(f"  Raw output: {raw[:500]}")
-        return fallback
-    log(f"  Normalized into {len(parsed)} request(s) via OpenRouter")
-    return parsed
+    return fallback
 
 
 def build_normalized_markdown(req: dict, headers: dict, seq: int) -> str:
