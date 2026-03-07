@@ -234,14 +234,24 @@ def git_create_branch(name: str):
     git("checkout", "-b", name)
 
 
-def git_commit_and_push(files: list[str], message: str, branch: str = "main"):
-    """Stage files, commit with message, and push to remote."""
+def git_commit(files: list[str], message: str):
+    """Stage files and commit (without pushing)."""
     if not files:
         return
     for f in files:
         git("add", f)
     git("commit", "-m", message)
+
+
+def git_push(branch: str = "main"):
+    """Push current branch to origin."""
     git("push", "origin", branch)
+
+
+def git_commit_and_push(files: list[str], message: str, branch: str = "main"):
+    """Stage files, commit with message, and push to remote."""
+    git_commit(files, message)
+    git_push(branch)
 
 
 def git_has_changes() -> bool:
