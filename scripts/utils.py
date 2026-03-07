@@ -57,29 +57,28 @@ def make_slug(date_str: str, subject: str, max_len: int = 80) -> str:
 # OpenCode CLI
 # ---------------------------------------------------------------------------
 
-def opencode_run(prompt: str, model: str | None = None) -> str:
-    """Run a prompt through the opencode CLI and return the response text.
+def opencode_run(message: str, model: str | None = None) -> str:
+    """Run a short instruction through the opencode CLI and return the response.
 
-    Uses ``opencode run`` in non-interactive mode.  A temporary file is used
-    to pass the prompt so we avoid command-line length limits with large
-    payloads.
+    The *message* should be a short instruction using @file references to
+    point opencode at the relevant files, e.g.:
+
+        "Read @prompts/normalize-request.md and apply on @requests/email.md"
+
+    The message is written to a temp file inside the project directory
+    (avoiding external-directory permission prompts) and passed as a
+    positional arg — opencode reads file-path positionals as messages.
     """
-    import tempfile
-
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".md", delete=False
-    ) as tmp:
-        tmp.write(prompt)
-        tmp_path = tmp.name
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    tmp_path = os.path.join(project_root, ".opencode-prompt.tmp.md")
 
     try:
-        cmd = ["opencode", "run", "--file", tmp_path]
+        with open(tmp_path, "w") as f:
+            f.write(message)
+
+        cmd = ["opencode", "run", tmp_path]
         if model:
             cmd.extend(["--model", model])
-        cmd.append(
-            "Follow the instructions in the attached file. "
-            "Return ONLY the requested output — no explanations, no tool use."
-        )
 
         result = subprocess.run(
             cmd, capture_output=True, text=True, check=False, timeout=300,
@@ -90,7 +89,8 @@ def opencode_run(prompt: str, model: str | None = None) -> str:
             )
         return result.stdout.strip()
     finally:
-        os.unlink(tmp_path)
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
 
 
 # ---------------------------------------------------------------------------

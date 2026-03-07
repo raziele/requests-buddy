@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Local test for the normalize_requests pipeline.
+"""Test the normalize step on a raw_emails/ folder.
 
 Usage:
-    uv run python scripts/test_normalize.py                          # first 2 files
-    uv run python scripts/test_normalize.py requests/some-file.md    # specific file
+    uv run python scripts/test_normalize.py                                # first pending folder
+    uv run python scripts/test_normalize.py raw_emails/test-kibbutzim      # specific folder
+    uv run python scripts/test_normalize.py raw_emails/test-kibbutzim -o out.txt
 """
 
-import json
 import os
 import sys
 
@@ -16,71 +16,82 @@ from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
+from normalize_requests import normalize_email, build_normalized_markdown, find_pending_folders
 from utils import parse_frontmatter
-from ingest_emails import normalize_requests, build_normalized_markdown
 
 
-def test_file(path: str):
-    print(f"\n{'='*60}")
-    print(f"Testing: {path}")
-    print(f"{'='*60}")
+def test_folder(folder: str, out=None):
+    f = out or sys.stdout
 
-    with open(path) as f:
-        text = f.read()
+    def p(msg):
+        print(msg, file=f, flush=True)
+        if f is not sys.stdout:
+            print(msg, flush=True)
 
-    meta, body = parse_frontmatter(text)
-    subject = meta.get("subject", "no-subject")
-    attachments = meta.get("attachments", [])
+    email_path = os.path.join(folder, "email.md")
+    if not os.path.exists(email_path):
+        p(f"ERROR: {email_path} not found")
+        return
 
-    body_section = body
-    if body_section.startswith("## Content"):
-        body_section = body_section[len("## Content"):].strip()
-    att_idx = body_section.find("\n## Attachments")
-    if att_idx != -1:
-        body_section = body_section[:att_idx].strip()
+    with open(email_path) as fp:
+        text = fp.read()
+    headers, _ = parse_frontmatter(text)
 
-    print(f"\nSubject: {subject}")
-    print(f"Attachments: {attachments}")
-    print(f"Body length: {len(body_section)} chars")
-    print(f"\n--- Calling normalize_requests ---\n")
+    p(f"\n{'='*60}")
+    p(f"Folder:  {folder}")
+    p(f"Subject: {headers.get('subject', '?')}")
+    p(f"From:    {headers.get('from', '?')}")
+    p(f"{'='*60}")
+    p(f"\n--- Running opencode normalize ---\n")
 
-    results = normalize_requests(subject, body_section, attachments)
+    results = normalize_email(email_path)
 
-    print(f"\nGot {len(results)} request(s):\n")
+    p(f"\nGot {len(results)} request(s):\n")
     for i, req in enumerate(results):
-        org = req.get("organization", "?")
-        print(f"  [{i+1}] Organization: {org}")
-        print(f"      Type: {req.get('request_type', '?')}")
-        print(f"      Urgency: {req.get('urgency', '?')}")
-        print(f"      Sector: {req.get('sector', '?')}")
-        summary_preview = (req.get("summary") or "")[:200].replace("\n", " ")
-        print(f"      Summary: {summary_preview}...")
-        print()
+        if req.get("_fallback"):
+            p(f"  [{i+1}] FALLBACK (opencode failed)")
+            continue
+        p(f"  [{i+1}] Organization: {req.get('organization', '?')}")
+        p(f"      Type:     {req.get('request_type', '?')}")
+        p(f"      Urgency:  {req.get('urgency', '?')}")
+        p(f"      Sector:   {req.get('sector', '?')}")
+        p(f"      Summary:  {(req.get('summary') or '')[:200]}...")
+        p("")
 
-    print("--- Raw JSON ---")
-    print(json.dumps(results, indent=2, ensure_ascii=False))
+    import json
+    p("--- Raw JSON ---")
+    p(json.dumps(results, indent=2, ensure_ascii=False))
 
-    print("\n--- Rendered Markdown (first request) ---\n")
-    fake_headers = {
-        "message-id": "<test@example.com>",
-        "from": meta.get("from", "test@example.com"),
-        "subject": subject,
-        "date": meta.get("date", "2026-03-06"),
-    }
-    md = build_normalized_markdown(results[0], fake_headers, seq=1)
-    print(md)
+    good = [r for r in results if not r.get("_fallback")]
+    if good:
+        p("\n--- Rendered Markdown (first request) ---\n")
+        md = build_normalized_markdown(good[0], headers, seq=1)
+        p(md)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        files = sys.argv[1:]
-    else:
-        requests_dir = os.path.join(os.path.dirname(__file__), "..", "requests")
-        files = [
-            os.path.join(requests_dir, f)
-            for f in sorted(os.listdir(requests_dir))
-            if f.endswith(".md")
-        ][:2]
+    args = sys.argv[1:]
+    output_path = None
 
-    for path in files:
-        test_file(path)
+    if "-o" in args:
+        i = args.index("-o")
+        output_path = args[i + 1]
+        args = args[:i] + args[i + 2:]
+
+    if args:
+        folders = args
+    else:
+        folders = find_pending_folders()[:1]
+
+    if not folders:
+        print("No folders to test. Provide a path or add folders to raw_emails/.")
+        sys.exit(1)
+
+    out_f = open(output_path, "w") if output_path else None
+    try:
+        for folder in folders:
+            test_folder(folder, out=out_f)
+    finally:
+        if out_f:
+            out_f.close()
+            print(f"Output written to {output_path}")

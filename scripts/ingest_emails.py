@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""Process 1: Fetch unread Gmail messages and convert to structured Markdown."""
+"""Step 1: Fetch unread Gmail messages and save raw emails to raw_emails/.
+
+Each email gets its own folder:
+    raw_emails/<slug>/
+        email.md          # frontmatter + raw body
+        attachment1.pdf    # any attachments
+        attachment2.png
+"""
 
 import base64
 import json
 import os
-import re
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -19,13 +25,11 @@ from utils import (
     git_create_branch,
     log,
     make_slug,
-    opencode_run,
     render_frontmatter,
 )
 
 
-REQUESTS_DIR = "requests"
-NORMALIZE_PROMPT_PATH = os.path.join(os.path.dirname(__file__), "..", "prompts", "normalize-request.md")
+RAW_DIR = "raw_emails"
 
 
 def ensure_processed_label() -> str:
@@ -90,7 +94,6 @@ def decode_body(payload: dict) -> str:
         if part.get("mimeType") == "text/plain" and "data" in part.get("body", {}):
             return base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8", errors="replace")
 
-    # Fallback: try html or nested parts
     for part in payload.get("parts", []):
         result = decode_body(part)
         if result:
@@ -102,67 +105,8 @@ def decode_body(payload: dict) -> str:
     return ""
 
 
-def normalize_requests(subject: str, body: str, attachments: list[str]) -> list[dict]:
-    """Use opencode to clean the email and produce normalized request documents.
-
-    Returns a list of dicts with all template fields populated.
-    Falls back to a minimal dict with just 'organization' and 'summary' on error.
-    """
-    fallback = [{
-        "organization": subject,
-        "summary": body[:2000],
-        "context": body[:4000],
-        "_fallback": True,
-    }]
-
-    try:
-        with open(NORMALIZE_PROMPT_PATH) as f:
-            template = f.read()
-    except OSError as e:
-        log(f"  Could not load normalize-request prompt: {e}")
-        return fallback
-
-    att_str = ", ".join(attachments) if attachments else "(none)"
-    prompt = (
-        template
-        .replace("{{subject}}", subject)
-        .replace("{{body}}", body)
-        .replace("{{attachments}}", att_str)
-    )
-
-    try:
-        raw = opencode_run(prompt)
-    except RuntimeError as e:
-        log(f"  opencode failed, skipping normalize: {e}")
-        return fallback
-
-    raw = raw.strip()
-    if raw.startswith("```"):
-        raw = re.sub(r"^```\w*\n?", "", raw)
-        raw = re.sub(r"\n?```$", "", raw)
-
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError as e:
-        log(f"  Could not parse opencode JSON response: {e}")
-        return fallback
-
-    requests = data.get("requests")
-    if not isinstance(requests, list) or not requests:
-        log("  opencode returned empty or invalid requests list")
-        return fallback
-
-    for req in requests:
-        if not isinstance(req, dict) or "summary" not in req:
-            log("  opencode returned malformed request entry, using fallback")
-            return fallback
-
-    log(f"  Normalized email into {len(requests)} request(s)")
-    return requests
-
-
 def extract_attachments(msg: dict, dest_dir: str) -> list[str]:
-    """Download attachments and return list of filenames."""
+    """Download attachments into dest_dir and return list of filenames."""
     msg_id = msg["id"]
     filenames = []
 
@@ -209,107 +153,31 @@ def mark_processed(msg_id: str, label_id: str):
     )
 
 
-def build_normalized_markdown(req: dict, headers: dict, seq: int) -> str:
-    """Render a normalized request dict into the standard template."""
-
-    org = req.get("organization") or headers.get("subject", "Unknown")
-    summary = req.get("summary") or ""
-    req_id = f"REQ-{headers.get('date', '')[:10]}-{seq:03d}"
-
+def build_raw_markdown(headers: dict, body: str, attachments: list[str]) -> str:
+    """Build a raw Markdown document from email data."""
     meta = {
-        "id": req_id,
-        "source_email_id": headers.get("message-id", ""),
-        "date_received": headers.get("date", "")[:25],
-        "status": "new",
+        "id": headers.get("message-id", ""),
+        "from": headers.get("from", ""),
+        "subject": headers.get("subject", ""),
+        "date": headers.get("date", ""),
     }
+    if attachments:
+        meta["attachments"] = attachments
 
-    def val(key: str, default: str = "—") -> str:
-        v = req.get(key)
-        if v is None or v == "null" or v == "":
-            return default
-        return str(v)
+    sections = ["## Content", "", body.strip()]
 
-    lines = [
-        f"# {org} — {val('request_type', 'Request').replace('_', ' ').title()}",
-        "",
-        "## Quick Reference",
-        "",
-        "| Field | Value |",
-        "|---|---|",
-        f"| **Organization** | {org} |",
-        f"| **Contact** | {val('contact_name')} — {val('contact_role')} |",
-        f"| **Contact Email** | {val('contact_email')} |",
-        f"| **Contact Phone** | {val('contact_phone')} |",
-        f"| **Website** | {val('website')} |",
-        f"| **Original Date** | {val('original_date', headers.get('date', '—'))} |",
-        f"| **Forwarded By** | {headers.get('from', '—')} |",
-        "",
-        "## Classification",
-        "",
-        "| Field | Value |",
-        "|---|---|",
-        f"| **Request Type** | {val('request_type')} |",
-        f"| **Urgency** | {val('urgency')} |",
-        f"| **Sector** | {val('sector')} |",
-        f"| **Target Population** | {val('target_population')} |",
-        f"| **Geographic Focus** | {val('geographic_focus')} |",
-        f"| **Language** | {val('language')} |",
-        "",
-        "## The Ask",
-        "",
-        summary,
-        "",
-        f"**Funding Requested:** {val('funding_requested', 'Not specified')}",
-    ]
+    if attachments:
+        sections += ["", "## Attachments", ""]
+        for fname in attachments:
+            sections.append(f"- [{fname}]({fname})")
 
-    breakdown = req.get("funding_breakdown")
-    if isinstance(breakdown, list) and breakdown:
-        lines.append("")
-        lines.append("**Funding Breakdown:**")
-        for item in breakdown:
-            if isinstance(item, dict):
-                lines.append(f"- {item.get('item', '?')}: {item.get('amount', '?')}")
-
-    nfa = req.get("non_financial_ask")
-    if nfa and nfa != "null":
-        lines.append("")
-        lines.append(f"**Non-Financial Ask:** {nfa}")
-
-    lines.extend([
-        "",
-        "## Context & Background",
-        "",
-        val("context", summary),
-        "",
-        "## Attachments",
-        "",
-    ])
-
-    att_list = req.get("attachments")
-    if isinstance(att_list, list) and att_list:
-        lines.append("| Filename | Description |")
-        lines.append("|---|---|")
-        for att in att_list:
-            if isinstance(att, dict):
-                lines.append(f"| {att.get('filename', '?')} | {att.get('description', '—')} |")
-    else:
-        lines.append("(none)")
-
-    lines.extend([
-        "",
-        "## Internal Notes",
-        "",
-        "_To be filled by reviewer._",
-    ])
-
-    return render_frontmatter(meta, "\n".join(lines))
+    return render_frontmatter(meta, "\n".join(sections))
 
 
-def process_message(msg_stub: dict, label_id: str) -> list[tuple[str, list[str], dict[str, str]]]:
-    """Process a single message: download attachments, normalize via LLM, write docs.
+def process_message(msg_stub: dict, label_id: str) -> tuple[str, list[str], dict[str, str]] | None:
+    """Fetch a single message and save it to raw_emails/<slug>/.
 
-    Returns a list of (slug, created_files, headers) tuples — one per normalized request.
-    Returns an empty list on failure.
+    Returns (slug, created_files, headers) or None on failure.
     """
     msg_id = msg_stub["id"]
     log(f"Processing message {msg_id}...")
@@ -318,59 +186,36 @@ def process_message(msg_stub: dict, label_id: str) -> list[tuple[str, list[str],
         msg = get_message(msg_id)
     except RuntimeError as e:
         log(f"  Failed to fetch message: {e}")
-        return []
+        return None
 
     headers = extract_headers(msg)
     subject = headers.get("subject", "no-subject")
     date = headers.get("date", "")
-
     body = decode_body(msg.get("payload", {}))
 
-    base_slug = make_slug(date, subject)
-    att_dir = os.path.join(REQUESTS_DIR, base_slug, "attachments")
-    attachment_filenames = extract_attachments(msg, att_dir)
+    slug = make_slug(date, subject)
+    folder = os.path.join(RAW_DIR, slug)
+    os.makedirs(folder, exist_ok=True)
 
-    normalized = normalize_requests(subject, body, attachment_filenames)
+    attachment_filenames = extract_attachments(msg, folder)
 
-    results: list[tuple[str, list[str], dict[str, str]]] = []
-
-    for i, req in enumerate(normalized):
-        org = req.get("organization") or subject
-        slug = make_slug(date, org)
-        md_path = os.path.join(REQUESTS_DIR, f"{slug}.md")
-
-        if os.path.exists(md_path):
-            slug = f"{slug}-{msg_id[:8]}"
-            md_path = os.path.join(REQUESTS_DIR, f"{slug}.md")
-
-        req_headers = {**headers}
-        if len(normalized) > 1:
-            req_headers["split_from"] = headers.get("message-id", msg_id)
-            req_headers["split_index"] = i + 1
-            req_headers["split_total"] = len(normalized)
-
-        markdown = build_normalized_markdown(req, req_headers, seq=i + 1)
-
-        os.makedirs(os.path.dirname(md_path) if os.path.dirname(md_path) else ".", exist_ok=True)
-        with open(md_path, "w") as f:
-            f.write(markdown)
-        log(f"  Wrote {md_path}")
-
-        created_files = [md_path]
-        if i == 0:
-            for fname in attachment_filenames:
-                created_files.append(os.path.join(att_dir, fname))
-
-        results.append((slug, created_files, req_headers))
+    email_path = os.path.join(folder, "email.md")
+    raw_md = build_raw_markdown(headers, body, attachment_filenames)
+    with open(email_path, "w") as f:
+        f.write(raw_md)
+    log(f"  Wrote {email_path}")
 
     mark_processed(msg_id, label_id)
     log(f"  Marked as processed")
 
-    return results
+    created_files = [email_path]
+    for fname in attachment_filenames:
+        created_files.append(os.path.join(folder, fname))
+
+    return slug, created_files, headers
 
 
 def build_commit_message(headers: dict, slug: str, num_attachments: int) -> str:
-    """Build a structured commit message for the ingestion log."""
     subject = headers.get("subject", "no-subject")
     sender = headers.get("from", "unknown")
     date = headers.get("date", "unknown")
@@ -384,22 +229,21 @@ def build_commit_message(headers: dict, slug: str, num_attachments: int) -> str:
         f"From: {sender}\n"
         f"Date: {date}\n"
         f"Message-ID: {msg_id}\n"
-        f"File: requests/{slug}.md"
+        f"File: raw_emails/{slug}/"
     )
 
 
 def build_pr_body(ingested: list[tuple[str, dict]]) -> str:
-    """Build a PR body summarizing all ingested emails."""
-    lines = [f"Ingested **{len(ingested)}** email(s).\n"]
+    lines = [f"Ingested **{len(ingested)}** email(s) into `raw_emails/`.\n"]
     for slug, headers in ingested:
         subject = headers.get("subject", "no-subject")
         sender = headers.get("from", "unknown")
-        lines.append(f"- **{subject}** — from {sender} → `requests/{slug}.md`")
+        lines.append(f"- **{subject}** — from {sender} → `raw_emails/{slug}/`")
     return "\n".join(lines)
 
 
 def main():
-    os.makedirs(REQUESTS_DIR, exist_ok=True)
+    os.makedirs(RAW_DIR, exist_ok=True)
 
     log("Ensuring 'processed' label exists...")
     label_id = ensure_processed_label()
@@ -421,32 +265,23 @@ def main():
     ingested: list[tuple[str, dict]] = []
 
     for msg_stub in messages:
-        results = process_message(msg_stub, label_id)
-        if not results:
+        result = process_message(msg_stub, label_id)
+        if not result:
             continue
 
-        all_files = []
-        for slug, created_files, headers in results:
-            all_files.extend(created_files)
-            ingested.append((slug, headers))
+        slug, created_files, headers = result
+        att_count = len(created_files) - 1
 
-        first_slug = results[0][0]
-        first_headers = results[0][2]
-        att_count = len([f for f in all_files if "attachments/" in f])
-
-        commit_msg = build_commit_message(first_headers, first_slug, att_count)
-        if len(results) > 1:
-            extra_slugs = ", ".join(s for s, _, _ in results[1:])
-            commit_msg += f"\nAlso: {extra_slugs}"
-
-        git_commit_and_push(all_files, commit_msg, branch=branch)
-        log(f"  Committed {len(results)} request(s) from message {msg_stub['id']}")
+        commit_msg = build_commit_message(headers, slug, att_count)
+        git_commit_and_push(created_files, commit_msg, branch=branch)
+        ingested.append((slug, headers))
+        log(f"  Committed raw_emails/{slug}/")
 
     if not ingested:
         log("No emails were successfully processed.")
         return
 
-    pr_title = f"ingest: {len(ingested)} new request(s) — {ts}"
+    pr_title = f"ingest: {len(ingested)} new email(s) — {ts}"
     pr_body = build_pr_body(ingested)
     pr_url = gh_pr_create(pr_title, pr_body)
     log(f"Created PR: {pr_url}")
