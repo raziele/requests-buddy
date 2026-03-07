@@ -53,5 +53,20 @@ echo "Uploading NOTEBOOKLM_CREDENTIALS (storage_state.json only)..."
 base64 < "$SECRETS_DIR/notebooklm-credentials/storage_state.json" | \
   gh secret set NOTEBOOKLM_CREDENTIALS -R "$REPO"
 
+if [[ -f "$SECRETS_DIR/gemini-api-key" ]]; then
+  echo "Uploading GEMINI_API_KEY..."
+  gh secret set GEMINI_API_KEY -R "$REPO" < "$SECRETS_DIR/gemini-api-key"
+fi
+
+if [[ -f "$SECRETS_DIR/langfuse-public-key" ]]; then
+  echo "Uploading LANGFUSE_PUBLIC_KEY..."
+  gh secret set LANGFUSE_PUBLIC_KEY -R "$REPO" < "$SECRETS_DIR/langfuse-public-key"
+fi
+
+if [[ -f "$SECRETS_DIR/langfuse-secret-key" ]]; then
+  echo "Uploading LANGFUSE_SECRET_KEY..."
+  gh secret set LANGFUSE_SECRET_KEY -R "$REPO" < "$SECRETS_DIR/langfuse-secret-key"
+fi
+
 echo ""
 echo "All secrets uploaded to $REPO."
