@@ -1,12 +1,15 @@
 # Requests Buddy
 
-Automated pipeline that ingests email requests from Gmail, deduplicates them using AI, and syncs everything to Google NotebookLM — orchestrated by GitHub Actions.
+Automated pipeline that ingests email requests from Gmail, normalizes them with AI, deduplicates, and syncs everything to Google NotebookLM — orchestrated by GitHub Actions.
 
 ## What It Does
 
-1. **Email Ingestion** (hourly) — Fetches unread Gmail messages, converts them to structured Markdown files under `requests/`, and commits them to `main`.
-2. **Deduplication** (daily) — Compares new requests against existing ones using an LLM via OpenRouter. Merges duplicates into unified documents and opens a PR for review.
-3. **NotebookLM Sync** (on push) — Keeps a NotebookLM notebook in sync with the `requests/` folder — adding new sources, removing stale ones, and updating a metadata source with the last sync timestamp.
+Four processes run as separate GitHub Actions workflows:
+
+1. **Ingest Emails** (hourly) — Fetches unread Gmail messages and saves them as raw Markdown to `raw_emails/<timestamp>/`. Each run gets its own timestamped folder on a dedicated branch (`ingest/<ts>`), then triggers Process 2.
+2. **Normalize Requests** (triggered by Process 1) — Runs the AI normalize agent on the raw emails from an ingest branch, writes structured request documents to `requests/`, creates a PR, and auto-merges it to `main`.
+3. **Sync NotebookLM** (on push to main) — Keeps a NotebookLM notebook in sync with the `requests/` folder — adding new sources, removing stale ones, and updating a metadata source with the last sync timestamp.
+4. **Deduplicate** (daily) — Scans requests for semantic duplicates using AI, merges them, and opens a PR for human review (not auto-merged).
 
 ## How to Start
 
@@ -49,17 +52,30 @@ Go to the [Actions tab](https://github.com/raziele/requests-buddy/actions) and t
 
 ### 4. Done
 
-All three processes now run unattended on their schedules. Email ingestion runs every hour, deduplication runs daily at 06:00 UTC, and NotebookLM sync triggers whenever new files are pushed to `requests/`.
+All four processes now run unattended. Email ingestion runs every hour and automatically triggers normalization. Deduplication runs daily at 06:00 UTC and opens PRs for human review. NotebookLM sync triggers whenever normalized requests are merged to `main`.
 
 ## Running scripts locally
 
 Use `uv run` so scripts use the project environment:
 
 ```bash
+# Process 1: ingest emails (creates branch, triggers Process 2)
 uv run python scripts/ingest_emails.py
-uv run python scripts/deduplicate.py
+
+# Process 2: normalize a specific ingest run (with PR + merge)
+uv run python scripts/normalize_requests.py --run-folder 20260307-120000 --branch ingest/20260307-120000
+
+# Process 2: normalize specific folders (no PR)
+uv run python scripts/normalize_requests.py raw_emails/20260307-120000/some-folder
+
+# Process 3: sync to NotebookLM
 uv run python scripts/sync_notebooklm.py
-uv run python scripts/test_normalize.py raw_emails/some-folder
+
+# Process 4: deduplicate
+uv run python scripts/deduplicate.py
+
+# Test normalize on a folder
+uv run python scripts/test_normalize.py raw_emails/20260307-120000/some-folder
 ```
 
 Scripts load `.env` from the repo root; set `GOOGLE_GENERATIVE_AI_API_KEY` (or `GEMINI_API_KEY`) there for opencode normalize.
@@ -96,17 +112,20 @@ If you need to rotate a secret (e.g., new OpenRouter API key), update the file i
 
 ```
 .github/workflows/
-  ingest-emails.yml       # Hourly cron
-  deduplicate.yml         # Daily cron
-  sync-notebooklm.yml     # Trigger on push to requests/
+  ingest-emails.yml         # Process 1: hourly cron — emails → raw_emails/
+  normalize-requests.yml    # Process 2: dispatched by P1 — raw_emails/ → requests/ → merge
+  sync-notebooklm.yml      # Process 3: on push to main — requests/ → NotebookLM
+  deduplicate.yml           # Process 4: daily cron — detect & merge duplicates → open PR
 scripts/
-  setup.sh                # Interactive first-time setup
-  upload-secrets.sh       # Upload local credentials to GitHub secrets
-  ingest_emails.py        # Process 1: email ingestion
-  deduplicate.py          # Process 2: AI deduplication
-  sync_notebooklm.py      # Process 3: NotebookLM sync
-  reset.py                # Reset: clean notebook + delete requests
-  utils.py                # Shared helpers
-requests/                  # Ingested request Markdown files
-logs/                      # NotebookLM sync logs and source manifest
+  setup.sh                  # Interactive first-time setup
+  upload-secrets.sh          # Upload local credentials to GitHub secrets
+  ingest_emails.py           # Process 1: fetch Gmail → raw_emails/<ts>/<slug>/
+  normalize_requests.py      # Process 2: normalize raw emails → requests/
+  deduplicate.py             # Process 4: AI deduplication
+  sync_notebooklm.py         # Process 3: NotebookLM sync
+  reset.py                   # Reset: clean notebook + delete requests
+  utils.py                   # Shared helpers
+raw_emails/                   # Raw ingested emails (timestamped run folders)
+requests/                     # Normalized request Markdown files
+logs/                         # NotebookLM sync logs and source manifest
 ```

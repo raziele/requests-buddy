@@ -1,0 +1,54 @@
+name: Normalize Requests
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Ingest branch to normalize (e.g. ingest/20260307-120000)'
+        required: true
+        type: string
+      run_folder:
+        description: 'Timestamp folder inside raw_emails/ (e.g. 20260307-120000)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: |
+          npm install -g opencode-ai
+          uv sync
+
+      - name: Configure git
+        run: |
+          git config user.name "requests-buddy[bot]"
+          git config user.email "requests-buddy[bot]@users.noreply.github.com"
+
+      - name: Run normalize
+        env:
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          uv run python scripts/normalize_requests.py
+          --run-folder "${{ inputs.run_folder }}"
+          --branch "${{ inputs.branch }}"

@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Step 2: Normalize raw emails into structured request documents.
+"""Process 2: Normalize raw emails into structured request documents.
 
-Reads each folder in raw_emails/, sends the email + PDF attachments to
-the OpenRouter API with the normalize-request prompt, and writes the
+Reads raw email folders, sends the email + PDF attachments to the
+normalize agent (opencode/Gemini or OpenRouter), and writes the
 result to requests/.
 
+When invoked with --run-folder, operates on a specific ingest run,
+commits results, creates a PR, and auto-merges it to main.
+
 Usage:
-    uv run python scripts/normalize_requests.py                     # all pending
-    uv run python scripts/normalize_requests.py raw_emails/<slug>   # specific folder
+    uv run python scripts/normalize_requests.py --run-folder 20260307-120000
+    uv run python scripts/normalize_requests.py raw_emails/<ts>/<slug>   # specific folder
+    uv run python scripts/normalize_requests.py                          # all pending
 """
 
+import argparse
 import base64
 import json
 import mimetypes
@@ -26,6 +31,9 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from utils import (
     GEMINI_MODEL,
+    gh_pr_create,
+    gh_pr_merge,
+    git_commit_and_push,
     log,
     make_slug,
     opencode_run,
@@ -361,8 +369,28 @@ def _copy_attachments(raw_folder: str, md_path: str) -> list[str]:
     return copied
 
 
+def find_folders_in_run(run_folder: str) -> list[str]:
+    """Return all email folders inside a specific run directory (raw_emails/<ts>/)."""
+    run_dir = os.path.join(RAW_DIR, run_folder)
+    if not os.path.isdir(run_dir):
+        return []
+
+    folders = []
+    for name in sorted(os.listdir(run_dir)):
+        folder = os.path.join(run_dir, name)
+        if not os.path.isdir(folder):
+            continue
+        if not os.path.exists(os.path.join(folder, "email.md")):
+            continue
+        folders.append(folder)
+    return folders
+
+
 def find_pending_folders() -> list[str]:
-    """Return raw_emails/ folders that don't yet have a normalized request."""
+    """Return raw_emails/ folders that don't yet have a normalized request.
+
+    Handles both flat (raw_emails/<slug>/) and nested (raw_emails/<ts>/<slug>/) layouts.
+    """
     if not os.path.isdir(RAW_DIR):
         return []
 
@@ -371,16 +399,39 @@ def find_pending_folders() -> list[str]:
         folder = os.path.join(RAW_DIR, name)
         if not os.path.isdir(folder):
             continue
-        if not os.path.exists(os.path.join(folder, "email.md")):
+        if os.path.exists(os.path.join(folder, "email.md")):
+            pending.append(folder)
             continue
-        pending.append(folder)
+        for sub in sorted(os.listdir(folder)):
+            subfolder = os.path.join(folder, sub)
+            if os.path.isdir(subfolder) and os.path.exists(os.path.join(subfolder, "email.md")):
+                pending.append(subfolder)
 
     return pending
 
 
+def _build_pr_body(run_folder: str, created_files: list[str]) -> str:
+    lines = [
+        f"Normalized **{len(created_files)}** request document(s) "
+        f"from ingest run `{run_folder}`.\n",
+    ]
+    for f in created_files:
+        if f.endswith(".md"):
+            lines.append(f"- `{f}`")
+    return "\n".join(lines)
+
+
 def main():
-    if len(sys.argv) > 1:
-        folders = sys.argv[1:]
+    parser = argparse.ArgumentParser(description="Normalize raw emails into requests")
+    parser.add_argument("folders", nargs="*", help="Specific raw_emails/<ts>/<slug> folders")
+    parser.add_argument("--run-folder", help="Timestamp of the ingest run to normalize")
+    parser.add_argument("--branch", help="Branch name (for PR creation)")
+    args = parser.parse_args()
+
+    if args.run_folder:
+        folders = find_folders_in_run(args.run_folder)
+    elif args.folders:
+        folders = args.folders
     else:
         folders = find_pending_folders()
 
@@ -390,12 +441,32 @@ def main():
 
     log(f"Found {len(folders)} folder(s) to normalize.")
 
-    total_created = []
+    total_created: list[str] = []
     for folder in folders:
         created = process_folder(folder)
         total_created.extend(created)
 
     log(f"Done. Created {len(total_created)} request document(s).")
+
+    if not total_created:
+        log("Nothing to commit.")
+        return
+
+    if args.run_folder and args.branch:
+        git_commit_and_push(
+            total_created,
+            f"normalize: {len(total_created)} request document(s) from run {args.run_folder}",
+            branch=args.branch,
+        )
+        log(f"Committed {len(total_created)} normalized file(s)")
+
+        pr_title = f"ingest+normalize: {len(total_created)} request(s) — {args.run_folder}"
+        pr_body = _build_pr_body(args.run_folder, total_created)
+        pr_url = gh_pr_create(pr_title, pr_body)
+        log(f"Created PR: {pr_url}")
+
+        gh_pr_merge(pr_url)
+        log(f"PR merged: {pr_url}")
 
 
 if __name__ == "__main__":

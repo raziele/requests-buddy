@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Step 1: Fetch unread Gmail messages and save raw emails to raw_emails/.
+"""Process 1: Fetch unread Gmail messages and save raw emails to raw_emails/.
 
-Each email gets its own folder:
-    raw_emails/<slug>/
-        email.md          # frontmatter + raw body
-        attachment1.pdf    # any attachments
-        attachment2.png
+Each ingestion run creates a timestamped folder:
+    raw_emails/<timestamp>/
+        <slug>/
+            email.md          # frontmatter + raw body
+            attachment1.pdf   # any attachments
 """
 
 import base64
 import json
 import os
+import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -19,8 +20,6 @@ from datetime import datetime, timezone
 
 from utils import (
     gws,
-    gh_pr_create,
-    gh_pr_merge,
     git_commit_and_push,
     git_create_branch,
     log,
@@ -197,8 +196,8 @@ def build_raw_markdown(headers: dict, body: str, attachments: list[str]) -> str:
     return render_frontmatter(meta, "\n".join(sections))
 
 
-def process_message(msg_stub: dict, label_id: str) -> tuple[str, list[str], dict[str, str]] | None:
-    """Fetch a single message and save it to raw_emails/<slug>/.
+def process_message(msg_stub: dict, label_id: str, run_dir: str) -> tuple[str, list[str], dict[str, str]] | None:
+    """Fetch a single message and save it to run_dir/<slug>/.
 
     Returns (slug, created_files, headers) or None on failure.
     """
@@ -217,7 +216,7 @@ def process_message(msg_stub: dict, label_id: str) -> tuple[str, list[str], dict
     body = decode_body(msg.get("payload", {}))
 
     slug = make_slug(date, subject)
-    folder = os.path.join(RAW_DIR, slug)
+    folder = os.path.join(run_dir, slug)
     os.makedirs(folder, exist_ok=True)
 
     attachment_filenames = extract_attachments(msg, folder)
@@ -238,7 +237,7 @@ def process_message(msg_stub: dict, label_id: str) -> tuple[str, list[str], dict
     return slug, created_files, headers
 
 
-def build_commit_message(headers: dict, slug: str, num_attachments: int) -> str:
+def build_commit_message(headers: dict, run_ts: str, slug: str, num_attachments: int) -> str:
     subject = headers.get("subject", "no-subject")
     sender = headers.get("from", "unknown")
     date = headers.get("date", "unknown")
@@ -252,24 +251,21 @@ def build_commit_message(headers: dict, slug: str, num_attachments: int) -> str:
         f"From: {sender}\n"
         f"Date: {date}\n"
         f"Message-ID: {msg_id}\n"
-        f"File: raw_emails/{slug}/"
+        f"File: raw_emails/{run_ts}/{slug}/"
     )
 
 
-def build_pr_body(ingested: list[tuple[str, dict]], normalized_count: int = 0) -> str:
-    lines = [f"Ingested **{len(ingested)}** email(s) into `raw_emails/`.\n"]
-    for slug, headers in ingested:
-        subject = headers.get("subject", "no-subject")
-        sender = headers.get("from", "unknown")
-        lines.append(f"- **{subject}** — from {sender} → `raw_emails/{slug}/`")
-    if normalized_count:
-        lines.append(f"\nNormalized into **{normalized_count}** request document(s) in `requests/`.")
-    return "\n".join(lines)
+def trigger_normalize(branch: str, run_folder: str):
+    """Trigger the normalize-requests workflow via GitHub CLI."""
+    log(f"Triggering normalize workflow for branch={branch} run_folder={run_folder}")
+    subprocess.run(
+        ["gh", "workflow", "run", "normalize-requests.yml",
+         "-f", f"branch={branch}", "-f", f"run_folder={run_folder}"],
+        check=True,
+    )
 
 
 def main():
-    os.makedirs(RAW_DIR, exist_ok=True)
-
     log("Ensuring processed label exists...")
     label_id = ensure_processed_label()
 
@@ -283,6 +279,9 @@ def main():
     log(f"Found {len(messages)} unread email(s).")
 
     ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
+    run_dir = os.path.join(RAW_DIR, ts)
+    os.makedirs(run_dir, exist_ok=True)
+
     branch = f"ingest/{ts}"
     git_create_branch(branch)
     log(f"Created branch {branch}")
@@ -290,46 +289,23 @@ def main():
     ingested: list[tuple[str, dict]] = []
 
     for msg_stub in messages:
-        result = process_message(msg_stub, label_id)
+        result = process_message(msg_stub, label_id, run_dir)
         if not result:
             continue
 
         slug, created_files, headers = result
         att_count = len(created_files) - 1
 
-        commit_msg = build_commit_message(headers, slug, att_count)
+        commit_msg = build_commit_message(headers, ts, slug, att_count)
         git_commit_and_push(created_files, commit_msg, branch=branch)
         ingested.append((slug, headers))
-        log(f"  Committed raw_emails/{slug}/")
+        log(f"  Committed raw_emails/{ts}/{slug}/")
 
     if not ingested:
         log("No emails were successfully processed.")
         return
 
-    from normalize_requests import process_folder as normalize_folder
-
-    normalized_files: list[str] = []
-    for slug, _headers in ingested:
-        folder = os.path.join(RAW_DIR, slug)
-        created = normalize_folder(folder)
-        normalized_files.extend(created)
-
-    if normalized_files:
-        git_commit_and_push(
-            normalized_files,
-            f"normalize: {len(normalized_files)} request document(s)",
-            branch=branch,
-        )
-        log(f"Committed {len(normalized_files)} normalized file(s)")
-
-    pr_title = f"ingest: {len(ingested)} new email(s) — {ts}"
-    pr_body = build_pr_body(ingested, len(normalized_files))
-    pr_url = gh_pr_create(pr_title, pr_body)
-    log(f"Created PR: {pr_url}")
-
-    gh_pr_merge(pr_url)
-    log(f"PR merged: {pr_url}")
-
+    trigger_normalize(branch, ts)
     log("Ingestion complete.")
 
 
