@@ -47,5 +47,5 @@ jobs:
           GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE: /tmp/gws/credentials.json
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: uv run python scripts/ingest_emails.py

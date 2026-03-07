@@ -132,7 +132,7 @@ def _parse_normalize_response(raw: str) -> list[dict] | None:
 
 
 def normalize_email(folder: str) -> list[dict]:
-    """Normalize raw email folder: try opencode+Gemini if GEMINI_API_KEY set, else OpenRouter."""
+    """Normalize raw email folder: try opencode+Gemini if Google API key set, else OpenRouter."""
     fallback = [{"_fallback": True}]
 
     email_path = os.path.join(folder, "email.md")
@@ -140,27 +140,33 @@ def normalize_email(folder: str) -> list[dict]:
         log(f"  No email.md in {folder}")
         return fallback
 
-    # Prefer opencode with Gemini when GEMINI_API_KEY is set
-    gemini_key = os.environ.get("GEMINI_API_KEY", "").strip()
-    if gemini_key:
+    # Prefer opencode with Gemini when GOOGLE_GENERATIVE_AI_API_KEY (or GEMINI_API_KEY) is set
+    google_key = (
+        os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY", "").strip()
+        or os.environ.get("GEMINI_API_KEY", "").strip()
+    )
+    if google_key:
         file_paths = _folder_file_paths(folder)
         if file_paths:
             file_names = ", ".join(os.path.basename(p) for p in file_paths)
             message = f"Normalize the attached email and any attachments ({file_names}). Return only the JSON."
             try:
                 log("  Trying opencode (Gemini)...")
+                os.environ["GOOGLE_GENERATIVE_AI_API_KEY"] = google_key
                 raw = opencode_run(
                     message,
                     files=file_paths,
                     agent="normalize",
                     model=GEMINI_MODEL,
                     cwd=PROJECT_ROOT,
-                    env={"GEMINI_API_KEY": gemini_key},
                 )
                 parsed = _parse_normalize_response(raw)
                 if parsed:
                     log(f"  Normalized into {len(parsed)} request(s) via opencode (Gemini)")
                     return parsed
+                log(f"  opencode returned but parse failed (raw length {len(raw)}), falling back to OpenRouter")
+                if len(raw) < 500 and "Error:" in raw:
+                    log(f"  opencode message: {raw.strip()}")
             except Exception as e:
                 log(f"  opencode failed: {e}, falling back to OpenRouter")
 
