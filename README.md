@@ -100,6 +100,10 @@ Your GCP OAuth app is in **Testing** mode. Only accounts listed as **Test users*
 
 Expected when the app is in testing mode. Click **Advanced** → **Go to &lt;app&gt; (unsafe)** to continue. Safe for personal use.
 
+### Ingest runs but Normalize never triggers
+
+Pushes made with the default `GITHUB_TOKEN` from a workflow **do not** trigger other workflows (GitHub prevents recursive runs). Add a [Personal Access Token](https://github.com/settings/tokens) with `repo` scope as the repository secret **REPO_ACCESS_TOKEN**. The ingest workflow uses it for checkout and push so that the push triggers the Normalize workflow. If the secret is missing, ingest still runs but normalize must be triggered manually (e.g. workflow_dispatch).
+
 ## Updating Credentials
 
 If you need to rotate a secret (e.g., new OpenRouter API key), update the file in `.secrets/` and re-run:
