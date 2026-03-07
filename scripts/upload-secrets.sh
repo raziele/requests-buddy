@@ -14,7 +14,7 @@ echo "Looking for .secrets in: $REPO_ROOT"
 echo ""
 
 missing=0
-for f in gws-credentials.json openrouter-api-key notebooklm-notebook-id; do
+for f in gws-credentials.json google-generative-ai-api-key notebooklm-notebook-id; do
   if [[ ! -f "$SECRETS_DIR/$f" ]]; then
     echo "ERROR: Missing $SECRETS_DIR/$f"
     missing=1
@@ -43,8 +43,8 @@ echo ""
 echo "Uploading GWS_CREDENTIALS..."
 gh secret set GWS_CREDENTIALS -R "$REPO" < "$SECRETS_DIR/gws-credentials.json"
 
-echo "Uploading OPENROUTER_API_KEY..."
-gh secret set OPENROUTER_API_KEY -R "$REPO" < "$SECRETS_DIR/openrouter-api-key"
+echo "Uploading GOOGLE_GENERATIVE_AI_API_KEY..."
+gh secret set GOOGLE_GENERATIVE_AI_API_KEY -R "$REPO" < "$SECRETS_DIR/google-generative-ai-api-key"
 
 echo "Uploading NOTEBOOKLM_NOTEBOOK_ID..."
 gh secret set NOTEBOOKLM_NOTEBOOK_ID -R "$REPO" < "$SECRETS_DIR/notebooklm-notebook-id"
@@ -52,11 +52,6 @@ gh secret set NOTEBOOKLM_NOTEBOOK_ID -R "$REPO" < "$SECRETS_DIR/notebooklm-noteb
 echo "Uploading NOTEBOOKLM_CREDENTIALS (storage_state.json only)..."
 base64 < "$SECRETS_DIR/notebooklm-credentials/storage_state.json" | \
   gh secret set NOTEBOOKLM_CREDENTIALS -R "$REPO"
-
-if [[ -f "$SECRETS_DIR/gemini-api-key" ]]; then
-  echo "Uploading GEMINI_API_KEY..."
-  gh secret set GEMINI_API_KEY -R "$REPO" < "$SECRETS_DIR/gemini-api-key"
-fi
 
 if [[ -f "$SECRETS_DIR/langfuse-public-key" ]]; then
   echo "Uploading LANGFUSE_PUBLIC_KEY..."

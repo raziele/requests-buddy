@@ -46,7 +46,7 @@ uv sync
 echo ""
 
 # --- Step 1: Gmail auth ---
-echo "--- Step 1/8: Gmail Authentication ---"
+echo "--- Step 1/7: Gmail Authentication ---"
 if [[ -f "$SECRETS_DIR/gws-credentials.json" ]]; then
   echo "Found existing $SECRETS_DIR/gws-credentials.json — skipping."
 else
@@ -67,7 +67,7 @@ fi
 echo ""
 
 # --- Step 2: NotebookLM auth ---
-echo "--- Step 2/8: NotebookLM Authentication ---"
+echo "--- Step 2/7: NotebookLM Authentication ---"
 if [[ -d "$SECRETS_DIR/notebooklm-credentials" ]]; then
   echo "Found existing $SECRETS_DIR/notebooklm-credentials/ — skipping."
 else
@@ -83,32 +83,20 @@ else
 fi
 echo ""
 
-# --- Step 3: OpenRouter API key (for opencode) ---
-echo "--- Step 3/8: OpenRouter API Key (opencode) ---"
-if [[ -f "$SECRETS_DIR/openrouter-api-key" ]]; then
-  echo "Found existing $SECRETS_DIR/openrouter-api-key — skipping."
-else
-  echo "Get your key at https://openrouter.ai/settings/keys"
-  read -rp "Paste your OpenRouter API key: " api_key
-  echo -n "$api_key" > "$SECRETS_DIR/openrouter-api-key"
-  echo "Saved to $SECRETS_DIR/openrouter-api-key"
-fi
-echo ""
-
-# --- Step 4: Gemini API key (for opencode normalize agent) ---
-echo "--- Step 4/8: Gemini API Key ---"
-if [[ -f "$SECRETS_DIR/gemini-api-key" ]]; then
-  echo "Found existing $SECRETS_DIR/gemini-api-key — skipping."
+# --- Step 3: Google Generative AI API key (for opencode) ---
+echo "--- Step 3/7: Google Generative AI API Key (opencode) ---"
+if [[ -f "$SECRETS_DIR/google-generative-ai-api-key" ]]; then
+  echo "Found existing $SECRETS_DIR/google-generative-ai-api-key — skipping."
 else
   echo "Get your key at https://aistudio.google.com/apikey"
-  read -rp "Paste your Gemini API key: " gemini_key
-  echo -n "$gemini_key" > "$SECRETS_DIR/gemini-api-key"
-  echo "Saved to $SECRETS_DIR/gemini-api-key"
+  read -rp "Paste your Google Generative AI API key: " api_key
+  echo -n "$api_key" > "$SECRETS_DIR/google-generative-ai-api-key"
+  echo "Saved to $SECRETS_DIR/google-generative-ai-api-key"
 fi
 echo ""
 
-# --- Step 5: NotebookLM notebook ID ---
-echo "--- Step 5/8: NotebookLM Notebook ID ---"
+# --- Step 4: NotebookLM notebook ID ---
+echo "--- Step 4/7: NotebookLM Notebook ID ---"
 if [[ -f "$SECRETS_DIR/notebooklm-notebook-id" ]]; then
   echo "Found existing $SECRETS_DIR/notebooklm-notebook-id — skipping."
 else
@@ -119,8 +107,8 @@ else
 fi
 echo ""
 
-# --- Step 6 (optional): Langfuse observability ---
-echo "--- Step 6/8: Langfuse Observability (optional) ---"
+# --- Step 5 (optional): Langfuse observability ---
+echo "--- Step 5/7: Langfuse Observability (optional) ---"
 if [[ -f "$SECRETS_DIR/langfuse-public-key" && -f "$SECRETS_DIR/langfuse-secret-key" ]]; then
   echo "Found existing Langfuse keys — skipping."
 else
@@ -140,13 +128,13 @@ else
 fi
 echo ""
 
-# --- Step 7: Upload secrets to GitHub ---
-echo "--- Step 7/8: Upload Secrets to GitHub ---"
+# --- Step 6: Upload secrets to GitHub ---
+echo "--- Step 6/7: Upload Secrets to GitHub ---"
 bash scripts/upload-secrets.sh
 echo ""
 
-# --- Step 8: Create Gmail "processed" label ---
-echo "--- Step 8/8: Create Gmail 'processed' Label ---"
+# --- Step 7: Create Gmail "processed" label ---
+echo "--- Step 7/7: Create Gmail 'processed' Label ---"
 echo "Creating label (will fail harmlessly if it already exists)..."
 gws gmail users labels create \
   --params '{"userId": "me"}' \
