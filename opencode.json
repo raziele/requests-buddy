@@ -1,14 +1,15 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
-  "model": "arcee-ai/trinity-mini:free",
+  "model": "google/gemini-2.5-flash-lite",
+  "default_agent": "normalize",
   "provider": {
     "openrouter": {
       "models": {
         "arcee-ai/trinity-mini:free": {}
       },
       "options": {
-        "apiKey": "{file:.secrets/openrouter-api-key}",
+        "apiKey": "{env:OPENROUTER_API_KEY}",
         "baseURL": "https://openrouter.ai/api/v1"
       }
     },
@@ -17,7 +18,7 @@
         "gemini-2.5-flash-lite": {}
       },
       "options": {
-        "apiKey": "{file:.secrets/gemini-api-key}"
+        "apiKey": "{env:GEMINI_API_KEY}"
       }
     }
   },
