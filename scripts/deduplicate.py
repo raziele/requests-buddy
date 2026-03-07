@@ -1,29 +1,31 @@
 #!/usr/bin/env python3
-"""Process 2: Detect semantically duplicate requests and create a merge PR."""
+"""Process 4: Detect semantically duplicate requests and create a merge PR."""
 
 import hashlib
 import json
 import os
 import sys
+import tempfile
 from datetime import datetime, timezone
 from glob import glob
 
 sys.path.insert(0, os.path.dirname(__file__))
 
 from utils import (
+    GEMINI_MODEL,
     git,
     git_commit_and_push,
     gh_pr_create,
     log,
     opencode_run,
     parse_frontmatter,
-    render_frontmatter,
 )
 
 
 REQUESTS_DIR = "requests"
 MARKER_FILE = "logs/last-dedup-marker"
 PROMPTS_DIR = "prompts"
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 
 def get_new_files(marker_path: str) -> tuple[list[str], list[str]]:
@@ -104,7 +106,21 @@ def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict])
         existing_requests=json.dumps(existing_summaries, indent=2),
     )
 
-    response = opencode_run(prompt)
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".md", prefix="dedup-detect-", delete=False,
+    ) as tmp:
+        tmp.write(prompt)
+        prompt_file = tmp.name
+
+    try:
+        response = opencode_run(
+            "Analyze the attached file and return the JSON as instructed.",
+            files=[prompt_file],
+            model=GEMINI_MODEL,
+            cwd=PROJECT_ROOT,
+        )
+    finally:
+        os.unlink(prompt_file)
 
     text = response.strip()
     if text.startswith("```"):
@@ -135,7 +151,21 @@ def merge_group(group_files: list[str]) -> tuple[str, str]:
 
     prompt = load_prompt("merge-duplicates", documents=documents_block)
 
-    merged = opencode_run(prompt)
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".md", prefix="dedup-merge-", delete=False,
+    ) as tmp:
+        tmp.write(prompt)
+        prompt_file = tmp.name
+
+    try:
+        merged = opencode_run(
+            "Merge the duplicate documents as instructed in the attached file.",
+            files=[prompt_file],
+            model=GEMINI_MODEL,
+            cwd=PROJECT_ROOT,
+        )
+    finally:
+        os.unlink(prompt_file)
 
     # Strip markdown code fences if present
     text = merged.strip()
