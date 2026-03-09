@@ -16,10 +16,21 @@ Yoav Raban
 Director of Grants & Outreach in Israel
 Jewish Federation of Detroit
 ________________________________
+מאת: Shifra Stroosky <Shifra@nitzancenter.org>
+‏‏נשלח: יום שני 09 מרץ 2026 14:13
+‏‏אל: Lichtig, Ofer <Ofer.Lichtig@JewishFederations.org>
+עותק: Shifra Stroosky <Shifra@nitzancenter.org>; sara sanditen <saras@nitzancenter.org>
+‏‏נושא: Nitzan for the IDF Reservists' Wives
+
+​​EXTERNAL EMAIL - USE CAUTION Do not click on links or open attachments unless you can verify the sender's identity and͏​​﻿‌͏
+[External email] <https://summary.us1.defend.egress.com/v3/summary?ref=email&crId=69aeb9735673dbc4662a2985&lang=en>
+External email <https://summary.us1.defend.egress.com/v3/summary?ref=email&crId=69aeb9735673dbc4662a2985&lang=en>
+[External email] <https://summary.us1.defend.egress.com/v3/summary?ref=email&crId=69aeb9735673dbc4662a2985&lang=en>
 
 
-[https://jewishdetroit.org/emailsignature/img/phone-alt-blue.png]972505788776[https://jewishdetroit.org/emailsignature/img/1-pixel.gif][https://jewishdetroit.org/emailsignature/img/envelope-blue.png]raban@jewishdetroit.org<mailto:raban@jewishdetroit.org>[https://jewishdetroit.org/emailsignature/img/1-pixel.gif][https://jewishdetroit.org/emailsignature/img/globe-blue.png]jewishdetroit.org<https://jewishdetroit.org/>
+​​EXTERNAL EMAIL - USE CAUTION
 
+Do not click on links or open attachments unless you can verify the sender's identity and know the content is safe.
 
 
 
