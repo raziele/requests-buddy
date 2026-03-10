@@ -1,76 +1,49 @@
 ---
-id: <DM5PR18MB231261A62AF8B5BF2489DAFEFE46A@DM5PR18MB2312.namprd18.prod.outlook.com>
+id: <DM5PR18MB2312C6BF7AE59E82CB2B8FE9FE46A@DM5PR18MB2312.namprd18.prod.outlook.com>
 from: '"Berman, Dina" <dina@juf.org.il>'
-subject: "FW: \u05D4\u05D9\u05DB\u05E8\u05D5\u05EA \u05E2\u05DD \u05D0\u05E8\u05D2\
-  \u05D5\u05DF \"\u05D1\u05D6\u05DB\u05D5\u05EA\""
-date: Tue, 10 Mar 2026 06:06:34 +0000
+subject: "FW: \u05D3\u05D7\u05D5\u05E3 \u05D3\u05D7\u05D5\u05E3 \u05E1\u05D9\u05D5\
+  \u05E2 \u05DC\u05D4\u05E6\u05DC\u05D7\u05EA \u05D7\u05D9\u05D9\u05DD \u05D0\u05E0\
+  \u05E9\u05D9\u05DD \u05E2\u05DD \u05DE\u05D5\u05D2\u05D1\u05DC\u05D5\u05EA \u05D5\
+  \u05E7\u05E9\u05D9\u05E9\u05D9\u05DD \u05D1\u05DE\u05DC\u05D7\u05DE\u05D4 - \u05D0\
+  \u05E4\u05D5\u05D3 \u05E1\u05D2\u05D5\u05DC - \u05E2\u05DE\u05D5\u05EA\u05EA \u05E0\
+  \u05D2\u05D9\u05E9\u05D5\u05EA \u05D9\u05E9\u05E8\u05D0\u05DC"
+date: Tue, 10 Mar 2026 05:56:44 +0000
 attachments:
-- 2025-RESOURCES-FOR-SUPPORTING-ISRAELIS-WITH-DISABILITIES-REPORT (1).pdf
+- "\u05D3\u05D7\u05D5\u05E3 \u05D1\u05E7\u05E9\u05D4 \u05DC\u05EA\u05E8\u05D5\u05DE\
+  \u05D4 \u05E0\u05D2\u05D9\u05E9\u05D5\u05EA \u05D9\u05E9\u05E8\u05D0\u05DC \u05D0\
+  \u05E4\u05D5\u05D3 \u05E1\u05D2\u05D5\u05DC \u05E1\u05D9\u05D5\u05E2 \u05DC\u05DE\
+  \u05DC\u05D7\u05DE\u05D4 28-2-2026 .pdf"
 ---
 
 ## Content
 
-________________________________
-From: טלי מרקוס | בזכות <Tali@bizchut.org.il<mailto:Tali@bizchut.org.il>>
-Sent: Thursday, March 5, 2026 3:30 PM
-To: Abarbanel, Maya <maya@juf.org.il<mailto:maya@juf.org.il>>
-Subject: RE: היכרות עם ארגון "בזכות" %
+From: יובל וגנר <yuval@aisrael.org<mailto:yuval@aisrael.org>>
+Date: 28 February 2026 at 22:31:22 GMT+2
+To: "Abarbanel, Maya" <maya@juf.org.il<mailto:maya@juf.org.il>>, donorservices@juf.org<mailto:donorservices@juf.org>, "Bavly, Ofer" <Ofer@juf.org.il<mailto:Ofer@juf.org.il>>
+Cc: אליעד מלמד <eliad@hatashtit.co.il<mailto:eliad@hatashtit.co.il>>, "איילת (ayelet@hatashtit.co.il<mailto:ayelet@hatashtit.co.il>)" <ayelet@hatashtit.co.il<mailto:ayelet@hatashtit.co.il>>, Michal Rimon <michal@aisrael.org<mailto:michal@aisrael.org>>, יובל וגנר <yuval@aisrael.org<mailto:yuval@aisrael.org>>
+Subject: דחוף דחוף סיוע להצלחת חיים אנשים עם מוגבלות וקשישים במלחמה - אפוד סגול - עמותת נגישות ישראל
+﻿
 
+​​EXTERNAL EMAIL - USE CAUTION
 
-מאיה שלום,
+Do not click on links or open attachments unless you can verify the sender's identity and know the content is safe.
+לחברים משיקאגו
+הי
 
+החל מהיום בשש וחצי בבוקר אנחנו בתוך מוכנות וסיוע מיידי
+להצלחת חיים אנשים עם מוגבלות וקשישים במלחמה – במסגרת מיזם האפוד סגול מבית עמותת נגישות ישראל
+מצ"ב פנייתנו הדחופה והקריטית
+אנחנו צריכים אותכם כשותפים דחוף.
+אנחנו פנויים להבהרות והסברים
+מצפים לשמוע ממכם מחר
+בהערכה
+יובל
 
-
-מקווה שאת והקרובים לך בטוב בתקופה לא פשוטה זו.
-
-
-
-היינו בקשר לפני כשנה בנוגע לאפשרות לתמוך בארגון "בזכות".
-
-בינתיים, ה- Task Force של ארגון הגג של הפדרציות של צפון אמריקה הוציא דו"ח בנושא תמיכה באנשים עם מוגבלות בישראל.
-
-אני מניחה שקיבלתם את הדו"ח אבל מצרפת אותו כאן למען הנוחות.
-
-
-
-במסגרת העבודה על הדו"ח כותבי הדו"ח התייעצו עמנו לגבי מצבם של אנשים עם מוגבלות בישראל ולגבי הצרכים שלהם.
-
-ארגון בזכות הוא גם אחד הארגונים שהומלץ לתמיכה על-ידי ה- Task Force.
-
-
-
-אשמח לקבוע פגישה לספר לכם על הפרויקטים שאנחנו עובדים עליהם כעת.
-
-
-
-בנוסף, אנחנו כרגע מפנים פעילות שלנו לטובת סיוע לאנשים עם מוגבלות במלחמת "שאגת הארי".
-
-אשמח לדעת האם יש לכם כספי חירום שמיועדים לתמיכה בעת מלחמה והאם תוכלו לתמוך בפעילות שלנו. כל תמיכה, גם קטנה, תסייע לנו מאוד להמשיך ולקדם את זכויותיהם ורווחתם של אנשים עם מוגבלות.
-
-להלן מספר פעולות שעשינו בימים האחרונים:
-
-  *   הנגשת התרעות פיקוד העורף לכבדי שמיעה וחרשים – היום אזעקות אינן נגישות לכבדי שמיעה וחרשים. הגשנו לפני כשנתיים עתירה לבית המשפט העליון בנושא, שבעקבותיה המדינה החלה לפעול על מנת למצוא פתרון הולם לסוגיה הזו. העתירה עדיין תלויה ועומדת. בעתירה ארגון בזכות מייצג גם את ארגון "בקול" וגם 5 עותרות כבדות שמיעה. שלשום הגשנו בקשה דחופה לבגץ בנושא. כמו כן, יזמנו כתבה ב Ynet על הנושא, כדי להעלות את הסוגיה לסדר היום הציבורי: https://www.ynet.co.il/activism/article/yokra14697958
-  *   שלחנו פניה לשרת התחבורה, הגב' מירי רגב, בבקשה לדאוג לתת קדימות לעובדים זרים בתחום הסיעוד הביתי שיצאו לחופשה במולדתם ולא מצליחים לחזור לארץ – עובדי הסיעוד מספקים טיפול יומיומי וסיוע חיוני לעשרות אלפי אנשים עם מוגבלות וקשישים. היעדר עובד הסיעוד, במיוחד בשעת חירום, מותיר את כל אותם אנשים בסיכון לבריאותם ולביטחונם האישי, פוגע בעצמאותם ולאיכות חייהם ומטיל נטל כבד מאוד על המשפחות. להלן כתבה בנושא: https://www.israelhayom.co.il/news/welfare/article/20040859
-  *   העדר מרחבים מוגנים נגישים לאנשים עם מוגבלות – חוק שוויון זכויות לאנשים עם מוגבלות מחייב, בין היתר, התקנת תקנות חירום לאנשים עם מוגבלות. כבר למעלה מ-20 שנה שהתקנות שאמורות להסדיר את הנושא אינן מותקנות. ארגון בזכות עתר כבר לפני שנים, יחד עם ארגונים נוספים, בעניין אי התקנות התקנות. בשנה האחרונה פנינו בעניין למשרד רוה"מ ולמשרד הביטחון בדרישה שעד להתקנת התקנות ימצא מענה ויזמנו דיון דחוף בכנסת במהלך מלחמת "עם כלביא". כעת פנינו שוב לח"כ בבקשה לקיים דיון דחוף בסוגיה ובתשובה נאמר לנו שיתקיים דיון בשבוע הבא. להלן כתבה על הנושא: https://www.ynet.co.il/yedioth/article/yokra14697689
-
-
-
-תודה וסופ"ש שקט,
-
-טלי
-
-
-
-ד"ר טלי מרקוס | מנכ"לית
-
-Tali Marcus, Ph.D. | Executive Director
-
-
-
-בזכ!ת, המרכז לזכויות אדם של אנשים עם מוגבלויות
-
-          B!zchut – The Israel Human Rights center for People with Disabilities
+Yuval Wagner, Chair
+Access Israel Org
+www.aisrael.org<http://www.aisrael.org/>
+yuval@aisrael.org<mailto:yuval@aisrael.org>
 
 ## Attachments
 
-- [2025-RESOURCES-FOR-SUPPORTING-ISRAELIS-WITH-DISABILITIES-REPORT (1).pdf](2025-RESOURCES-FOR-SUPPORTING-ISRAELIS-WITH-DISABILITIES-REPORT (1).pdf)
+- [דחוף בקשה לתרומה נגישות ישראל אפוד סגול סיוע למלחמה 28-2-2026 .pdf](דחוף בקשה לתרומה נגישות ישראל אפוד סגול סיוע למלחמה 28-2-2026 .pdf)
