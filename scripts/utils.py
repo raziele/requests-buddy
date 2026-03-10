@@ -303,11 +303,11 @@ def gh_pr_create(title: str, body: str, base: str = "main") -> str:
 def gh_pr_merge(pr_url: str, method: str = "squash"):
     """Merge a pull request via gh CLI.
 
-    Uses --auto so GitHub merges it once any required status checks pass,
-    without needing admin-bypass rights on the token.
+    Requires GH_TOKEN to be set to a PAT with pull-requests:write and
+    contents:write so it can merge directly without admin-bypass flags.
     """
     subprocess.run(
-        ["gh", "pr", "merge", pr_url, f"--{method}", "--auto", "--delete-branch"],
+        ["gh", "pr", "merge", pr_url, f"--{method}", "--delete-branch"],
         capture_output=True, text=True, check=True,
     )
 
