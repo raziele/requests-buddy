@@ -67,7 +67,15 @@ def make_slug(date_str: str, subject: str, max_len: int = 80, include_date: bool
 # ---------------------------------------------------------------------------
 
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_FREE_MODEL = "arcee-ai/trinity-large-preview:free"
+
+
+def _openrouter_model() -> str:
+    """Model for OpenRouter; requires OPENROUTER_MODEL env."""
+    value = os.environ.get("OPENROUTER_MODEL", "").strip()
+    if not value:
+        raise RuntimeError("OPENROUTER_MODEL not set")
+    return value
+
 
 def openrouter_chat(
     system_prompt: str,
@@ -96,7 +104,7 @@ def openrouter_chat(
     )
 
     payload: dict = {
-        "model": model or OPENROUTER_FREE_MODEL,
+        "model": model or _openrouter_model(),
         "temperature": temperature,
         "messages": [
             {"role": "system", "content": system_prompt},
@@ -156,7 +164,7 @@ def openrouter_extract_pdf(pdf_path: str) -> str:
     return openrouter_chat(
         "You are a document text extractor. Return only the extracted text, no commentary.",
         user_content,
-        model=OPENROUTER_FREE_MODEL,
+        model=_openrouter_model(),
         temperature=0.0,
     )
 
@@ -184,8 +192,9 @@ def opencode_run(
     load_dotenv(os.path.join(_repo_root, ".env"))
 
     cmd = ["opencode", "run", "--agent", agent]
-    if model:
-        cmd.extend(["--model", model])
+    model_to_use = model or os.environ.get("OPENROUTER_MODEL", "").strip()
+    if model_to_use:
+        cmd.extend(["--model", model_to_use])
     for fp in files:
         cmd.extend(["--file", fp])
     cmd.append("--")
