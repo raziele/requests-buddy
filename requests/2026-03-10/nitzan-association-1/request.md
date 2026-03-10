@@ -16,7 +16,7 @@ status: new
 | **Contact Email** | Shifra@nitzancenter.org |
 | **Contact Phone** | — |
 | **Website** | — |
-| **Original Date** | Mon, Mar 9, 2026 at 2:16…12 |
+| **Original Date** | Mon, Mar 9, 2026 at 2:16 PM |
 | **Forwarded By** | "Broady, Tamar" <tbrody@jewishphilly.org> |
 
 ## Classification
@@ -24,27 +24,27 @@ status: new
 | Field | Value |
 |---|---|
 | **Request Type** | program_funding |
-| **Urgency** | high |
-| **Sector** | trauma_support |
+| **Urgency** | medium |
+| **Sector** | community_resilience,trauma_support |
 | **Target Population** | Wives of IDF reservists |
-| **Geographic Focus** | Nationwide (Israel) |
-| **Language** | he |
+| **Geographic Focus** | Nationwide |
+| **Language** | mixed |
 
 ## The Ask
 
-Nitzan Association is requesting support for a project to strengthen the resilience and parental authority of wives of IDF reservists who have become de facto single mothers during the longest war in Israel's history.
+The Nitzan Association is seeking support for a project to strengthen resilience and parental authority for wives of reserve forces who have become 'almost single mothers' during Israel's longest war.
 
 **Funding Requested:** Not specified
 
 ## Context & Background
 
-Throughout the longest war in Israel's history, the wives of reserve forces have become one of the solid pillars of Israeli society, suddenly becoming almost single mothers while allowing their partners to focus on defending the State of Israel. These women carry an enormous burden and Nitzan Association wishes to provide them with a process to strengthen their resilience and parental authority. The organization is seeking support for a project to provide these mothers with a broad, comprehensive, and supportive envelope.
+Throughout Israel's longest war in history, the wives of reserve forces have become one of the solid pillars of Israeli society, carrying an enormous burden while allowing their partners to focus on defending the State of Israel. These women have suddenly become almost single mothers and need support to strengthen their resilience and parental authority. The Nitzan Association wishes to provide them with a comprehensive and supportive process.
 
 ## Attachments
 
 | Filename | Description |
 |---|---|
-| Nitzan for the IDF Reservists' Wives.docx | Project proposal for supporting IDF reservists' wives |
+| Nitzan for the IDF Reservists' Wives.docx | Request for support for project benefiting wives of IDF reservists |
 
 ## Internal Notes
 
