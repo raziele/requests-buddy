@@ -12,11 +12,11 @@ status: new
 | Field | Value |
 |---|---|
 | **Organization** | Leket Israel |
-| **Contact** | Rosie Shem-Tov Miller — Grants and Donor Relations Manager |
+| **Contact** | Rosie Miller — Grants and Donor Relations Manager |
 | **Contact Email** | rosie@leket.org |
-| **Contact Phone** | +972-53-5678940 |
+| **Contact Phone** | — |
 | **Website** | http://www.leket.org |
-| **Original Date** | Mon, Mar 9, 2026 |
+| **Original Date** | Mon, Mar 9, 2026 at 12:59 PM |
 | **Forwarded By** | "Broady, Tamar" <tbrody@jewishphilly.org> |
 
 ## Classification
@@ -24,15 +24,15 @@ status: new
 | Field | Value |
 |---|---|
 | **Request Type** | emergency_aid |
-| **Urgency** | critical |
-| **Sector** | healthcare, refugees |
+| **Urgency** | high |
+| **Sector** | food_security |
 | **Target Population** | vulnerable families across Israel |
-| **Geographic Focus** | Nationwide Israel |
-| **Language** | mixed |
+| **Geographic Focus** | Nationwide |
+| **Language** | he |
 
 ## The Ask
 
-Leket Israel requires emergency funding to maintain food distribution operations during the ongoing war with Iran, facing a sharp decline in surplus food availability due to disrupted volunteer networks and halted harvests.
+Leket Israel is requesting $508,210 per week in emergency funding to maintain food distribution operations during the Israel-Iran war. The organization's supply chain has been disrupted due to rocket fire halting volunteer activity, farmer harvests, and IDF base operations, reducing meal distribution from 8,000 to 3,000 daily. Temporary food purchases and supermarket vouchers are needed to prevent additional hardship for vulnerable families.
 
 **Funding Requested:** $508,210 per week
 
@@ -40,11 +40,11 @@ Leket Israel requires emergency funding to maintain food distribution operations
 - Meals: 5,000 additional meals daily
 - Produce: significant temporary purchases
 
-**Non-Financial Ask:** Temporary supplementation with purchased food and supermarket vouchers
+**Non-Financial Ask:** Temporary food purchases and supermarket vouchers to supplement distribution operations
 
 ## Context & Background
 
-Since the outbreak of war with Iran, daily life across Israel has been marked by deep uncertainty. Rocket fire has forced Leket Israel to pause volunteer activity and limit collection/distribution operations. Farmers have halted harvests, IDF bases (primary suppliers) are closed, and surplus food availability has declined sharply. Leket is supplementing rescued food with purchased food and providing supermarket vouchers to maintain distribution levels for vulnerable families.
+Due to the Israel-Iran war, Leket Israel's food rescue operations have been severely disrupted. Rocket fire has forced suspension of volunteer activity and limited collection/distribution operations. Farmers have halted harvests, and IDF bases (primary food suppliers) are closed. This has reduced surplus food availability by 62.5%, requiring Leket to purchase 5,000 additional meals daily and significant produce to maintain distribution levels. The organization needs emergency funding to sustain operations and prevent increased hardship for vulnerable families during this critical period.
 
 ## Attachments
 
