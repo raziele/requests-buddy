@@ -10,3 +10,4 @@ node_modules/
 test_normalize_output.txt
 .opencode-prompt.tmp.md
 raw_emails/test-*/
+.github_pr_body.txt
