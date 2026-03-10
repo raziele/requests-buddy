@@ -21,6 +21,7 @@ import os
 import re
 import shutil
 import sys
+from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -278,7 +279,8 @@ def build_normalized_markdown(req: dict, headers: dict, seq: int) -> str:
 def process_folder(folder: str) -> list[str]:
     """Normalize a single raw_emails/<slug>/ folder.
 
-    Returns list of created request file paths.
+    Output structure: requests/YYYY-MM-DD/<slug>/request.md + attachments.
+    Returns list of created file paths.
     """
     email_path = os.path.join(folder, "email.md")
     if not os.path.exists(email_path):
@@ -289,7 +291,8 @@ def process_folder(folder: str) -> list[str]:
         text = f.read()
 
     headers, _ = parse_frontmatter(text)
-    slug = os.path.basename(folder)
+    raw_slug = os.path.basename(folder)
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     log(f"Normalizing {folder}...")
     normalized = normalize_email(folder)
@@ -300,33 +303,29 @@ def process_folder(folder: str) -> list[str]:
             log(f"  Skipping fallback result for {folder}")
             continue
 
-        org = req.get("organization") or headers.get("subject", slug)
-        out_slug = make_slug(headers.get("date", ""), org)
-        out_path = os.path.join(REQUESTS_DIR, f"{out_slug}.md")
+        org = req.get("organization") or headers.get("subject", raw_slug)
+        out_slug = make_slug("", org, include_date=False)
 
-        if os.path.exists(out_path):
-            out_slug = f"{out_slug}-{i+1}"
-            out_path = os.path.join(REQUESTS_DIR, f"{out_slug}.md")
+        out_dir = os.path.join(REQUESTS_DIR, today, out_slug)
+        if os.path.exists(out_dir):
+            out_dir = os.path.join(REQUESTS_DIR, today, f"{out_slug}-{i+1}")
+
+        os.makedirs(out_dir, exist_ok=True)
+        out_path = os.path.join(out_dir, "request.md")
 
         md = build_normalized_markdown(req, headers, seq=i + 1)
-
-        os.makedirs(REQUESTS_DIR, exist_ok=True)
         with open(out_path, "w") as f:
             f.write(md)
         log(f"  Wrote {out_path}")
         created.append(out_path)
 
-        created.extend(_copy_attachments(folder, out_path))
+        created.extend(_copy_attachments(folder, out_dir))
 
     return created
 
 
-def _copy_attachments(raw_folder: str, md_path: str) -> list[str]:
-    """Copy non-email.md files from raw_folder into a subfolder next to md_path.
-
-    E.g. requests/2026-03-05-org.md  ->  requests/2026-03-05-org/<filename>
-    """
-    att_dir = md_path.removesuffix(".md")
+def _copy_attachments(raw_folder: str, dest_dir: str) -> list[str]:
+    """Copy non-email.md files from raw_folder into dest_dir."""
     copied = []
     for fname in sorted(os.listdir(raw_folder)):
         if fname == "email.md":
@@ -334,8 +333,8 @@ def _copy_attachments(raw_folder: str, md_path: str) -> list[str]:
         src = os.path.join(raw_folder, fname)
         if not os.path.isfile(src):
             continue
-        os.makedirs(att_dir, exist_ok=True)
-        dst = os.path.join(att_dir, fname)
+        os.makedirs(dest_dir, exist_ok=True)
+        dst = os.path.join(dest_dir, fname)
         shutil.copy2(src, dst)
         copied.append(dst)
         log(f"  Copied attachment: {dst}")

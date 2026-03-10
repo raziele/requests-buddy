@@ -47,13 +47,16 @@ def render_frontmatter(meta: dict, body: str) -> str:
 # Slug generation
 # ---------------------------------------------------------------------------
 
-def make_slug(date_str: str, subject: str, max_len: int = 80) -> str:
+def make_slug(date_str: str, subject: str, max_len: int = 80, include_date: bool = True) -> str:
     """Generate a filesystem-safe slug from a date and subject line."""
     slug = subject.lower()
     slug = re.sub(r"[^a-z0-9]+", "-", slug)
     slug = slug.strip("-")
     if len(slug) > max_len:
         slug = slug[:max_len].rstrip("-")
+
+    if not include_date:
+        return slug
 
     date_prefix = date_str[:10] if date_str else datetime.now(timezone.utc).strftime("%Y-%m-%d")
     return f"{date_prefix}-{slug}"
