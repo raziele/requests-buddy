@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Process 2: Normalize raw emails into structured request documents.
 
-Reads raw email folders, sends the email + PDF attachments to the
-normalize agent (opencode + Gemini), and writes the result to requests/.
+Two-step pipeline, both via OpenRouter:
+  1. Extract text from PDF attachments (openrouter/free + pdf-text plugin)
+  2. Normalize email + extracted text into structured JSON (opencode + arcee-ai)
 
 When invoked with --run-folder, operates on a specific ingest run,
 commits results, creates a PR, and auto-merges it to main.
@@ -15,6 +16,7 @@ Usage:
 
 import argparse
 import json
+import mimetypes
 import os
 import re
 import shutil
@@ -27,13 +29,13 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from utils import (
-    GEMINI_MODEL,
     gh_pr_create,
     gh_pr_merge,
     git_commit_and_push,
     log,
     make_slug,
     opencode_run,
+    openrouter_extract_pdf,
     parse_frontmatter,
     render_frontmatter,
 )
@@ -84,8 +86,40 @@ def _parse_normalize_response(raw: str) -> list[dict] | None:
     return requests
 
 
+def _extract_pdfs(folder: str) -> dict[str, str]:
+    """Step 1: Extract text from all PDFs in folder via OpenRouter pdf-text plugin.
+
+    Returns {filename: extracted_text} for each successfully extracted PDF.
+    """
+    extracts: dict[str, str] = {}
+    for fname in sorted(os.listdir(folder)):
+        if fname == "email.md":
+            continue
+        fpath = os.path.join(folder, fname)
+        if not os.path.isfile(fpath):
+            continue
+        mime, _ = mimetypes.guess_type(fname)
+        if mime != "application/pdf":
+            continue
+        try:
+            log(f"  Extracting PDF: {fname} (OpenRouter pdf-text)...")
+            text = openrouter_extract_pdf(fpath)
+            if text:
+                extracts[fname] = text
+                log(f"  Extracted {len(text)} chars from {fname}")
+            else:
+                log(f"  Empty extraction for {fname}")
+        except Exception as e:
+            log(f"  PDF extraction failed for {fname}: {e}")
+    return extracts
+
+
 def normalize_email(folder: str) -> list[dict]:
-    """Normalize raw email folder via opencode + Gemini."""
+    """Normalize raw email folder via two-step OpenRouter pipeline.
+
+    Step 1: Extract text from PDFs using openrouter/free + pdf-text plugin.
+    Step 2: Normalize email + extracted text using opencode + arcee-ai/trinity-mini.
+    """
     fallback = [{"_fallback": True}]
 
     email_path = os.path.join(folder, "email.md")
@@ -93,25 +127,33 @@ def normalize_email(folder: str) -> list[dict]:
         log(f"  No email.md in {folder}")
         return fallback
 
-    google_key = os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY", "").strip()
-    if not google_key:
-        log("  GOOGLE_GENERATIVE_AI_API_KEY not set; skipping")
+    api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+    if not api_key:
+        log("  OPENROUTER_API_KEY not set; skipping")
         return fallback
 
-    file_paths = _folder_file_paths(folder)
-    if not file_paths:
-        return fallback
+    # Step 1: extract PDF text via OpenRouter
+    pdf_extracts = _extract_pdfs(folder)
 
-    file_names = ", ".join(os.path.basename(p) for p in file_paths)
-    message = f"Normalize the attached email and any attachments ({file_names}). Return only the JSON."
+    # Step 2: build message with email + extracted PDF text, send to opencode
+    parts = ["Normalize the attached email"]
+    if pdf_extracts:
+        parts.append(f" and {len(pdf_extracts)} PDF attachment(s)")
+    parts.append(". Return only the JSON.")
+
+    if pdf_extracts:
+        parts.append("\n\n## Extracted PDF Contents\n")
+        for fname, text in pdf_extracts.items():
+            parts.append(f"### {fname}\n\n{text}\n")
+
+    message = "".join(parts)
+
     try:
-        log("  Running opencode (Gemini)...")
-        os.environ["GOOGLE_GENERATIVE_AI_API_KEY"] = google_key
+        log("  Running opencode (arcee-ai via OpenRouter)...")
         raw = opencode_run(
             message,
-            files=file_paths,
+            files=[email_path],
             agent="normalize",
-            model=GEMINI_MODEL,
             cwd=PROJECT_ROOT,
         )
         parsed = _parse_normalize_response(raw)
