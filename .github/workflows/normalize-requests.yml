@@ -57,6 +57,7 @@ jobs:
           git config user.email "requests-buddy[bot]@users.noreply.github.com"
 
       - name: Run normalize
+        id: normalize
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,3 +65,16 @@ jobs:
           uv run python scripts/normalize_requests.py
           --run-folder "${{ steps.params.outputs.run_folder }}"
           --branch "${{ steps.params.outputs.branch }}"
+
+      - name: Create Pull Request
+        if: steps.normalize.outputs.pr_title != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pr_url=$(gh pr create \
+            --title "${{ steps.normalize.outputs.pr_title }}" \
+            --body-file .github_pr_body.txt \
+            --base main \
+            --head ${{ steps.params.outputs.branch }})
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+          gh pr merge "$pr_url" --squash --delete-branch

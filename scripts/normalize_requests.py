@@ -525,11 +525,22 @@ def main():
 
         pr_title = f"ingest+normalize: {len(total_created)} request(s) — {args.run_folder}"
         pr_body = _build_pr_body(args.run_folder, total_created)
-        pr_url = gh_pr_create(pr_title, pr_body)
-        log(f"Created PR: {pr_url}")
 
-        gh_pr_merge(pr_url)
-        log(f"PR merged: {pr_url}")
+        github_output = os.environ.get("GITHUB_OUTPUT")
+        if github_output:
+            # CI: let the workflow create and merge the PR
+            with open(github_output, "a") as f:
+                f.write(f"pr_title={pr_title}\n")
+            body_path = os.path.join(PROJECT_ROOT, ".github_pr_body.txt")
+            with open(body_path, "w") as f:
+                f.write(pr_body)
+            log("Wrote pr_title and pr_body for workflow PR step.")
+        else:
+            # Local: create and merge PR from script
+            pr_url = gh_pr_create(pr_title, pr_body)
+            log(f"Created PR: {pr_url}")
+            gh_pr_merge(pr_url)
+            log(f"PR merged: {pr_url}")
 
 
 if __name__ == "__main__":
