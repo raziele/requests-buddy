@@ -24,27 +24,27 @@ status: new
 | Field | Value |
 |---|---|
 | **Request Type** | program_funding |
-| **Urgency** | — |
+| **Urgency** | medium |
 | **Sector** | women |
-| **Target Population** | wives of IDF reservists |
+| **Target Population** | Reservist wives in Israel |
 | **Geographic Focus** | Israel |
 | **Language** | mixed |
 
 ## The Ask
 
-Request for support to strengthen resilience and parental authority of IDF reservists' wives through a comprehensive support program
+Request for support for a project to strengthen resilience and parental authority among reservist wives during Israel's ongoing conflict.
 
 **Funding Requested:** Not specified
 
 ## Context & Background
 
-During Israel's longest war, reservists' wives became de facto single mothers while their partners defended the country. The Nitzan Association seeks funding to provide a broad support program addressing their resilience and parental authority needs.
+Throughout Israel's longest war, reservist wives have become de facto single mothers while their partners serve in the military. The Nitzan Association seeks funding to provide comprehensive support services for these women, including resilience-building programs and parental authority development.
 
 ## Attachments
 
 | Filename | Description |
 |---|---|
-| Nitzan for the IDF Reservists' Wives.docx | Project proposal document |
+| Nitzan for the IDF Reservists' Wives.docx | Request for support for a project for the benefit of reservist wives |
 
 ## Internal Notes
 
