@@ -8,10 +8,6 @@ on:
       - 'raw_emails/**'
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'Ingest branch to normalize (e.g. ingest/20260307-120000)'
-        required: true
-        type: string
       run_folder:
         description: 'Timestamp folder inside raw_emails/ (e.g. 20260307-120000)'
         required: true
@@ -25,23 +21,22 @@ jobs:
   normalize:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch || github.ref_name }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Derive run parameters
         id: params
         run: |
           if [ -n "${{ inputs.run_folder }}" ]; then
             echo "run_folder=${{ inputs.run_folder }}" >> "$GITHUB_OUTPUT"
-            echo "branch=${{ inputs.branch }}" >> "$GITHUB_OUTPUT"
+            echo "branch=ingest/${{ inputs.run_folder }}" >> "$GITHUB_OUTPUT"
           else
             BRANCH="${{ github.ref_name }}"
-            RUN_FOLDER="${BRANCH#ingest/}"
-            echo "run_folder=${RUN_FOLDER}" >> "$GITHUB_OUTPUT"
+            echo "run_folder=${BRANCH#ingest/}" >> "$GITHUB_OUTPUT"
             echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
           fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.params.outputs.branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
