@@ -47,7 +47,7 @@ def render_frontmatter(meta: dict, body: str) -> str:
 # Slug generation
 # ---------------------------------------------------------------------------
 
-def make_slug(date_str: str, subject: str, max_len: int = 80) -> str:
+def make_slug(date_str: str, subject: str, max_len: int = 80, include_date: bool = True) -> str:
     """Generate a filesystem-safe slug from a date and subject line."""
     slug = subject.lower()
     slug = re.sub(r"[^a-z0-9]+", "-", slug)
@@ -55,15 +55,116 @@ def make_slug(date_str: str, subject: str, max_len: int = 80) -> str:
     if len(slug) > max_len:
         slug = slug[:max_len].rstrip("-")
 
+    if not include_date:
+        return slug
+
     date_prefix = date_str[:10] if date_str else datetime.now(timezone.utc).strftime("%Y-%m-%d")
     return f"{date_prefix}-{slug}"
 
 
 # ---------------------------------------------------------------------------
-# OpenCode CLI (Gemini)
+# OpenRouter API (direct)
 # ---------------------------------------------------------------------------
 
-GEMINI_MODEL = os.environ.get("OPENCODE_GEMINI_MODEL", "google/gemini-2.5-flash-lite")
+OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_FREE_MODEL = "openrouter/free"
+
+
+def openrouter_chat(
+    system_prompt: str,
+    user_content: str | list,
+    *,
+    model: str | None = None,
+    temperature: float = 0.1,
+) -> str:
+    """Call the OpenRouter chat completions API and return the assistant message.
+
+    *user_content* is either a plain string or a list of content parts
+    (text, file objects) per the OpenRouter multimodal spec.
+    When file parts are present, the pdf-text plugin is automatically enabled.
+    """
+    import requests as _requests
+
+    api_key = os.environ.get("OPENROUTER_API_KEY", "")
+    if not api_key:
+        raise RuntimeError("OPENROUTER_API_KEY not set")
+
+    if isinstance(user_content, str):
+        user_content = [{"type": "text", "text": user_content}]
+
+    has_files = any(
+        isinstance(p, dict) and p.get("type") == "file" for p in user_content
+    )
+
+    payload: dict = {
+        "model": model or OPENROUTER_FREE_MODEL,
+        "temperature": temperature,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_content},
+        ],
+    }
+    if has_files:
+        payload["plugins"] = [
+            {"id": "file-parser", "pdf": {"engine": "pdf-text"}}
+        ]
+
+    resp = _requests.post(
+        OPENROUTER_API_URL,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        json=payload,
+        timeout=300,
+    )
+    resp.raise_for_status()
+
+    data = resp.json()
+    choices = data.get("choices")
+    if not choices:
+        raise RuntimeError(f"OpenRouter returned no choices: {data}")
+
+    content = choices[0]["message"].get("content")
+    if content is None:
+        raise RuntimeError("OpenRouter returned null content")
+    return content.strip()
+
+
+def openrouter_extract_pdf(pdf_path: str) -> str:
+    """Extract text from a PDF file using OpenRouter's pdf-text plugin.
+
+    Sends the PDF as a base64 file part to the openrouter/free model and
+    returns the extracted text content.
+    """
+    import base64
+
+    with open(pdf_path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode("ascii")
+
+    filename = os.path.basename(pdf_path)
+    user_content = [
+        {"type": "text", "text": "Extract all text content from this PDF document. Return the full text as-is, preserving structure (headings, lists, tables, paragraphs)."},
+        {
+            "type": "file",
+            "file": {
+                "filename": filename,
+                "file_data": f"data:application/pdf;base64,{b64}",
+            },
+        },
+    ]
+
+    return openrouter_chat(
+        "You are a document text extractor. Return only the extracted text, no commentary.",
+        user_content,
+        model=OPENROUTER_FREE_MODEL,
+        temperature=0.0,
+    )
+
+
+# ---------------------------------------------------------------------------
+# OpenCode CLI (via OpenRouter)
+# ---------------------------------------------------------------------------
 
 
 def opencode_run(
@@ -77,9 +178,8 @@ def opencode_run(
 ) -> str:
     """Run opencode CLI with the given message and file attachments.
 
-    Requires GOOGLE_GENERATIVE_AI_API_KEY in env (or in *env*) so opencode can use Google/Gemini.
+    Requires OPENROUTER_API_KEY in env so opencode can reach the OpenRouter provider.
     """
-    # Load .env so vars are in os.environ before we copy to subprocess (e.g. when run via uv run)
     _scripts_dir = os.path.dirname(os.path.abspath(__file__))
     _repo_root = os.path.join(_scripts_dir, "..")
     load_dotenv(os.path.join(_repo_root, ".env"))

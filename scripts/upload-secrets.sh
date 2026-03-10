@@ -14,7 +14,7 @@ echo "Looking for .secrets in: $REPO_ROOT"
 echo ""
 
 missing=0
-for f in gws-credentials.json google-generative-ai-api-key notebooklm-notebook-id; do
+for f in gws-credentials.json openrouter-api-key notebooklm-notebook-id; do
   if [[ ! -f "$SECRETS_DIR/$f" ]]; then
     echo "ERROR: Missing $SECRETS_DIR/$f"
     missing=1
@@ -43,8 +43,8 @@ echo ""
 echo "Uploading GWS_CREDENTIALS..."
 gh secret set GWS_CREDENTIALS -R "$REPO" < "$SECRETS_DIR/gws-credentials.json"
 
-echo "Uploading GOOGLE_GENERATIVE_AI_API_KEY..."
-gh secret set GOOGLE_GENERATIVE_AI_API_KEY -R "$REPO" < "$SECRETS_DIR/google-generative-ai-api-key"
+echo "Uploading OPENROUTER_API_KEY..."
+gh secret set OPENROUTER_API_KEY -R "$REPO" < "$SECRETS_DIR/openrouter-api-key"
 
 echo "Uploading NOTEBOOKLM_NOTEBOOK_ID..."
 gh secret set NOTEBOOKLM_NOTEBOOK_ID -R "$REPO" < "$SECRETS_DIR/notebooklm-notebook-id"

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Process 2: Normalize raw emails into structured request documents.
 
-Reads raw email folders, sends the email + PDF attachments to the
-normalize agent (opencode + Gemini), and writes the result to requests/.
+Two-step pipeline, both via OpenRouter:
+  1. Extract text from PDF attachments (openrouter/free + pdf-text plugin)
+  2. Normalize email + extracted text into structured JSON (opencode + arcee-ai)
 
 When invoked with --run-folder, operates on a specific ingest run,
 commits results, creates a PR, and auto-merges it to main.
@@ -15,10 +16,12 @@ Usage:
 
 import argparse
 import json
+import mimetypes
 import os
 import re
 import shutil
 import sys
+from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -27,13 +30,13 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from utils import (
-    GEMINI_MODEL,
     gh_pr_create,
     gh_pr_merge,
     git_commit_and_push,
     log,
     make_slug,
     opencode_run,
+    openrouter_extract_pdf,
     parse_frontmatter,
     render_frontmatter,
 )
@@ -84,8 +87,40 @@ def _parse_normalize_response(raw: str) -> list[dict] | None:
     return requests
 
 
+def _extract_pdfs(folder: str) -> dict[str, str]:
+    """Step 1: Extract text from all PDFs in folder via OpenRouter pdf-text plugin.
+
+    Returns {filename: extracted_text} for each successfully extracted PDF.
+    """
+    extracts: dict[str, str] = {}
+    for fname in sorted(os.listdir(folder)):
+        if fname == "email.md":
+            continue
+        fpath = os.path.join(folder, fname)
+        if not os.path.isfile(fpath):
+            continue
+        mime, _ = mimetypes.guess_type(fname)
+        if mime != "application/pdf":
+            continue
+        try:
+            log(f"  Extracting PDF: {fname} (OpenRouter pdf-text)...")
+            text = openrouter_extract_pdf(fpath)
+            if text:
+                extracts[fname] = text
+                log(f"  Extracted {len(text)} chars from {fname}")
+            else:
+                log(f"  Empty extraction for {fname}")
+        except Exception as e:
+            log(f"  PDF extraction failed for {fname}: {e}")
+    return extracts
+
+
 def normalize_email(folder: str) -> list[dict]:
-    """Normalize raw email folder via opencode + Gemini."""
+    """Normalize raw email folder via two-step OpenRouter pipeline.
+
+    Step 1: Extract text from PDFs using openrouter/free + pdf-text plugin.
+    Step 2: Normalize email + extracted text using opencode + arcee-ai/trinity-mini.
+    """
     fallback = [{"_fallback": True}]
 
     email_path = os.path.join(folder, "email.md")
@@ -93,25 +128,33 @@ def normalize_email(folder: str) -> list[dict]:
         log(f"  No email.md in {folder}")
         return fallback
 
-    google_key = os.environ.get("GOOGLE_GENERATIVE_AI_API_KEY", "").strip()
-    if not google_key:
-        log("  GOOGLE_GENERATIVE_AI_API_KEY not set; skipping")
+    api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+    if not api_key:
+        log("  OPENROUTER_API_KEY not set; skipping")
         return fallback
 
-    file_paths = _folder_file_paths(folder)
-    if not file_paths:
-        return fallback
+    # Step 1: extract PDF text via OpenRouter
+    pdf_extracts = _extract_pdfs(folder)
 
-    file_names = ", ".join(os.path.basename(p) for p in file_paths)
-    message = f"Normalize the attached email and any attachments ({file_names}). Return only the JSON."
+    # Step 2: build message with email + extracted PDF text, send to opencode
+    parts = ["Normalize the attached email"]
+    if pdf_extracts:
+        parts.append(f" and {len(pdf_extracts)} PDF attachment(s)")
+    parts.append(". Return only the JSON.")
+
+    if pdf_extracts:
+        parts.append("\n\n## Extracted PDF Contents\n")
+        for fname, text in pdf_extracts.items():
+            parts.append(f"### {fname}\n\n{text}\n")
+
+    message = "".join(parts)
+
     try:
-        log("  Running opencode (Gemini)...")
-        os.environ["GOOGLE_GENERATIVE_AI_API_KEY"] = google_key
+        log("  Running opencode (arcee-ai via OpenRouter)...")
         raw = opencode_run(
             message,
-            files=file_paths,
+            files=[email_path],
             agent="normalize",
-            model=GEMINI_MODEL,
             cwd=PROJECT_ROOT,
         )
         parsed = _parse_normalize_response(raw)
@@ -236,7 +279,8 @@ def build_normalized_markdown(req: dict, headers: dict, seq: int) -> str:
 def process_folder(folder: str) -> list[str]:
     """Normalize a single raw_emails/<slug>/ folder.
 
-    Returns list of created request file paths.
+    Output structure: requests/YYYY-MM-DD/<slug>/request.md + attachments.
+    Returns list of created file paths.
     """
     email_path = os.path.join(folder, "email.md")
     if not os.path.exists(email_path):
@@ -247,7 +291,8 @@ def process_folder(folder: str) -> list[str]:
         text = f.read()
 
     headers, _ = parse_frontmatter(text)
-    slug = os.path.basename(folder)
+    raw_slug = os.path.basename(folder)
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     log(f"Normalizing {folder}...")
     normalized = normalize_email(folder)
@@ -258,33 +303,29 @@ def process_folder(folder: str) -> list[str]:
             log(f"  Skipping fallback result for {folder}")
             continue
 
-        org = req.get("organization") or headers.get("subject", slug)
-        out_slug = make_slug(headers.get("date", ""), org)
-        out_path = os.path.join(REQUESTS_DIR, f"{out_slug}.md")
+        org = req.get("organization") or headers.get("subject", raw_slug)
+        out_slug = make_slug("", org, include_date=False)
 
-        if os.path.exists(out_path):
-            out_slug = f"{out_slug}-{i+1}"
-            out_path = os.path.join(REQUESTS_DIR, f"{out_slug}.md")
+        out_dir = os.path.join(REQUESTS_DIR, today, out_slug)
+        if os.path.exists(out_dir):
+            out_dir = os.path.join(REQUESTS_DIR, today, f"{out_slug}-{i+1}")
+
+        os.makedirs(out_dir, exist_ok=True)
+        out_path = os.path.join(out_dir, "request.md")
 
         md = build_normalized_markdown(req, headers, seq=i + 1)
-
-        os.makedirs(REQUESTS_DIR, exist_ok=True)
         with open(out_path, "w") as f:
             f.write(md)
         log(f"  Wrote {out_path}")
         created.append(out_path)
 
-        created.extend(_copy_attachments(folder, out_path))
+        created.extend(_copy_attachments(folder, out_dir))
 
     return created
 
 
-def _copy_attachments(raw_folder: str, md_path: str) -> list[str]:
-    """Copy non-email.md files from raw_folder into a subfolder next to md_path.
-
-    E.g. requests/2026-03-05-org.md  ->  requests/2026-03-05-org/<filename>
-    """
-    att_dir = md_path.removesuffix(".md")
+def _copy_attachments(raw_folder: str, dest_dir: str) -> list[str]:
+    """Copy non-email.md files from raw_folder into dest_dir."""
     copied = []
     for fname in sorted(os.listdir(raw_folder)):
         if fname == "email.md":
@@ -292,8 +333,8 @@ def _copy_attachments(raw_folder: str, md_path: str) -> list[str]:
         src = os.path.join(raw_folder, fname)
         if not os.path.isfile(src):
             continue
-        os.makedirs(att_dir, exist_ok=True)
-        dst = os.path.join(att_dir, fname)
+        os.makedirs(dest_dir, exist_ok=True)
+        dst = os.path.join(dest_dir, fname)
         shutil.copy2(src, dst)
         copied.append(dst)
         log(f"  Copied attachment: {dst}")

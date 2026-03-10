@@ -83,15 +83,15 @@ else
 fi
 echo ""
 
-# --- Step 3: Google Generative AI API key (for opencode) ---
-echo "--- Step 3/7: Google Generative AI API Key (opencode) ---"
-if [[ -f "$SECRETS_DIR/google-generative-ai-api-key" ]]; then
-  echo "Found existing $SECRETS_DIR/google-generative-ai-api-key — skipping."
+# --- Step 3: OpenRouter API key (for opencode + PDF extraction) ---
+echo "--- Step 3/7: OpenRouter API Key ---"
+if [[ -f "$SECRETS_DIR/openrouter-api-key" ]]; then
+  echo "Found existing $SECRETS_DIR/openrouter-api-key — skipping."
 else
-  echo "Get your key at https://aistudio.google.com/apikey"
-  read -rp "Paste your Google Generative AI API key: " api_key
-  echo -n "$api_key" > "$SECRETS_DIR/google-generative-ai-api-key"
-  echo "Saved to $SECRETS_DIR/google-generative-ai-api-key"
+  echo "Get your key at https://openrouter.ai/keys"
+  read -rp "Paste your OpenRouter API key (sk-or-...): " api_key
+  echo -n "$api_key" > "$SECRETS_DIR/openrouter-api-key"
+  echo "Saved to $SECRETS_DIR/openrouter-api-key"
 fi
 echo ""
 
