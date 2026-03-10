@@ -301,17 +301,13 @@ def gh_pr_create(title: str, body: str, base: str = "main") -> str:
 
 
 def gh_pr_merge(pr_url: str, method: str = "squash"):
-    """Approve and merge a pull request via gh CLI.
+    """Merge a pull request via gh CLI.
 
-    Uses --admin to bypass branch-protection review requirements when the
-    token has the necessary permissions.
+    Requires GH_TOKEN to be set to a PAT with pull-requests:write and
+    contents:write so it can merge directly without admin-bypass flags.
     """
     subprocess.run(
-        ["gh", "pr", "review", pr_url, "--approve"],
-        capture_output=True, text=True, check=False,
-    )
-    subprocess.run(
-        ["gh", "pr", "merge", pr_url, f"--{method}", "--admin", "--delete-branch"],
+        ["gh", "pr", "merge", pr_url, f"--{method}", "--delete-branch"],
         capture_output=True, text=True, check=True,
     )
 
