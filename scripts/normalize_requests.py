@@ -62,29 +62,120 @@ def _folder_file_paths(folder: str) -> list[str]:
     return paths
 
 
-def _parse_normalize_response(raw: str) -> list[dict] | None:
-    """Parse opencode JSON response into requests list or None."""
-    raw = raw.strip()
-    json_str = raw
-    if "```" in raw:
-        match = re.search(r"```(?:json)?\s*\n(.*?)\n?```", raw, re.DOTALL)
-        if match:
-            json_str = match.group(1).strip()
-    if not json_str.strip().startswith("{"):
-        idx = json_str.find("{")
-        if idx >= 0:
-            json_str = json_str[idx:]
-    try:
-        data = json.loads(json_str)
-    except json.JSONDecodeError:
+def _find_repetition_start(text: str) -> int | None:
+    """Detect degenerate LLM repetition and return the offset where it begins."""
+    text_len = len(text)
+    for period in range(10, min(500, text_len // 4)):
+        if text[-period:] == text[-2 * period:-period]:
+            pos = text_len - 2 * period
+            while pos >= period and text[pos - period:pos] == text[pos:pos + period]:
+                pos -= period
+            return pos
+    return None
+
+
+def _close_json(fragment: str) -> str:
+    """Close a truncated JSON fragment by adding missing quotes/brackets."""
+    in_string = False
+    escape = False
+    stack: list[str] = []
+
+    for c in fragment:
+        if escape:
+            escape = False
+            continue
+        if c == "\\" and in_string:
+            escape = True
+            continue
+        if c == '"':
+            in_string = not in_string
+            continue
+        if in_string:
+            continue
+        if c in "{[":
+            stack.append(c)
+        elif c == "}" and stack and stack[-1] == "{":
+            stack.pop()
+        elif c == "]" and stack and stack[-1] == "[":
+            stack.pop()
+
+    result = fragment
+    if in_string:
+        result += '"'
+    for bracket in reversed(stack):
+        result += "}" if bracket == "{" else "]"
+    return result
+
+
+def _validate_requests(data: object) -> list[dict] | None:
+    """Return the requests list if *data* has the expected shape, else None."""
+    if not isinstance(data, dict):
         return None
     requests = data.get("requests")
     if not isinstance(requests, list) or not requests:
         return None
-    for req in requests:
-        if not isinstance(req, dict) or "summary" not in req:
-            return None
-    return requests
+    if all(isinstance(r, dict) and "summary" in r for r in requests):
+        return requests
+    return None
+
+
+def _parse_normalize_response(raw: str) -> list[dict] | None:
+    """Parse opencode JSON response into requests list or None.
+
+    Handles verbose opencode output by trying multiple extraction strategies:
+    1. JSON inside a fenced code block
+    2. raw_decode from the first '{' (tolerates trailing text)
+    3. Detect LLM repetition, truncate, repair, and re-parse
+    """
+    raw = raw.strip()
+    candidates: list[str] = []
+
+    # Strategy 1: code-fenced JSON blocks (collect all, prefer last)
+    for m in re.finditer(r"```(?:json)?\s*\n(.*?)\n?```", raw, re.DOTALL):
+        candidates.append(m.group(1).strip())
+    candidates.reverse()
+
+    # Strategy 2: locate '{' positions in the raw text
+    if not candidates:
+        anchor = raw.find('{"requests"')
+        if anchor >= 0:
+            candidates.append(raw[anchor:])
+        brace_positions = [i for i, c in enumerate(raw) if c == "{"]
+        for pos in reversed(brace_positions):
+            candidates.append(raw[pos:])
+
+    decoder = json.JSONDecoder()
+    for candidate in candidates:
+        try:
+            data, _ = decoder.raw_decode(candidate)
+        except (json.JSONDecodeError, ValueError):
+            continue
+        result = _validate_requests(data)
+        if result is not None:
+            return result
+
+    # Strategy 3: detect repetitive degeneration, truncate, repair JSON
+    rep_start = _find_repetition_start(raw)
+    if rep_start is not None:
+        log(f"  [debug] detected LLM repetition at offset {rep_start}/{len(raw)}")
+        truncated = raw[:rep_start]
+        json_start = truncated.find('{"requests"')
+        if json_start < 0:
+            json_start = truncated.find("{")
+        if json_start >= 0:
+            repaired = _close_json(truncated[json_start:])
+            try:
+                data = json.loads(repaired)
+                result = _validate_requests(data)
+                if result is not None:
+                    log(f"  [debug] recovered JSON after truncating repetition")
+                    return result
+            except json.JSONDecodeError:
+                pass
+
+    log(f"  [debug] parse failed — first 300 chars: {raw[:300]!r}")
+    log(f"  [debug] parse failed — last  300 chars: {raw[-300:]!r}")
+    return None
 
 
 def _extract_pdfs(folder: str) -> dict[str, str]:
