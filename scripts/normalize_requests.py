@@ -2,7 +2,7 @@
 """Process 2: Normalize raw emails into structured request documents.
 
 Two-step pipeline, both via OpenRouter:
-  1. Extract text from PDF attachments (openrouter/free + pdf-text plugin)
+  1. Extract text from PDF attachments (arcee-ai/trinity-large-preview:free + pdf-text plugin)
   2. Normalize email + extracted text into structured JSON (opencode + arcee-ai)
 
 When invoked with --run-folder, operates on a specific ingest run,
@@ -118,7 +118,7 @@ def _extract_pdfs(folder: str) -> dict[str, str]:
 def normalize_email(folder: str) -> list[dict]:
     """Normalize raw email folder via two-step OpenRouter pipeline.
 
-    Step 1: Extract text from PDFs using openrouter/free + pdf-text plugin.
+    Step 1: Extract text from PDFs using arcee-ai/trinity-large-preview:free + pdf-text plugin.
     Step 2: Normalize email + extracted text using opencode + arcee-ai/trinity-mini.
     """
     fallback = [{"_fallback": True}]

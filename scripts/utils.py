@@ -67,7 +67,7 @@ def make_slug(date_str: str, subject: str, max_len: int = 80, include_date: bool
 # ---------------------------------------------------------------------------
 
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_FREE_MODEL = "openrouter/free"
+OPENROUTER_FREE_MODEL = "arcee-ai/trinity-large-preview:free"
 
 
 def openrouter_chat(
@@ -134,7 +134,7 @@ def openrouter_chat(
 def openrouter_extract_pdf(pdf_path: str) -> str:
     """Extract text from a PDF file using OpenRouter's pdf-text plugin.
 
-    Sends the PDF as a base64 file part to the openrouter/free model and
+    Sends the PDF as a base64 file part to the arcee-ai/trinity-large-preview:free model and
     returns the extracted text content.
     """
     import base64
