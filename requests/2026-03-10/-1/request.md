@@ -5,14 +5,14 @@ date_received: Tue, 10 Mar 2026 10:29:09 +0000
 status: new
 ---
 
-# פרויקט הומניטרי ארצי המסייע לאוכלוסיות קשות — Program Funding
+# מכינת שובו אחים לזכר שלושת החטופים — Emergency Aid
 
 ## Quick Reference
 
 | Field | Value |
 |---|---|
-| **Organization** | פרויקט הומניטרי ארצי המסייע לאוכלוסיות קשות |
-| **Contact** | Leah — מנהלת הפרויקטים |
+| **Organization** | מכינת שובו אחים לזכר שלושת החטופים |
+| **Contact** | ליה — מנהלת הפרויקטים |
 | **Contact Email** | shuvuahim20@gmail.com |
 | **Contact Phone** | 055-568-0882 |
 | **Website** | — |
@@ -23,50 +23,28 @@ status: new
 
 | Field | Value |
 |---|---|
-| **Request Type** | program_funding |
+| **Request Type** | emergency_aid |
 | **Urgency** | high |
-| **Sector** | healthcare, refugees, elderly |
-| **Target Population** | Children in shelters needing computers, soldiers requiring emergency kits, elderly needing hygiene products |
-| **Geographic Focus** | Chicago - Maywood and Shadrach areas |
-| **Language** | mixed |
+| **Sector** | refugees,elderly |
+| **Target Population** | Affected families, soldiers, elderly |
+| **Geographic Focus** | Northern Israel – Haifa region |
+| **Language** | he |
 
 ## The Ask
 
-National humanitarian project seeking donations or supplies for children in shelters needing computers, soldiers requiring emergency kits, and elderly needing hygiene products
+Humanitarian project seeking donations or product contributions for affected families, soldiers, and elderly in Northern Israel during Operation Lion.
 
 **Funding Requested:** Not specified
 
-**Non-Financial Ask:** Partnerships
+**Non-Financial Ask:** Donations or product contributions
 
 ## Context & Background
 
-National humanitarian project assisting hard populations in Chicago through emergency response to families in financial distress, displaced families, single soldiers, and elderly. Current needs include computers for remote learning, emergency kits for soldiers, and basic hygiene products for elderly.
+Humanitarian project in Northern Israel (Haifa region) providing aid to affected families, soldiers, and elderly during Operation Lion. Requests donations or product contributions to support these populations.
 
 ## Attachments
 
 (none)
-
-## Extracted Data
-
-היי דינה ברמן פדרציית שיקגו, מה שלומך?
-נעים להכיר, אני ליה, מנהלת הפרויקטים במכינת שובו אחים לזכר שלושת החטופים. המכינה מפעילה פרויקט הומניטרי ארצי המסייע לאוכלוסיות קשות, בשיתוף פעולה עם מחלקות הרווחה מקרית שמונה ועד שדרות.
-
-בשבוע וחצי האחרונים, במהלך מבצע "שאגת הארי", אנו מקבלים פניות רבות מהשטח ממשפחות מילואימניקים שנפגעו כלכלית, משפחות מפונות, חיילים בודדים וקשישים.
-
-הצרכים שאנו מגייסים הם:
-* ילדים השוהים במקלטים ונדרשים ללמידה מרחוק אך ידם אינה משגת לרכוש מחשבים,
-* חיילים שהוקפצו עם תחילת המבצע ונמצאים כבר שבוע וחצי בשטח וזקוקים לערכות חירום,
-* קשישים הזקוקים למוצרי היגיינה, תרופות ומזון בסיסי.
-
-נוכל לבדוק אפשרות לסייע בתרומה או בתרומת מוצרים עבור האוכלוסיות הללו לאור הצורך והשעה.
-
-העמותה מחזיקה בכל המסמכים הנדרשים לצורכי מס.
-
-נשמח מאוד לשותפות החשובה. תודה גדולה מראש על כל מחשבה ועזרה.
-ליה
-shuvuahim20@gmail.com<mailto:shuvuahim20@gmail.com>
-055-568-0882
-
 
 ## Internal Notes
 
