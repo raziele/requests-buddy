@@ -33,10 +33,11 @@ jobs:
             echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
           fi
 
+      # PAT required: GITHUB_TOKEN is not permitted to create/approve PRs in this repo.
       - uses: actions/checkout@v4
         with:
           ref: ${{ steps.params.outputs.branch }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -60,7 +61,7 @@ jobs:
         id: normalize
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: >
           uv run python scripts/normalize_requests.py
           --run-folder "${{ steps.params.outputs.run_folder }}"
@@ -69,7 +70,7 @@ jobs:
       - name: Create Pull Request
         if: steps.normalize.outputs.pr_title != ''
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           pr_url=$(gh pr create \
             --title "${{ steps.normalize.outputs.pr_title }}" \
