@@ -72,10 +72,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
+          BASE_BRANCH="${{ github.event.repository.default_branch }}"
+          git fetch origin "$BASE_BRANCH"
           pr_url=$(gh pr create \
             --title "${{ steps.normalize.outputs.pr_title }}" \
             --body-file .github_pr_body.txt \
-            --base main \
+            --base "$BASE_BRANCH" \
             --head ${{ steps.params.outputs.branch }})
           echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
           gh pr merge "$pr_url" --squash --delete-branch
