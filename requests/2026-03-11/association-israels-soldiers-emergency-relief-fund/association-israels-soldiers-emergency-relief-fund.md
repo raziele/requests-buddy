@@ -12,12 +12,12 @@ status: new
 | Field | Value |
 |---|---|
 | **Organization** | The Association for Israel's Soldiers |
-| **Contact** | COL (Res.) Sherry Carmel — Chief Executive Officer |
+| **Contact** | COL (Res.) Sherry Carmel — CEO |
 | **Contact Email** | Shirley-sy@ufis.org |
 | **Contact Phone** | +972-52-924-2021 |
 | **Website** | — |
-| **Original Date** | March 4, 2026 |
-| **Forwarded By** | Barak Loozon <BarakL@jewishfed.org> |
+| **Original Date** | 2026-03-04 |
+| **Forwarded By** | "Broady, Tamar" <tbrody@jewishphilly.org> |
 
 ## Classification
 
