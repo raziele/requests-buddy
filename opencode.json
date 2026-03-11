@@ -1,13 +1,11 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
-  "model": "openrouter/arcee-ai/trinity-large-preview:free",
+  "model": "{env:OPENROUTER_MODEL}",
   "default_agent": "normalize",
   "provider": {
     "openrouter": {
-      "models": {
-        "arcee-ai/trinity-mini:free": {}
-      },
+      "models": {},
       "options": {
         "apiKey": "{env:OPENROUTER_API_KEY}",
         "baseURL": "https://openrouter.ai/api/v1"
@@ -22,7 +20,7 @@
     "normalize": {
       "description": "Normalizes raw email requests into structured JSON. Reads email.md and extracted PDF text, then extracts organization details, classification, funding info, and context.",
       "mode": "primary",
-      "model": "openrouter/arcee-ai/trinity-large-preview:free",
+      "model": "{env:OPENROUTER_MODEL}",
       "prompt": "{file:./prompts/opencode-normalize.md}",
       "tools": {
         "write": true,
