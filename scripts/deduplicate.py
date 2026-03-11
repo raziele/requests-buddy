@@ -5,19 +5,17 @@ import hashlib
 import json
 import os
 import sys
-import tempfile
 from datetime import datetime, timezone
 from glob import glob
 
 sys.path.insert(0, os.path.dirname(__file__))
 
 from utils import (
-    GEMINI_MODEL,
+    cursor_agent_run,
     git,
     git_commit_and_push,
     gh_pr_create,
     log,
-    opencode_run,
     parse_frontmatter,
 )
 
@@ -106,21 +104,7 @@ def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict])
         existing_requests=json.dumps(existing_summaries, indent=2),
     )
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".md", prefix="dedup-detect-", delete=False,
-    ) as tmp:
-        tmp.write(prompt)
-        prompt_file = tmp.name
-
-    try:
-        response = opencode_run(
-            "Analyze the attached file and return the JSON as instructed.",
-            files=[prompt_file],
-            model=GEMINI_MODEL,
-            cwd=PROJECT_ROOT,
-        )
-    finally:
-        os.unlink(prompt_file)
+    response = cursor_agent_run(prompt, cwd=PROJECT_ROOT)
 
     text = response.strip()
     if text.startswith("```"):
@@ -151,21 +135,7 @@ def merge_group(group_files: list[str]) -> tuple[str, str]:
 
     prompt = load_prompt("merge-duplicates", documents=documents_block)
 
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".md", prefix="dedup-merge-", delete=False,
-    ) as tmp:
-        tmp.write(prompt)
-        prompt_file = tmp.name
-
-    try:
-        merged = opencode_run(
-            "Merge the duplicate documents as instructed in the attached file.",
-            files=[prompt_file],
-            model=GEMINI_MODEL,
-            cwd=PROJECT_ROOT,
-        )
-    finally:
-        os.unlink(prompt_file)
+    merged = cursor_agent_run(prompt, cwd=PROJECT_ROOT)
 
     # Strip markdown code fences if present
     text = merged.strip()
