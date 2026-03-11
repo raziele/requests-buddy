@@ -30,13 +30,13 @@ else
   echo "gws already installed."
 fi
 
-# --- Install opencode if missing ---
-if ! command -v opencode &>/dev/null; then
-  echo "Installing opencode..."
-  npm install -g @opencode-ai/cli
-  echo "Installed opencode."
+# --- Install Cursor agent CLI if missing ---
+if ! command -v agent &>/dev/null; then
+  echo "Installing Cursor agent CLI..."
+  curl https://cursor.com/install -fsS | bash
+  echo "Installed Cursor agent CLI."
 else
-  echo "opencode already installed."
+  echo "Cursor agent CLI already installed."
 fi
 echo ""
 
@@ -83,15 +83,15 @@ else
 fi
 echo ""
 
-# --- Step 3: OpenRouter API key (for opencode + PDF extraction) ---
-echo "--- Step 3/7: OpenRouter API Key ---"
-if [[ -f "$SECRETS_DIR/openrouter-api-key" ]]; then
-  echo "Found existing $SECRETS_DIR/openrouter-api-key — skipping."
+# --- Step 3: Cursor API key (for Cursor agent CLI) ---
+echo "--- Step 3/7: Cursor API Key ---"
+if [[ -f "$SECRETS_DIR/cursor-api-key" ]]; then
+  echo "Found existing $SECRETS_DIR/cursor-api-key — skipping."
 else
-  echo "Get your key at https://openrouter.ai/keys"
-  read -rp "Paste your OpenRouter API key (sk-or-...): " api_key
-  echo -n "$api_key" > "$SECRETS_DIR/openrouter-api-key"
-  echo "Saved to $SECRETS_DIR/openrouter-api-key"
+  echo "Get your key from Cursor settings."
+  read -rp "Paste your Cursor API key: " api_key
+  echo -n "$api_key" > "$SECRETS_DIR/cursor-api-key"
+  echo "Saved to $SECRETS_DIR/cursor-api-key"
 fi
 echo ""
 
