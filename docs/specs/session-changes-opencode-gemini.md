@@ -14,7 +14,7 @@ Summary of changes made to get opencode using Gemini for the normalize step and 
 - **API keys:** Switched from file refs to env vars so CI can use GitHub Secrets:
   - Was: `"apiKey": "{file:.secrets/openrouter-api-key}"` and `{file:.secrets/gemini-api-key}`.
   - Now: no `apiKey` in config; OpenCode uses `GOOGLE_GENERATIVE_AI_API_KEY` from the environment (see [opencode.ai](https://opencode.ai/docs/cli#auth)).
-- **Default model:** Set to `google/gemini-2.5-flash-lite` (was `arcee-ai/trinity-mini:free`).
+- **Default model:** Set to `google/gemini-2.5-flash-lite` (was a prior OpenRouter model).
 - **Default agent:** Set to `normalize`.
 - **OpenRouter removed:** OpenRouter provider was removed so the default provider is Google. Normalize and any other opencode usage now use Gemini when the key is set.
 
