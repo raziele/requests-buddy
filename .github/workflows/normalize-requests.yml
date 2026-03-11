@@ -49,7 +49,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install -g opencode-ai
+          curl https://cursor.com/install -fsS | bash
           uv sync
 
       - name: Configure git
@@ -60,8 +60,7 @@ jobs:
       - name: Run normalize
         id: normalize
         env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || secrets.OPENROUTER_MODEL }}
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: >
           uv run python scripts/normalize_requests.py
