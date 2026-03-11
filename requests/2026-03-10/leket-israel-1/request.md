@@ -1,7 +1,7 @@
 ---
 id: REQ-Mon, 9 Mar-001
-source_email_id: <CA+FP07YNooNcY5bmAAbPdegHBX--CKOnaA7KJPZJ4o7BaoSN1A@mail.gmail.com>
-date_received: Mon, 9 Mar 2026 17:03:40 +0200
+source_email_id: <MN2PR18MB34244F123B73315456DE3D819E79A@MN2PR18MB3424.namprd18.prod.outlook.com>
+date_received: Mon, 9 Mar 2026 12:52:18 +0000
 status: new
 ---
 
@@ -16,46 +16,44 @@ status: new
 | **Contact Email** | rosie@leket.org |
 | **Contact Phone** | +972-53-5678940 |
 | **Website** | www.leket.org |
-| **Original Date** | Mon, Mar 9, 2026 |
-| **Forwarded By** | "Broady, Tamar" <tbrody@jewishphilly.org> |
+| **Original Date** | Mon, 9 Mar 2026 14:02 |
+| **Forwarded By** | "Lichtig, Ofer" <Ofer.Lichtig@jewishfederations.org> |
 
 ## Classification
 
 | Field | Value |
 |---|---|
 | **Request Type** | emergency_aid |
-| **Urgency** | critical |
-| **Sector** | food_security, refugees |
+| **Urgency** | high |
+| **Sector** | community_resilience |
 | **Target Population** | vulnerable families across Israel |
-| **Geographic Focus** | Nationwide Israel |
+| **Geographic Focus** | Nationwide |
 | **Language** | mixed |
 
 ## The Ask
 
-Leket Israel requires $508,210 weekly emergency funding to maintain food distribution operations during the Israel-Iran war, as disrupted supply chains have reduced meal distribution from 8,000 to 3,000 daily meals.
+Leket Israel is seeking emergency funding to maintain food distribution to vulnerable families during the ongoing security crisis, as disruptions to food rescue networks have created significant gaps in their operations.
 
 **Funding Requested:** $508,210 per week
 
 **Funding Breakdown:**
-- Meals: 5,000 additional meals daily
-- Produce: Temporary purchases to maintain supply
-
-**Non-Financial Ask:** Temporary food purchases and supermarket vouchers for families unable to access distribution points
+- Additional meals: 5,000 meals daily
+- Produce purchases: Significant temporary purchases
 
 ## Context & Background
 
-Due to rocket fire disrupting volunteer activity and supply chains, Leket Israel's food rescue operations have dropped from 8,000 to 3,000 daily meals. The organization needs emergency funding to sustain distribution and prevent increased hardship for vulnerable families during the ongoing war.
+Leket Israel, Israel's national food bank, is facing severe disruptions to its food rescue operations due to the ongoing security situation. Rocket fire has forced them to pause volunteer activity, limit collection and distribution operations, and halt harvests. The supply of surplus food has declined sharply, with daily meal distribution dropping from 8,000 to 3,000 meals. To maintain operations and prevent vulnerable families from facing additional hardship, Leket is temporarily supplementing rescued food with purchased food and providing supermarket vouchers. They need an additional $508,210 per week to address these critical gaps and ensure consistent food security for hundreds of nonprofit partners serving vulnerable populations across the country.
 
 ## Attachments
 
 | Filename | Description |
 |---|---|
-| image001.png | Leket Israel logo and banner |
-| image002.png | Leket Israel logo and banner |
-| image003.png | Leket Israel logo and banner |
-| image004.png | Leket Israel logo and banner |
-| image005.png | Leket Israel logo and banner |
-| image865982.jpg | Leket Israel banner with emergency appeal |
+| image001.png | Social media icons (Facebook, Instagram, Twitter, YouTube) |
+| image002.png | Social media icons (Facebook, Instagram, Twitter, YouTube) |
+| image003.png | Social media icons (Facebook, Instagram, Twitter, YouTube) |
+| image004.png | Social media icons (Facebook, Instagram, Twitter, YouTube) |
+| image005.png | Social media icons (Facebook, Instagram, Twitter, YouTube) |
+| image349988.jpg | Image attachment (content not readable) |
 
 ## Internal Notes
 

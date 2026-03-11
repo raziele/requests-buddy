@@ -1,7 +1,7 @@
 ---
 id: REQ-Mon, 9 Mar-001
-source_email_id: <CA+FP07YNooNcY5bmAAbPdegHBX--CKOnaA7KJPZJ4o7BaoSN1A@mail.gmail.com>
-date_received: Mon, 9 Mar 2026 17:03:40 +0200
+source_email_id: <MN2PR18MB34244F123B73315456DE3D819E79A@MN2PR18MB3424.namprd18.prod.outlook.com>
+date_received: Mon, 9 Mar 2026 12:52:18 +0000
 status: new
 ---
 
@@ -12,41 +12,41 @@ status: new
 | Field | Value |
 |---|---|
 | **Organization** | Leket Israel |
-| **Contact** | Rosie Miller — Grants and Donor Relations Manager |
+| **Contact** | Rosie Shem-Tov Miller — Grants and Donor Relations Manager |
 | **Contact Email** | rosie@leket.org |
 | **Contact Phone** | +972-53-5678940 |
-| **Website** | http://www.leket.org/ |
-| **Original Date** | Mon, Mar 9, 2026 at 12:59 PM |
-| **Forwarded By** | "Broady, Tamar" <tbrody@jewishphilly.org> |
+| **Website** | www.leket.org |
+| **Original Date** | Mon, 9 Mar 2026 14:02:00 +0000 |
+| **Forwarded By** | "Lichtig, Ofer" <Ofer.Lichtig@jewishfederations.org> |
 
 ## Classification
 
 | Field | Value |
 |---|---|
 | **Request Type** | emergency_aid |
-| **Urgency** | high |
-| **Sector** | community_resilience,refugees |
-| **Target Population** | Vulnerable families |
+| **Urgency** | critical |
+| **Sector** | refugees, community_resilience |
+| **Target Population** | Vulnerable families across Israel |
 | **Geographic Focus** | Israel |
 | **Language** | mixed |
 
 ## The Ask
 
-Leket Israel is requesting emergency funding to address increased food security needs due to the ongoing conflict. Daily life in Israel is disrupted by sirens and instability, impacting food supply chains. Leket is supplementing rescued food with purchased food and providing supermarket vouchers, requiring an additional $508,210 per week to maintain operations and meet the needs of vulnerable families.
+Leket Israel is requesting emergency financial support to continue providing food to vulnerable families during the ongoing war with Iran. The conflict has disrupted their usual food rescue operations, leading to a significant decrease in available surplus food. To maintain distribution levels, Leket Israel is temporarily supplementing rescued food with purchased food and providing supermarket vouchers. They require an additional $508,210 per week to cover the costs of purchasing meals and produce, and to maintain distribution to their nonprofit partners.
 
 **Funding Requested:** $508,210 per week
 
 **Funding Breakdown:**
 - Meals: Purchase of an additional 5,000 meals daily
-- Produce: Significant temporary purchases due to farmers' inability to harvest
+- Produce: Significant temporary purchases to maintain supply
 
 ## Context & Background
 
-The ongoing conflict in Israel has created widespread uncertainty and disrupted daily life, with frequent sirens and families moving between shelters. This instability has significantly impacted Leket Israel's ability to provide food to vulnerable families. The usual networks for food rescue have been disrupted due to rocket fire, leading to pauses in volunteer activity and limitations on collection and distribution operations. Farmers have halted harvests, corporate offices are closed, and IDF bases are not permitting entry, resulting in a sharp decline in the supply of surplus food available for rescue.
+The current security situation in Israel, marked by the outbreak of war with Iran, has created deep uncertainty and disruption. Daily life is affected by sirens and the need to move to shelters. This instability impacts nearly every aspect of daily life, making resilience essential for families to meet their basic needs, including food security.
 
-Despite these challenges, Leket Israel is working to maintain and even increase distribution levels to its hundreds of nonprofit partners. To bridge the gap, they are temporarily supplementing rescued food with purchased food and providing supermarket vouchers to families who cannot access distribution points. This emergency response requires significant additional funding to address the immediate needs.
+Leket Israel, as the national food bank, is committed to ensuring vulnerable families have a reliable supply of nutritious food during this crisis. However, the conflict has significantly disrupted their operations. Rocket fire has led to a pause in volunteer activities and limitations on collection and distribution. Farmers have halted harvests, corporate suppliers are inaccessible, and IDF bases are not allowing entry, all of which have drastically reduced the supply of surplus food available for rescue.
 
-Leket Israel is appealing to the Jewish Federation of Greater Philadelphia for emergency support to sustain these efforts. They highlight that maintaining operations during this crisis requires an additional $508,210 per week, primarily to cover the costs of purchasing additional meals and produce. The organization emphasizes the importance of partnership and solidarity from Jewish communities abroad during this critical period.
+Despite these challenges, Leket Israel is working to maintain regular distribution levels and, where possible, increase them. They are supplementing rescued food with purchased food and providing supermarket vouchers to families who cannot access distribution points. To sustain these critical operations during the crisis, they require an additional $508,210 per week. This funding is primarily needed to purchase meals and produce, which have seen a sharp decline in availability through rescue efforts.
 
 ## Attachments
 
@@ -57,28 +57,7 @@ Leket Israel is appealing to the Jewish Federation of Greater Philadelphia for e
 | image003.png | Instagram icon |
 | image004.png | Twitter icon |
 | image005.png | YouTube icon |
-| image865982.jpg | Banner: Leket Israel Doesn't Stop. Join us ensuring that fresh, healthy food reaches the people who truly need it. Donate Now. |
-
-## Extracted Data
-
-### image001.png
-Image of Leket Israel logo.
-
-### image002.png
-Image of Facebook icon.
-
-### image003.png
-Image of Instagram icon.
-
-### image004.png
-Image of Twitter icon.
-
-### image005.png
-Image of YouTube icon.
-
-### image865982.jpg
-Banner with text "Leket Israel Doesn't Stop", "Join us ensuring that fresh, healthy food reaches the people who rtuly need it.", and a "Donate Now" button. Also features the Leket Israel logo and the Israeli flag.
-
+| image349988.jpg | Leket Israel banner with a "Donate Now" button and text 'Leket Israel Doesn't Stop. Join us ensuring that fresh, healthy food reaches the people who truly need it.' |
 
 ## Internal Notes
 
