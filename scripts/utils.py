@@ -70,10 +70,15 @@ OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
 def _openrouter_model() -> str:
-    """Model for OpenRouter; requires OPENROUTER_MODEL env."""
+    """Model for OpenRouter API; requires OPENROUTER_MODEL env.
+
+    Strips openrouter/ prefix if present (opencode uses openrouter/MODEL_ID format).
+    """
     value = os.environ.get("OPENROUTER_MODEL", "").strip()
     if not value:
         raise RuntimeError("OPENROUTER_MODEL not set")
+    if value.startswith("openrouter/"):
+        value = value[len("openrouter/") :]
     return value
 
 

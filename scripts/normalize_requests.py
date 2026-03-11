@@ -20,6 +20,7 @@ import mimetypes
 import os
 import re
 import shutil
+import subprocess
 import sys
 from datetime import datetime, timezone
 
@@ -240,25 +241,21 @@ def normalize_email(folder: str) -> list[dict]:
 
     message = "".join(parts)
 
-    try:
-        log("  Running opencode (OpenRouter)...")
-        raw = opencode_run(
-            message,
-            files=[email_path],
-            agent="normalize",
-            cwd=PROJECT_ROOT,
-        )
-        parsed = _parse_normalize_response(raw)
-        if parsed:
-            log(f"  Normalized into {len(parsed)} request(s)")
-            return parsed
-        log(f"  opencode returned but parse failed (raw length {len(raw)})")
-        if len(raw) < 500 and "Error:" in raw:
-            log(f"  opencode message: {raw.strip()}")
-    except Exception as e:
-        log(f"  opencode failed: {e}")
-
-    return fallback
+    log("  Running opencode (OpenRouter)...")
+    raw = opencode_run(
+        message,
+        files=[email_path],
+        agent="normalize",
+        cwd=PROJECT_ROOT,
+    )
+    parsed = _parse_normalize_response(raw)
+    if parsed:
+        log(f"  Normalized into {len(parsed)} request(s)")
+        return parsed
+    raise RuntimeError(
+        f"opencode returned but parse failed (raw length {len(raw)}). "
+        f"Output may contain an error. First 500 chars: {raw[:500]!r}"
+    )
 
 
 def build_normalized_markdown(req: dict, headers: dict, seq: int) -> str:
@@ -490,6 +487,12 @@ def main():
     parser.add_argument("--run-folder", help="Timestamp of the ingest run to normalize")
     parser.add_argument("--branch", help="Branch name (for PR creation)")
     args = parser.parse_args()
+
+    subprocess.run(
+        [sys.executable, os.path.join(SCRIPT_DIR, "inject_opencode_model.py")],
+        check=True,
+        cwd=PROJECT_ROOT,
+    )
 
     if args.run_folder:
         folders = find_folders_in_run(args.run_folder)

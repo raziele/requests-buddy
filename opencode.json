@@ -5,7 +5,9 @@
   "default_agent": "normalize",
   "provider": {
     "openrouter": {
-      "models": {},
+      "models": {
+        "{env:OPENROUTER_MODEL}": {}
+      },
       "options": {
         "apiKey": "{env:OPENROUTER_API_KEY}",
         "baseURL": "https://openrouter.ai/api/v1"
