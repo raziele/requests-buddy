@@ -12,11 +12,11 @@ status: new
 | Field | Value |
 |---|---|
 | **Organization** | The Association for Israel's Soldiers |
-| **Contact** | מיכל כהן אמיר — — |
-| **Contact Email** | michal-c@ufis.org |
-| **Contact Phone** | — |
+| **Contact** | Shirley Sobel Yosiphon — Foreign Affairs Director |
+| **Contact Email** | Shirley-sy@ufis.org |
+| **Contact Phone** | +972-52-924-2021 |
 | **Website** | www.ufis.org |
-| **Original Date** | Sun, Mar 8, 2026 at 2:22 PM |
+| **Original Date** | 2026-03-09T19:45:38+02:00 |
 | **Forwarded By** | "Broady, Tamar" <tbrody@jewishphilly.org> |
 
 ## Classification

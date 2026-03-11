@@ -15,8 +15,8 @@ status: new
 | **Contact** | Tamar Broady — Israel Program Representative |
 | **Contact Email** | tbrody@jewishphilly.org |
 | **Contact Phone** | 972 54-2497941 |
-| **Website** | jewishphilly.org/supersunday |
-| **Original Date** | Mon, 9 Mar 2026 15:57:05 +0200 |
+| **Website** | jewishphilly.org |
+| **Original Date** | Mon, 9 Mar 2026 19:45:38 +0200 |
 | **Forwarded By** | "Broady, Tamar" <tbrody@jewishphilly.org> |
 
 ## Classification
@@ -53,15 +53,11 @@ The Jewish Federation of Greater Philadelphia is supporting the Association for 
 
 | Filename | Description |
 |---|---|
-| Roaring Lion Portfolio 040326.pdf | Portfolio detailing the Association for Israel's Soldiers' emergency relief fund and funding requirements |
+| email.md | Original email with Hebrew subject and English body |
 
 ## Extracted Data
 
-ROARING LION
-OPERATION
-ISRAEL DEFENSE FORCES (IDF)
-OUR MISSION
-The IDF... (full PDF content as provided)
+Operation Roaring Lion: 1325 Israelis injured, 13 killed. Urgent needs include: 1) Medical equipment ($ per item), 2) Military ambulances ($650k each), 3) Financial aid for injured families ($5k), bereaved families ($2k). Association for Israel's Soldiers contact: Raanan@kerenbshemesh.org.il, 02-991-4211. Super Sunday donation link: jewishphilly.org/supersunday
 
 
 ## Internal Notes
