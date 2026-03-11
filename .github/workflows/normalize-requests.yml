@@ -12,6 +12,10 @@ on:
         description: 'Timestamp folder inside raw_emails/ (e.g. 20260307-120000)'
         required: true
         type: string
+      branch:
+        description: 'Branch to check out (defaults to ingest/<run_folder>)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -26,7 +30,8 @@ jobs:
         run: |
           if [ -n "${{ inputs.run_folder }}" ]; then
             echo "run_folder=${{ inputs.run_folder }}" >> "$GITHUB_OUTPUT"
-            echo "branch=ingest/${{ inputs.run_folder }}" >> "$GITHUB_OUTPUT"
+            BRANCH="${{ inputs.branch }}"
+            echo "branch=${BRANCH:-ingest/${{ inputs.run_folder }}}" >> "$GITHUB_OUTPUT"
           else
             BRANCH="${{ github.ref_name }}"
             echo "run_folder=${BRANCH#ingest/}" >> "$GITHUB_OUTPUT"
