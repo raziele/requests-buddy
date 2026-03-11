@@ -170,8 +170,6 @@ def _parse_normalize_response(raw: str) -> list[dict] | None:
             except json.JSONDecodeError:
                 pass
 
-    log(f"  [debug] parse failed — first 300 chars: {raw[:300]!r}")
-    log(f"  [debug] parse failed — last  300 chars: {raw[-300:]!r}")
     return None
 
 
@@ -201,18 +199,37 @@ def normalize_email(folder: str) -> list[dict]:
     file_paths = _folder_file_paths(folder)
     rel_paths = [os.path.relpath(p, PROJECT_ROOT) for p in file_paths]
 
-    # Compose the prompt: system prompt + file references
+    # Output file: written by agent, read by us, deleted before commit
+    output_path = os.path.join(folder, "normalized.json")
+    rel_output_path = os.path.relpath(output_path, PROJECT_ROOT)
+
+    # Compose the prompt: system prompt + file references + output path
     file_refs = "\n".join(f"- ./{p}" for p in rel_paths)
-    message = f"{system_prompt}\n\n## Files to analyze\n\n{file_refs}"
+    message = (
+        f"{system_prompt}\n\n"
+        f"## Files to analyze\n\n{file_refs}\n\n"
+        f"## Output file\n\nWrite the JSON to: ./{rel_output_path}"
+    )
 
     try:
         log(f"  Running Cursor agent on {len(rel_paths)} file(s)...")
-        raw = cursor_agent_run(message, cwd=PROJECT_ROOT)
+        cursor_agent_run(message, cwd=PROJECT_ROOT)
+
+        if not os.path.exists(output_path):
+            log(f"  Cursor agent did not write output file: {output_path}")
+            return fallback
+
+        with open(output_path) as f:
+            raw = f.read()
+        os.unlink(output_path)
+        log(f"  Deleted temp file: {output_path}")
+
         parsed = _parse_normalize_response(raw)
         if parsed:
             log(f"  Normalized into {len(parsed)} request(s)")
             return parsed
-        log(f"  Cursor agent returned but parse failed (raw length {len(raw)})")
+        log(f"  Parse failed (raw length {len(raw)})")
+        log(f"  [debug] first 300 chars: {raw[:300]!r}")
     except Exception as e:
         log(f"  Cursor agent failed: {e}")
 

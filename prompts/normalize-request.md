@@ -59,7 +59,7 @@ Fill every field from the email content. If information is not available, use `n
 
 ## Output
 
-Return ONLY valid JSON — no markdown fences, no explanation, no extra text:
+Write ONLY valid JSON to the output file path provided at the end of this prompt — no markdown fences, no explanation, no extra text. The file must contain the JSON object and nothing else:
 
 ```
 {
