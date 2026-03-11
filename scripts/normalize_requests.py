@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Process 2: Normalize raw emails into structured request documents.
 
-Two-step pipeline, both via OpenRouter:
-  1. Extract text from PDF attachments (OPENROUTER_MODEL + pdf-text plugin)
-  2. Normalize email + extracted text into structured JSON (opencode + OPENROUTER_MODEL)
+Single-step pipeline via Cursor agent CLI:
+  - Reads email.md + PDF attachments natively, normalizes into structured JSON.
 
 When invoked with --run-folder, operates on a specific ingest run,
 commits results, creates a PR, and auto-merges it to main.
@@ -16,7 +15,6 @@ Usage:
 
 import argparse
 import json
-import mimetypes
 import os
 import re
 import shutil
@@ -30,13 +28,12 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from utils import (
+    cursor_agent_run,
     gh_pr_create,
     gh_pr_merge,
     git_commit_and_push,
     log,
     make_slug,
-    opencode_run,
-    openrouter_extract_pdf,
     parse_frontmatter,
     render_frontmatter,
 )
@@ -178,39 +175,10 @@ def _parse_normalize_response(raw: str) -> list[dict] | None:
     return None
 
 
-def _extract_pdfs(folder: str) -> dict[str, str]:
-    """Step 1: Extract text from all PDFs in folder via OpenRouter pdf-text plugin.
-
-    Returns {filename: extracted_text} for each successfully extracted PDF.
-    """
-    extracts: dict[str, str] = {}
-    for fname in sorted(os.listdir(folder)):
-        if fname == "email.md":
-            continue
-        fpath = os.path.join(folder, fname)
-        if not os.path.isfile(fpath):
-            continue
-        mime, _ = mimetypes.guess_type(fname)
-        if mime != "application/pdf":
-            continue
-        try:
-            log(f"  Extracting PDF: {fname} (OpenRouter pdf-text)...")
-            text = openrouter_extract_pdf(fpath)
-            if text:
-                extracts[fname] = text
-                log(f"  Extracted {len(text)} chars from {fname}")
-            else:
-                log(f"  Empty extraction for {fname}")
-        except Exception as e:
-            log(f"  PDF extraction failed for {fname}: {e}")
-    return extracts
-
-
 def normalize_email(folder: str) -> list[dict]:
-    """Normalize raw email folder via two-step OpenRouter pipeline.
+    """Normalize raw email folder via Cursor agent (single step).
 
-    Step 1: Extract text from PDFs using OPENROUTER_MODEL + pdf-text plugin.
-    Step 2: Normalize email + extracted text using opencode + OPENROUTER_MODEL.
+    Cursor agent reads email.md + PDF attachments natively.
     """
     fallback = [{"_fallback": True}]
 
@@ -219,44 +187,34 @@ def normalize_email(folder: str) -> list[dict]:
         log(f"  No email.md in {folder}")
         return fallback
 
-    api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
+    api_key = os.environ.get("CURSOR_API_KEY", "").strip()
     if not api_key:
-        log("  OPENROUTER_API_KEY not set; skipping")
+        log("  CURSOR_API_KEY not set; skipping")
         return fallback
 
-    # Step 1: extract PDF text via OpenRouter
-    pdf_extracts = _extract_pdfs(folder)
+    # Load prompt from prompts/normalize-request.md
+    prompt_path = os.path.join(SCRIPT_DIR, "..", "prompts", "normalize-request.md")
+    with open(prompt_path) as f:
+        system_prompt = f.read().strip()
 
-    # Step 2: build message with email + extracted PDF text, send to opencode
-    parts = ["Normalize the attached email"]
-    if pdf_extracts:
-        parts.append(f" and {len(pdf_extracts)} PDF attachment(s)")
-    parts.append(". Return only the JSON.")
+    # Build file list as relative paths (required by Cursor agent)
+    file_paths = _folder_file_paths(folder)
+    rel_paths = [os.path.relpath(p, PROJECT_ROOT) for p in file_paths]
 
-    if pdf_extracts:
-        parts.append("\n\n## Extracted PDF Contents\n")
-        for fname, text in pdf_extracts.items():
-            parts.append(f"### {fname}\n\n{text}\n")
-
-    message = "".join(parts)
+    # Compose the prompt: system prompt + file references
+    file_refs = "\n".join(f"- ./{p}" for p in rel_paths)
+    message = f"{system_prompt}\n\n## Files to analyze\n\n{file_refs}"
 
     try:
-        log("  Running opencode (OpenRouter)...")
-        raw = opencode_run(
-            message,
-            files=[email_path],
-            agent="normalize",
-            cwd=PROJECT_ROOT,
-        )
+        log(f"  Running Cursor agent on {len(rel_paths)} file(s)...")
+        raw = cursor_agent_run(message, cwd=PROJECT_ROOT)
         parsed = _parse_normalize_response(raw)
         if parsed:
             log(f"  Normalized into {len(parsed)} request(s)")
             return parsed
-        log(f"  opencode returned but parse failed (raw length {len(raw)})")
-        if len(raw) < 500 and "Error:" in raw:
-            log(f"  opencode message: {raw.strip()}")
+        log(f"  Cursor agent returned but parse failed (raw length {len(raw)})")
     except Exception as e:
-        log(f"  opencode failed: {e}")
+        log(f"  Cursor agent failed: {e}")
 
     return fallback
 
@@ -367,10 +325,38 @@ def build_normalized_markdown(req: dict, headers: dict, seq: int) -> str:
     return render_frontmatter(meta, "\n".join(lines))
 
 
+def generate_request_filename(req: dict) -> str:
+    """Generate a descriptive filename for a request via Cursor agent.
+
+    Uses the request summary + organization as input.
+    Falls back to org slug if the agent call fails.
+    """
+    org = req.get("organization", "unknown")
+    summary = req.get("summary", "")
+
+    prompt_path = os.path.join(SCRIPT_DIR, "..", "prompts", "generate-filename.md")
+    with open(prompt_path) as f:
+        system_prompt = f.read().strip()
+
+    message = f"{system_prompt}\n\nOrganization: {org}\nSummary: {summary}"
+
+    try:
+        raw = cursor_agent_run(message, cwd=PROJECT_ROOT)
+        name = raw.strip().strip('"').strip("'").strip("`")
+        # Validate: only allow [a-z0-9-], max 80 chars
+        name = re.sub(r"[^a-z0-9-]", "", name.lower())[:80].strip("-")
+        if name:
+            return name
+    except Exception as e:
+        log(f"  Filename generation failed, using org slug: {e}")
+
+    return make_slug("", org, include_date=False)
+
+
 def process_folder(folder: str) -> list[str]:
     """Normalize a single raw_emails/<slug>/ folder.
 
-    Output structure: requests/YYYY-MM-DD/<slug>/request.md + attachments.
+    Output structure: requests/YYYY-MM-DD/<generated-name>/<generated-name>.md + attachments.
     Returns list of created file paths.
     """
     email_path = os.path.join(folder, "email.md")
@@ -382,7 +368,6 @@ def process_folder(folder: str) -> list[str]:
         text = f.read()
 
     headers, _ = parse_frontmatter(text)
-    raw_slug = os.path.basename(folder)
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     log(f"Normalizing {folder}...")
@@ -394,15 +379,14 @@ def process_folder(folder: str) -> list[str]:
             log(f"  Skipping fallback result for {folder}")
             continue
 
-        org = req.get("organization") or headers.get("subject", raw_slug)
-        out_slug = make_slug("", org, include_date=False)
+        out_slug = generate_request_filename(req)
 
         out_dir = os.path.join(REQUESTS_DIR, today, out_slug)
         if os.path.exists(out_dir):
             out_dir = os.path.join(REQUESTS_DIR, today, f"{out_slug}-{i+1}")
 
         os.makedirs(out_dir, exist_ok=True)
-        out_path = os.path.join(out_dir, "request.md")
+        out_path = os.path.join(out_dir, f"{out_slug}.md")
 
         md = build_normalized_markdown(req, headers, seq=i + 1)
         with open(out_path, "w") as f:
