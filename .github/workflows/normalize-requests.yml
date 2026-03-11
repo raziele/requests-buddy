@@ -21,6 +21,10 @@ permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: normalize-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   normalize:
     runs-on: ubuntu-latest
