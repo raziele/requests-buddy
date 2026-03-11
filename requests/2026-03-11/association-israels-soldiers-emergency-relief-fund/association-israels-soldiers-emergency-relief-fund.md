@@ -1,7 +1,7 @@
 ---
-id: REQ-Mon, 9 Mar-002
-source_email_id: <CA+FP07Y_NphLwxkE=5LqvSHyS+4KPvvGP9Kbte_C4FXCLjsS=g@mail.gmail.com>
-date_received: Mon, 9 Mar 2026 19:45:38 +0200
+id: REQ-Sun, 8 Mar-002
+source_email_id: <SA1PR19MB50223103A2D1656546489847D478A@SA1PR19MB5022.namprd19.prod.outlook.com>
+date_received: Sun, 8 Mar 2026 13:21:04 +0000
 status: new
 ---
 
@@ -24,95 +24,94 @@ status: new
 | Field | Value |
 |---|---|
 | **Request Type** | emergency_aid |
-| **Urgency** | high |
-| **Sector** | trauma_support |
-| **Target Population** | IDF soldiers; evacuated soldiers and their families; wounded soldiers (moderately or seriously) and their families; bereaved families in mourning |
-| **Geographic Focus** | Israel (nationwide) |
+| **Urgency** | critical |
+| **Sector** | trauma_support, community_resilience |
+| **Target Population** | IDF soldiers; evacuated soldiers and families; wounded soldiers and their families; bereaved families in mourning; vulnerable populations affected by the conflict |
+| **Geographic Focus** | Israel |
 | **Language** | en |
 
 ## The Ask
 
-The Association for Israel's Soldiers, the sole IDF-authorized nonprofit for soldier welfare, is raising funds through its Emergency Relief Fund to support soldiers and their families following Operation Roaring Lion (launched February 28, 2026) and the broader Swords of Iron context. The fund enables the IDF and Ministry of Defense to procure essential supplies without delay: basic personal necessities (hygiene kits, non-military clothing, respite resources), life-saving medical equipment (military ambulances, mobile medical units), and support for impacted families (evacuated families, wounded soldiers' families, bereaved families) via financial vouchers and emergency assistance grants. 100% of donations go directly to benefiting soldiers with no overhead.
+The Association for Israel's Soldiers, the sole IDF-authorized nonprofit for soldier welfare donations, is raising funds through its Emergency Relief Fund following Operation Roaring Lion (launched February 28, 2026). The fund supports immediate procurement of hygiene kits and personal necessities for soldiers, life-saving medical equipment including military ambulances, physical and mental respite for troops, and financial aid for evacuated families (2,000 NIS vouchers), moderately or seriously wounded soldiers' families (5,000 NIS within 24 hours of admission), and bereaved families during shiva (2,000 NIS). One hundred percent of donations go directly to benefiting soldiers with no overhead. The portfolio does not specify a single total amount requested; donors can support specific line items.
 
 **Funding Requested:** Not specified
 
 **Funding Breakdown:**
-- Male hygiene kit: 200 NIS
-- Female hygiene kit (shared by 4 soldiers): 150 NIS
-- Physical & mental recharge per soldier: approx. 100 NIS (40–250k NIS per military unit)
+- Male hygiene kit (per soldier): 200 NIS
+- Female hygiene kit (per 4 soldiers): 150 NIS
+- Physical & mental recharge (per soldier): approx. 100 NIS (40–250k NIS per military unit)
 - Financial aid for evacuated soldiers and families (vouchers): 2,000 NIS per family
-- Life-preserving medical gear: per item
-- Military ambulance (fully equipped Mercedes Sprinter): 650,000 NIS
-- Financial aid for families of moderately/seriously injured soldiers: 5,000 NIS per family
-- Financial aid for bereaved families in mourning (shiva): 2,000 NIS per family
+- Financial aid for moderately or seriously wounded soldiers' families (vouchers, within 24h of admission): 5,000 NIS per family
+- Financial aid for bereaved families in mourning (shiva vouchers): 2,000 NIS per family
+- Military ambulance (fully equipped vehicle): 650,000 NIS per vehicle
 
 ## Context & Background
 
-On Saturday, February 28, 2026, IDF and U.S. military forces launched Operation Roaring Lion, a broad coordinated campaign targeting the Iranian regime. The attack by Iran struck Israel's civilian home front, resulting in fatalities, injuries, and extensive damage to residential buildings. As of March 4, 2026, the document cites 13 Israelis killed, 1,325 injured, 571+ rockets fired into Israel, 1,391+ families evacuated, and 1,500+ evacuated into Israel.
+On Saturday, February 28, 2026, IDF and U.S. military forces launched Operation Roaring Lion, a coordinated campaign against the Iranian regime. The operation followed months of joint planning. Iran had continued advancing its nuclear and missile programs and supporting proxies along Israel's borders. As of March 4, 2026, the PDF cites over 1,391 rockets fired into Israel, 1,325+ Israelis injured, 13 killed, and 1,500+ families evacuated.
 
-The Association for Israel's Soldiers is the sole organization authorized by the IDF to receive and distribute donations for the welfare and well-being of IDF soldiers; 100% of donations go directly to benefit servicepeople. In light of the security developments, the Association's Emergency Relief Fund enables the IDF and Ministry of Defense to procure essential supplies without delay. Army policies allow the IDF to receive donations from an emergency fund that can deliver immediate solutions.
-
-Main efforts include: personal hygiene products and apparel (hygiene kits for male and female soldiers); physical and mental recharge (pop-up respite services with meals, showers, haircuts, laundry); financial aid for evacuated families (2,000 NIS vouchers per family whose home was damaged); life-preserving medical gear for combat paramedics; military ambulances (650k NIS per fully equipped vehicle); financial aid for families of injured soldiers (5,000 NIS vouchers within 24 hours of hospital admission); and aid for bereaved families during shiva (2,000 NIS in vouchers). Bank transfer details and contact for Foreign Affairs Director LTC (Res.) Shirley Sobel Yosiphon are provided in the portfolio.
+The Association for Israel's Soldiers is the sole organization authorized by the IDF to receive and distribute donations for the welfare and well-being of IDF soldiers. In light of security developments since February 28, 2026, the association is taking proactive steps to support soldiers and their families. The Emergency Relief Fund enables the IDF and Ministry of Defense to procure essential supplies without delay. The Iranian attack struck Israel's civilian home front, causing fatalities, injuries, and extensive damage to residential buildings, including homes of IDF service members. The IDF identified an urgent need to provide immediate assistance to affected families. Donations go 100% to benefit servicepeople with no overhead or administrative delays.
 
 ## Attachments
 
 | Filename | Description |
 |---|---|
-| Roaring Lion Portfolio 040326.pdf | Emergency Relief Fund portfolio for Operation Roaring Lion; outlines IDF mission, donation policy, and itemized needs (hygiene kits, medical equipment, ambulances, family aid) with costs and donation instructions. |
+| Roaring Lion Portfolio 040326.pdf | Fundraising portfolio for Operation Roaring Lion Emergency Relief Fund: IDF soldier welfare, medical equipment, hygiene kits, family aid (evacuated, wounded, bereaved), and donation instructions. |
 
 ## Extracted Data
 
 ### Roaring Lion Portfolio 040326.pdf
 
-# ROARING LION OPERATION
+**ROARING LION OPERATION**
 
-## Israel Defense Forces (IDF) — Our Mission
+**ISRAEL DEFENSE FORCES (IDF) — OUR MISSION**
+The IDF was founded to defend the country, shield its residents, protect its independence, and foil attempts by enemies to disrupt routine life. The Association for Israel's Soldiers is the sole organization the IDF has authorized to receive and distribute donations for the welfare and well-being of IDF soldiers. 100% of all donations go directly to benefit servicepeople.
 
-The IDF, the State of Israel's military, was founded to defend the country, shield its residents, protect its independence, and foil attempts by its enemies to disrupt routine life. The Association for Israel's Soldiers nonprofit is the sole organization that the IDF has authorized to receive and distribute donations for the welfare and well-being of IDF soldiers. This means that 100% of all donations to the nonprofit go directly to benefit the servicepeople.
+**Operation Roaring Lion (Saturday 28 February)**
+IDF and U.S. military forces launched a broad, coordinated campaign to significantly degrade the Iranian regime and eliminate existential threats to Israel. The operation targeted dozens of military sites. Iran had continued advancing its nuclear and missile programs and supporting proxies along Israel's borders. IDF forces remain on high alert; Israeli Air Force continues precision strikes.
 
-## Operation Roaring Lion
+**Summary (data updated 4/3/2026):**
+- Rockets fired into Israel: 1,391+
+- Israelis injured: 1,325
+- Israelis killed: 13
+- Families evacuated: 1,500+
 
-On Saturday 28th of February, IDF and U.S. military forces launched a broad, coordinated campaign to significantly degrade the Iranian regime and eliminate existential threats to Israel. The operation targeted dozens of military sites. The attack by Iran struck Israel's civilian home front, resulting in fatalities, injuries, and extensive damage to residential buildings across the country, including the homes of IDF service members.
+**Emergency Relief Fund — main efforts:**
+1. Lifesaving medical equipment
+2. Bereaved families & wounded soldiers
+3. Well-being & individual aid
 
-**Summary (data updated 4/3/2026):** 13 Israelis killed; 1,325 injured; 571+ rockets fired into Israel; 1,391+ families evacuated; 1,500+ evacuated into Israel.
+**The need — personal hygiene products & apparel**
+- Male hygiene kit: 200 NIS
+- Female hygiene kit: 150 NIS (each kit shared by 4 soldiers)
 
-## The Emergency Relief Fund — Main Efforts
+**The need — physical & mental recharge**
+Pop-up service for soldiers: nourishment, entertainment, hot showers, haircuts, laundry. Cost: approx. 100 NIS per soldier (40–250k NIS per military unit depending on size).
 
-1. **Personal hygiene products & apparel**  
-   - Male hygiene kit: 200 NIS  
-   - Female hygiene kit: 150 NIS (each kit shared by 4 soldiers)
+**The need — financial aid for evacuated soldiers and families**
+Homes damaged in the attack; vouchers 2,000 NIS per family for food, clothing, basic household supplies. Cost: 2,000 NIS per family.
 
-2. **Physical & mental recharge**  
-   - Cost: approx. 100 NIS per soldier (40–250k NIS per military unit, depending on size). Pop-up respite service: meals, media, hot showers, haircuts, laundry.
+**The need — life-preserving medical gear**
+Combat paramedics need resources for lifesaving interventions (breathing, circulation, bleeding control, monitoring). Cost: per item.
 
-3. **Financial aid for evacuated soldiers and families**  
-   - 2,000 NIS per family (vouchers for food, clothing, basic household supplies) for families whose homes were damaged.
+**The need — military ambulances**
+Cost: 650k NIS per fully equipped vehicle (Mercedes Sprinter). Donor recognition signage on vehicle exterior following the war.
 
-4. **Life-preserving medical gear**  
-   - Cost: per item. For combat paramedics: lifesaving interventions, breathing, blood circulation, bleeding control, monitoring, medication administration.
+**The need — financial aid for soldiers injured moderately or seriously**
+Within 24 hours of hospital admission, 5,000 NIS in vouchers to the family. Redeemable at ~60 store chains in Israel. Cost: 5,000 NIS per family.
 
-5. **Military ambulances**  
-   - Cost: 650k NIS per fully equipped vehicle (Mercedes Sprinter). Donor recognition signage on vehicle exterior following the war.
+**The need — financial aid for bereaved families in mourning**
+During shiva, 2,000 NIS in vouchers for immediate expenses. Redeemable at ~60 store chains. Cost: 2,000 NIS per family.
 
-6. **Financial aid for soldiers injured moderately or seriously**  
-   - 5,000 NIS per family in vouchers within 24 hours of hospital admission; redeemable at ~60 store chains in Israel.
+**How to donate — bank transfer**
+Name: The Association for Israel's Soldiers
+Bank: The First International Bank of Israel
+Bank number: 31, Branch: 048, Account: 324035
+Address: 7 Itzhak Sadeh St. Tel Aviv, Israel
+IBAN: IL950310480000000324035
 
-7. **Financial aid for bereaved families in mourning**  
-   - 2,000 NIS per family in vouchers during shiva; redeemable at ~60 store chains in Israel.
-
-## How to Donate — Bank Transfer
-
-- **Name:** The Association for Israel's Soldiers  
-- **Bank:** The First International Bank of Israel  
-- **Bank number:** 31 | **Branch:** 048 | **Account:** 324035  
-- **Address:** 7 Itzhak Sadeh St. Tel Aviv, Israel  
-- **IBAN:** IL950310480000000324035
-
-## Contact
-
-LTC (Res.) Shirley Sobel Yosiphon  
-Foreign Affairs Director  
-Shirley-sy@ufis.org  
+**Contact:**
+LTC (Res.) Shirley Sobel Yosiphon, Foreign Affairs Director
+Shirley-sy@ufis.org
 +972-52-924-2021
 
 
