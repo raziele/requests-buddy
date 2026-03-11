@@ -61,6 +61,7 @@ jobs:
         id: normalize
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || secrets.OPENROUTER_MODEL }}
           GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: >
           uv run python scripts/normalize_requests.py
