@@ -1,7 +1,7 @@
 ---
 id: REQ-Mon, 9 Mar-001
-source_email_id: <CA+FP07Y_NphLwxkE=5LqvSHyS+4KPvvGP9Kbte_C4FXCLjsS=g@mail.gmail.com>
-date_received: Mon, 9 Mar 2026 19:45:38 +0200
+source_email_id: <CA+FP07aQvgceaP1n9g=T9fdnSShzcLH7PvnX=M42yM3XCv9XZQ@mail.gmail.com>
+date_received: Mon, 9 Mar 2026 15:57:05 +0200
 status: new
 ---
 
@@ -26,21 +26,28 @@ status: new
 | **Request Type** | program_funding |
 | **Urgency** | high |
 | **Sector** | healthcare, refugees |
-| **Target Population** | IDF soldiers and affected families |
+| **Target Population** | IDF soldiers and their families affected by military operations |
 | **Geographic Focus** | Israel |
-| **Language** | en |
+| **Language** | mixed |
 
 ## The Ask
 
-Jewish Federation of Greater Philadelphia seeks donations for Super Sunday to support IDF soldiers through the Association for Israel's Soldiers. Urgent funding needed for medical equipment, ambulances, and family support following Operation Roaring Lion.
+Jewish Federation of Greater Philadelphia seeks funding for the Association for Israel's Soldiers to support IDF personnel and their families affected by ongoing military operations. The request includes financial aid for bereaved families, injured soldiers, and essential supplies for soldiers' welfare.
 
-**Funding Requested:** Not specified
+**Funding Requested:** 2000
 
-**Non-Financial Ask:** Donations to Association for Israel's Soldiers Emergency Relief Fund
+**Funding Breakdown:**
+- Financial aid for bereaved families in mourning: 2000 NIS per family
+- Financial aid for soldiers injured moderately or seriously: 5000 NIS per family
+- Life-saving medical equipment: 650000 NIS per ambulance
+- Personal hygiene kits: 150 NIS per kit
+- Physical and mental recharge retreats: 100 NIS per soldier
+
+**Non-Financial Ask:** Partnership and awareness initiatives to support IDF soldiers and their families
 
 ## Context & Background
 
-Operation Roaring Lion (Feb 28, 2026) targeted Iranian military sites. IDF requires immediate funding for medical equipment, ambulances, and family support. Super Sunday (Mar 15) is the Jewish community's largest giving day.
+The Jewish Federation of Greater Philadelphia is supporting the Association for Israel's Soldiers in their efforts to provide immediate relief to IDF personnel and their families affected by the ongoing military operations in Israel. The Association is authorized by the IDF to distribute donations directly to soldiers' welfare needs, with 100% of funds going to support programs including medical aid, bereavement support, and essential supplies for soldiers.
 
 ## Attachments
 
