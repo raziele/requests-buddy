@@ -9,12 +9,6 @@ from datetime import datetime, timezone
 
 import yaml
 
-try:
-    from dotenv import load_dotenv
-except ImportError:
-    def load_dotenv(*args, **kwargs):
-        pass
-
 
 # ---------------------------------------------------------------------------
 # Frontmatter helpers
@@ -63,146 +57,36 @@ def make_slug(date_str: str, subject: str, max_len: int = 80, include_date: bool
 
 
 # ---------------------------------------------------------------------------
-# OpenRouter API (direct)
+# Cursor Agent CLI
 # ---------------------------------------------------------------------------
 
-OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-
-def _openrouter_model() -> str:
-    """Model for OpenRouter; requires OPENROUTER_MODEL env."""
-    value = os.environ.get("OPENROUTER_MODEL", "").strip()
-    if not value:
-        raise RuntimeError("OPENROUTER_MODEL not set")
-    return value
-
-
-def openrouter_chat(
-    system_prompt: str,
-    user_content: str | list,
+def cursor_agent_run(
+    prompt: str,
     *,
-    model: str | None = None,
-    temperature: float = 0.1,
-) -> str:
-    """Call the OpenRouter chat completions API and return the assistant message.
-
-    *user_content* is either a plain string or a list of content parts
-    (text, file objects) per the OpenRouter multimodal spec.
-    When file parts are present, the pdf-text plugin is automatically enabled.
-    """
-    import requests as _requests
-
-    api_key = os.environ.get("OPENROUTER_API_KEY", "")
-    if not api_key:
-        raise RuntimeError("OPENROUTER_API_KEY not set")
-
-    if isinstance(user_content, str):
-        user_content = [{"type": "text", "text": user_content}]
-
-    has_files = any(
-        isinstance(p, dict) and p.get("type") == "file" for p in user_content
-    )
-
-    payload: dict = {
-        "model": model or _openrouter_model(),
-        "temperature": temperature,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_content},
-        ],
-    }
-    if has_files:
-        payload["plugins"] = [
-            {"id": "file-parser", "pdf": {"engine": "pdf-text"}}
-        ]
-
-    resp = _requests.post(
-        OPENROUTER_API_URL,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-        json=payload,
-        timeout=300,
-    )
-    resp.raise_for_status()
-
-    data = resp.json()
-    choices = data.get("choices")
-    if not choices:
-        raise RuntimeError(f"OpenRouter returned no choices: {data}")
-
-    content = choices[0]["message"].get("content")
-    if content is None:
-        raise RuntimeError("OpenRouter returned null content")
-    return content.strip()
-
-
-def openrouter_extract_pdf(pdf_path: str) -> str:
-    """Extract text from a PDF file using OpenRouter's pdf-text plugin.
-
-    Sends the PDF as a base64 file part to the model and
-    returns the extracted text content.
-    """
-    import base64
-
-    with open(pdf_path, "rb") as f:
-        b64 = base64.b64encode(f.read()).decode("ascii")
-
-    filename = os.path.basename(pdf_path)
-    user_content = [
-        {"type": "text", "text": "Extract all text content from this PDF document. Return the full text as-is, preserving structure (headings, lists, tables, paragraphs)."},
-        {
-            "type": "file",
-            "file": {
-                "filename": filename,
-                "file_data": f"data:application/pdf;base64,{b64}",
-            },
-        },
-    ]
-
-    return openrouter_chat(
-        "You are a document text extractor. Return only the extracted text, no commentary.",
-        user_content,
-        model=_openrouter_model(),
-        temperature=0.0,
-    )
-
-
-# ---------------------------------------------------------------------------
-# OpenCode CLI (via OpenRouter)
-# ---------------------------------------------------------------------------
-
-
-def opencode_run(
-    message: str,
-    *,
-    files: list[str],
-    agent: str = "normalize",
-    model: str | None = None,
     cwd: str | None = None,
-    env: dict | None = None,
 ) -> str:
-    """Run opencode CLI with the given message and file attachments.
+    """Run Cursor agent CLI and return its text output.
 
-    Requires OPENROUTER_API_KEY in env so opencode can reach the OpenRouter provider.
+    Files are referenced inside the prompt as relative paths
+    (Cursor agent can read and parse PDFs natively).
+
+    Requires CURSOR_API_KEY env var.
     """
-    _scripts_dir = os.path.dirname(os.path.abspath(__file__))
-    _repo_root = os.path.join(_scripts_dir, "..")
-    load_dotenv(os.path.join(_repo_root, ".env"))
+    api_key = os.environ.get("CURSOR_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("CURSOR_API_KEY not set")
 
-    cmd = ["opencode", "run", "--agent", agent]
-    model_to_use = model or os.environ.get("OPENROUTER_MODEL", "").strip()
-    if model_to_use:
-        cmd.extend(["--model", model_to_use])
-    for fp in files:
-        cmd.extend(["--file", fp])
-    cmd.append("--")
-    cmd.append(message)
-
-    run_env = os.environ.copy()
-    if env:
-        run_env.update(env)
+    cmd = [
+        "agent",
+        "--api-key", api_key,
+        "--model", "auto",
+        "--output-format", "text",
+        "--trust",
+        "--force",
+        "-p",
+        prompt,
+    ]
 
     result = subprocess.run(
         cmd,
@@ -212,21 +96,14 @@ def opencode_run(
         timeout=300,
         stdin=subprocess.DEVNULL,
         cwd=cwd,
-        env=run_env,
     )
     if result.returncode != 0:
         raise RuntimeError(
-            f"opencode run failed (exit {result.returncode}):\n{result.stderr}"
+            f"cursor agent failed (exit {result.returncode}):\n{result.stderr}"
         )
     out = (result.stdout or "").strip()
-    # Known opencode behavior: run output sometimes goes to stderr (e.g. issue #369)
-    if not out and (result.stderr or "").strip():
-        out = (result.stderr or "").strip()
     if not out:
-        raise RuntimeError(
-            "opencode run produced no output"
-            + (f"; stderr: {result.stderr[:500]!r}" if result.stderr else "")
-        )
+        raise RuntimeError("cursor agent produced no output")
     return out
 
 
