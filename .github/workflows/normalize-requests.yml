@@ -12,10 +12,18 @@ on:
         description: 'Timestamp folder inside raw_emails/ (e.g. 20260307-120000)'
         required: true
         type: string
+      branch:
+        description: 'Branch to check out (defaults to ingest/<run_folder>)'
+        required: false
+        type: string
 
 permissions:
   contents: write
   pull-requests: write
+
+concurrency:
+  group: normalize-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   normalize:
@@ -26,7 +34,8 @@ jobs:
         run: |
           if [ -n "${{ inputs.run_folder }}" ]; then
             echo "run_folder=${{ inputs.run_folder }}" >> "$GITHUB_OUTPUT"
-            echo "branch=ingest/${{ inputs.run_folder }}" >> "$GITHUB_OUTPUT"
+            BRANCH="${{ inputs.branch }}"
+            echo "branch=${BRANCH:-ingest/${{ inputs.run_folder }}}" >> "$GITHUB_OUTPUT"
           else
             BRANCH="${{ github.ref_name }}"
             echo "run_folder=${BRANCH#ingest/}" >> "$GITHUB_OUTPUT"
@@ -49,7 +58,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install -g opencode-ai
+          curl https://cursor.com/install -fsS | bash
           uv sync
 
       - name: Configure git
@@ -60,8 +69,7 @@ jobs:
       - name: Run normalize
         id: normalize
         env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          OPENROUTER_MODEL: ${{ vars.OPENROUTER_MODEL || secrets.OPENROUTER_MODEL }}
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: >
           uv run python scripts/normalize_requests.py
