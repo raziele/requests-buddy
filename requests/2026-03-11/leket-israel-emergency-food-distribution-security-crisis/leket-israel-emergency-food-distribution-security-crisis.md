@@ -1,7 +1,7 @@
 ---
-id: REQ-Mon, 9 Mar-001
-source_email_id: <CA+FP07YNooNcY5bmAAbPdegHBX--CKOnaA7KJPZJ4o7BaoSN1A@mail.gmail.com>
-date_received: Mon, 9 Mar 2026 17:03:40 +0200
+id: REQ-Tue, 10 Ma-001
+source_email_id: <DM5PR18MB23120429700155D0F3943960FE46A@DM5PR18MB2312.namprd18.prod.outlook.com>
+date_received: Tue, 10 Mar 2026 06:01:49 +0000
 status: new
 ---
 
@@ -12,12 +12,12 @@ status: new
 | Field | Value |
 |---|---|
 | **Organization** | Leket Israel |
-| **Contact** | Rosie Shem-Tov Miller — Grants and Donor Relations Manager |
-| **Contact Email** | rosie@leket.org |
-| **Contact Phone** | +972-53-5678940 |
-| **Website** | http://www.leket.org |
-| **Original Date** | Mon, Mar 9, 2026 |
-| **Forwarded By** | "Broady, Tamar" <tbrody@jewishphilly.org> |
+| **Contact** | Deena Fiedler — VP of Overseas PR & Development |
+| **Contact Email** | deena@leket.org |
+| **Contact Phone** | M: +972-52-8359121 | T: +972-9-790-9208 |
+| **Website** | — |
+| **Original Date** | Sunday, March 8, 2026 |
+| **Forwarded By** | "Berman, Dina" <dina@juf.org.il> |
 
 ## Classification
 
@@ -25,39 +25,32 @@ status: new
 |---|---|
 | **Request Type** | emergency_aid |
 | **Urgency** | high |
-| **Sector** | community_resilience |
-| **Target Population** | Vulnerable families across Israel who depend on Leket's nonprofit partners for food; families who cannot access distribution points (receiving supermarket vouchers instead) |
-| **Geographic Focus** | Nationwide Israel |
+| **Sector** | community_resilience, trauma_support |
+| **Target Population** | Vulnerable families across Israel; families who cannot access distribution points (receiving supermarket vouchers) |
+| **Geographic Focus** | Nationwide (Israel) |
 | **Language** | en |
 
 ## The Ask
 
-Leket Israel, Israel's national food bank, is requesting emergency support to sustain food distribution during the current security crisis. Since the outbreak of war with Iran, surplus food supply has dropped sharply: volunteer activity is paused, farmers have halted harvests, corporate offices are closed, and IDF bases are not permitting entry. Daily meal distribution has fallen from 8,000 to 3,000. Leket is temporarily supplementing rescued food with purchased meals and supermarket vouchers. Maintaining these operations requires an additional $508,210 per week, primarily for purchasing 5,000 meals daily and temporary produce buys. The organization asks the Federation for any emergency support to ensure vulnerable Israelis continue to receive food during this critical period.
+Leket Israel, Israel's national food bank, is requesting support to sustain food distribution during the current security crisis following the outbreak of war with Iran. Rocket fire and operational restrictions have sharply reduced surplus food available for rescue (volunteer activity paused, farmers unable to harvest, IDF bases closed to collection). Daily meal distribution has dropped from 8,000 to 3,000. Leket is temporarily supplementing with purchased food and supermarket vouchers and seeks funding to maintain and where possible increase distribution so vulnerable families continue to receive nutritious food.
 
 **Funding Requested:** $508,210 per week
 
-**Funding Breakdown:**
-- Meals — purchase of 5,000 additional meals daily to replace lost surplus (distribution dropped from 8,000 to 3,000/day): part of $508,210/week
-- Produce — temporary purchases to maintain supply for nonprofit partners after farmers halted harvests: part of $508,210/week
-
 ## Context & Background
 
-Since the outbreak of war with Iran, daily life across Israel has been marked by deep uncertainty: sirens interrupt routines, families move in and out of shelters, and instability touches nearly every part of life. Food security is described as a critical part of resilience—when parents know nourishing food will be on the table, they are better able to care for their children and face the challenges of this period.
+Since the escalation of war with Iran, daily life across Israel has been marked by deep uncertainty: sirens, shelter use, and widespread disruption. Leket Israel frames food security as essential to resilience—when families know basic needs will be met, they can better care for children and cope with the crisis. As the national food bank, Leket is committed to ensuring vulnerable families continue to receive a reliable supply of nutritious food during national crises.
 
-Leket Israel, as Israel's national food bank, is committed to ensuring vulnerable families continue to receive a reliable supply of nutritious food during national crises. The current security situation has significantly disrupted the networks that enable food rescue: rocket fire has forced a pause in volunteer activity and limited collection and distribution; farmers have halted harvests; corporate offices are closed; and IDF bases—Leket's largest suppliers of cooked food—are not permitting entry. As a result, the supply of surplus food available for rescue has declined sharply.
+The current security situation has significantly disrupted the networks that enable food rescue. Rocket fire has forced a pause in volunteer activity and limited collection and distribution. Farmers have halted harvests, corporate offices are closed, and IDF bases—Leket's largest suppliers of cooked food—are not permitting entry. As a result, the supply of surplus food available for rescue has declined sharply. Despite this, Leket's team is working to maintain regular distribution to hundreds of nonprofit partners and to avoid additional hardship for vulnerable families.
 
-Despite these challenges, Leket's team is working to maintain regular distribution levels to the hundreds of nonprofit partners who depend on them. To do so, Leket is temporarily supplementing rescued food with purchased food and providing supermarket vouchers to families who require assistance but cannot access distribution points. The organization notes that it has several grant requests already under review with the Federation and that this outreach specifically addresses the additional emergency needs created by the current situation. Partnership and solidarity from Jewish communities abroad are described as especially meaningful at this time.
+To achieve this, Leket is temporarily supplementing rescued food with purchased food and providing supermarket vouchers for families who cannot access distribution points. Maintaining these operations requires an additional $508,210 per week. The sharp drop in surplus meals has reduced daily distribution from 8,000 to 3,000; Leket must purchase an additional 5,000 meals daily. Produce rescue has also been drastically reduced by farmers' inability to harvest, requiring significant temporary purchases to maintain supply for partners.
+
+The request is directed to JUF Chicago, with thanks for existing partnership and a request for any support the federation can provide to sustain the effort during this critical time.
 
 ## Attachments
 
 | Filename | Description |
 |---|---|
-| image001.png | Leket Israel logo |
-| image002.png | Facebook social icon from signature |
-| image003.png | Embedded icon from signature |
-| image004.png | Twitter/X social icon from signature |
-| image005.png | Embedded icon from signature |
-| image865982.jpg | Leket Israel banner — 'Leket Israel Doesn't Stop' / Donate Now call-to-action |
+| image004.jpg | Leket Israel Purim Matanot Le'evyonim fundraising banner: $180 = 111 meals for Israelis in need on Purim Day. |
 
 ## Internal Notes
 
