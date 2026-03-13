@@ -31,7 +31,7 @@ def get_new_files(marker_path: str) -> tuple[list[str], list[str]]:
 
     Returns (new_files, existing_files) — both as paths relative to repo root.
     """
-    all_files = sorted(glob(os.path.join(REQUESTS_DIR, "*.md")))
+    all_files = sorted(glob(os.path.join(REQUESTS_DIR, "**", "*.md"), recursive=True))
 
     if not os.path.exists(marker_path):
         return all_files, []
@@ -91,7 +91,7 @@ def load_prompt(name: str, **kwargs: str) -> str:
 
 
 def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict]) -> list[list[str]]:
-    """Use opencode to find duplicate groups between new and existing files.
+    """Use Cursor agent to find duplicate groups between new and existing files.
 
     Returns a list of groups, where each group is a list of file paths.
     """
@@ -124,7 +124,7 @@ def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict])
 
 
 def merge_group(group_files: list[str]) -> tuple[str, str]:
-    """Use opencode to merge a group of duplicate files into one unified document.
+    """Use Cursor agent to merge a group of duplicate files into one unified document.
 
     Returns (merged_markdown, suggested_filename).
     """
