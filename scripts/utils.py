@@ -9,6 +9,12 @@ from datetime import datetime, timezone
 
 import yaml
 
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv(*args, **kwargs):
+        pass
+
 
 # ---------------------------------------------------------------------------
 # Frontmatter helpers
