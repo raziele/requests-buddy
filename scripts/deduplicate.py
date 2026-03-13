@@ -24,6 +24,7 @@ REQUESTS_DIR = "requests"
 MARKER_FILE = "logs/last-dedup-marker"
 PROMPTS_DIR = "prompts"
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DETECT_BATCH_SIZE = 20  # max new files per LLM call to stay under Linux ARG_MAX
 
 
 def get_new_files(marker_path: str) -> tuple[list[str], list[str]]:
@@ -90,14 +91,8 @@ def load_prompt(name: str, **kwargs: str) -> str:
     return template
 
 
-def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict]) -> list[list[str]]:
-    """Use Cursor agent to find duplicate groups between new and existing files.
-
-    Returns a list of groups, where each group is a list of file paths.
-    """
-    if not new_summaries:
-        return []
-
+def _detect_duplicates_batch(new_summaries: list[dict], existing_summaries: list[dict]) -> list[list[str]]:
+    """Run one LLM call for a single batch of new files against all existing files."""
     prompt = load_prompt(
         "detect-duplicates",
         new_requests=json.dumps(new_summaries, indent=2),
@@ -121,6 +116,27 @@ def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict])
         return []
 
     return [g for g in groups if isinstance(g, list) and len(g) >= 2]
+
+
+def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict]) -> list[list[str]]:
+    """Use Cursor agent to find duplicate groups between new and existing files.
+
+    Processes new files in batches of DETECT_BATCH_SIZE to stay under the
+    Linux per-argument size limit (MAX_ARG_STRLEN ~128 KB).
+
+    Returns a list of groups, where each group is a list of file paths.
+    """
+    if not new_summaries:
+        return []
+
+    all_groups: list[list[str]] = []
+    for i in range(0, len(new_summaries), DETECT_BATCH_SIZE):
+        batch = new_summaries[i:i + DETECT_BATCH_SIZE]
+        log(f"  Batch {i // DETECT_BATCH_SIZE + 1}/{-(-len(new_summaries) // DETECT_BATCH_SIZE)}: {len(batch)} new file(s)")
+        groups = _detect_duplicates_batch(batch, existing_summaries)
+        all_groups.extend(groups)
+
+    return all_groups
 
 
 def merge_group(group_files: list[str]) -> tuple[str, str]:
