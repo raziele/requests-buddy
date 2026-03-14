@@ -1,8 +1,18 @@
 ---
-id: <CA+FP07Y_NphLwxkE=5LqvSHyS+4KPvvGP9Kbte_C4FXCLjsS=g@mail.gmail.com>
+id: <CA+FP07aFvmUDS2FUQ1ZP1h9HT7n1ByV9pR7kraQratsedKqcqQ@mail.gmail.com>
 from: '"Broady, Tamar" <tbrody@jewishphilly.org>'
-subject: "Fwd: \u05E7\u05E8\u05DF \u05D1\u05D9\u05EA \u05E9\u05DE\u05E9"
-date: Mon, 9 Mar 2026 19:45:38 +0200
+subject: "Fwd: \u05D3\u05D7\u05D5\u05E3 \u05D3\u05D7\u05D5\u05E3 \u05E1\u05D9\u05D5\
+  \u05E2 \u05DC\u05D4\u05E6\u05DC\u05D7\u05EA \u05D7\u05D9\u05D9\u05DD \u05D0\u05E0\
+  \u05E9\u05D9\u05DD \u05E2\u05DD \u05DE\u05D5\u05D2\u05D1\u05DC\u05D5\u05EA \u05D5\
+  \u05E7\u05E9\u05D9\u05E9\u05D9\u05DD \u05D1\u05DE\u05DC\u05D7\u05DE\u05D4 - \u05D0\
+  \u05E4\u05D5\u05D3 \u05E1\u05D2\u05D5\u05DC - \u05E2\u05DE\u05D5\u05EA\u05EA \u05E0\
+  \u05D2\u05D9\u05E9\u05D5\u05EA \u05D9\u05E9\u05E8\u05D0\u05DC"
+date: Mon, 9 Mar 2026 15:57:46 +0200
+attachments:
+- "\u05D3\u05D7\u05D5\u05E3 \u05D1\u05E7\u05E9\u05D4 \u05DC\u05EA\u05E8\u05D5\u05DE\
+  \u05D4 \u05E0\u05D2\u05D9\u05E9\u05D5\u05EA \u05D9\u05E9\u05E8\u05D0\u05DC \u05D0\
+  \u05E4\u05D5\u05D3 \u05E1\u05D2\u05D5\u05DC \u05E1\u05D9\u05D5\u05E2 \u05DC\u05DE\
+  \u05DC\u05D7\u05DE\u05D4 28-2-2026 .pdf"
 ---
 
 ## Content
@@ -34,40 +44,63 @@ your cooperation.
 
 ---------- Forwarded message ---------
 From: Lidar, Talia <tlidar@jewishphilly.org>
-Date: Mon, Mar 9, 2026 at 11:02 AM
-‪Subject: קרן בית שמש‬
+Date: Fri, Mar 6, 2026 at 11:30 AM
+‪Subject: Fwd: דחוף דחוף סיוע להצלחת חיים אנשים עם מוגבלות וקשישים במלחמה -
+אפוד סגול - עמותת נגישות ישראל‬
 To: Tamar Broady <tbrody@jewishphilly.org>
 
 
-Yesterday, a direct strike on a shelter in Beit Shemesh claimed lives and
-left many families in severe distress.
+הי תמר,
+עוד בקשת חירום
+ט
 
-Keren Shemesh (www.kerenbshemesh.org.il) – the municipal foundation – is
-working in coordination with the municipality, the municipal welfare
-department, and local chesed organizations to provide immediate assistance
-on the ground. To do so effectively, rapid and flexible funding is required.
-
-Three urgent priorities:
-1. Emergency relief for families and shelter activities – basic supplies,
-food, clothing, emotional support and guidance; activities for children and
-families staying in shelters.
-2. Strengthening the municipal rescue unit (200+ volunteers) – advanced
-rescue equipment, protective gear, lighting, communications, and training.
-3. Upgrading and maintaining shelters and safe rooms – renovations,
-equipment for extended stays, and building long-term protective
-infrastructure.
-
-The foundation is prepared to act immediately — subject to available
-resources.
-Every contribution enables life-saving action and strengthens the
-resilience of ourcity.
-
-Raanan@kerenbshemesh.org.il
-02-991-4211
-
-https://www.jgive.com/new/he/ils/collect/donation-targets/69997/amount
+---------- Forwarded message ---------
+From: יובל וגנר <yuval@aisrael.org>
+Date: Sat, Feb 28, 2026 at 11:59 PM
+‪Subject: דחוף דחוף סיוע להצלחת חיים אנשים עם מוגבלות וקשישים במלחמה - אפוד
+סגול - עמותת נגישות ישראל‬
+To: yoram.bouskila@gmail.com <yoram.bouskila@gmail.com>, Lidar, Talia <
+tlidar@jewishphilly.org>
+‪Cc: אליעד מלמד <eliad@hatashtit.co.il>, איילת (ayelet@hatashtit.co.il) <
+ayelet@hatashtit.co.il>, Michal Rimon <michal@aisrael.org>, יובל וגנר <
+yuval@aisrael.org>‬
 
 
+יורם בבקשה העבר לטלי לבחינה רוח חיובית
+
+
+
+החל מהיום בשש וחצי בבוקר אנחנו בתוך מוכנות וסיוע מיידי
+
+להצלחת חיים אנשים עם מוגבלות וקשישים במלחמה – במסגרת מיזם האפוד סגול מבית
+עמותת נגישות ישראל
+
+*מצ"ב פנייתנו הדחופה והקריטית*
+
+אנחנו צריכים אותכם כשותפים דחוף.
+
+אנחנו פנויים להבהרות והסברים
+
+מצפים לשמוע ממכם מחר
+
+בהערכה
+
+יובל
+
+
+
+Yuval Wagner, Chair
+
+Access Israel Org
+
+www.aisrael.org
+
+yuval@aisrael.org
+
+
+
+
+-- 
 
 *Talia Lidar *
 Director, Israel and Global Operations
@@ -92,3 +125,7 @@ attachments or copies; you are prohibited from retaining, distributing,
 disclosing or using any information contained in the e-mail. Please notify
 the sender of the erroneous e-mail delivery by return e-mail. Thank you for
 your cooperation.
+
+## Attachments
+
+- [דחוף בקשה לתרומה נגישות ישראל אפוד סגול סיוע למלחמה 28-2-2026 .pdf](דחוף בקשה לתרומה נגישות ישראל אפוד סגול סיוע למלחמה 28-2-2026 .pdf)
