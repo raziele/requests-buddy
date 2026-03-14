@@ -63,6 +63,15 @@ def append_sync_log(message: str):
         f.write(f"[{ts}] {message}\n")
 
 
+def list_notebook_sources(notebook_id: str) -> dict[str, str]:
+    """Return {source_id: title} for all sources currently in the notebook."""
+    notebooklm("use", notebook_id)
+    raw = notebooklm("source", "list", "--json")
+    data = json.loads(raw) if raw else {}
+    sources = data.get("sources", []) if isinstance(data, dict) else data
+    return {s["id"]: s.get("title", "") for s in sources}
+
+
 def add_source(notebook_id: str, filepath: str) -> str:
     """Add a file as a source to NotebookLM. Returns the source ID."""
     notebooklm("use", notebook_id)
@@ -132,17 +141,26 @@ def main():
     notebook_id = get_notebook_id()
     manifest = load_manifest()
 
+    # Fetch live source list so we can delete orphans not in the manifest
+    log("Fetching current notebook sources...")
+    live_sources = list_notebook_sources(notebook_id)
+    log(f"  Notebook has {len(live_sources)} source(s).")
+
     repo_files = discover_syncable_files()
     manifest_files = {k for k in manifest if k != "__sync_metadata__"}
 
     new_files = repo_files - manifest_files
-    stale_files = manifest_files - repo_files
 
-    if not new_files and not stale_files:
+    # Stale = in manifest but not in requests/, OR in notebook but not in manifest
+    stale_files = manifest_files - repo_files
+    manifest_source_ids = {v for k, v in manifest.items() if k != "__sync_metadata__"}
+    orphan_source_ids = set(live_sources.keys()) - manifest_source_ids - {manifest.get("__sync_metadata__")}
+
+    if not new_files and not stale_files and not orphan_source_ids:
         log("No changes to sync.")
         return
 
-    log(f"Sync: {len(new_files)} to add, {len(stale_files)} to remove.")
+    log(f"Sync: {len(new_files)} to add, {len(stale_files)} stale, {len(orphan_source_ids)} orphan(s) to remove.")
 
     added = []
     for filepath in sorted(new_files):
@@ -170,6 +188,17 @@ def main():
             log(f"  Failed to remove {filepath}: {e}")
             append_sync_log(f"FAILED to remove {filepath}: {e}")
         del manifest[filepath]
+
+    for source_id in sorted(orphan_source_ids):
+        title = live_sources.get(source_id, "")
+        log(f"  Removing orphan source: {source_id} ({title!r})")
+        try:
+            remove_source(notebook_id, source_id)
+            removed.append(source_id)
+            append_sync_log(f"REMOVED orphan {source_id} ({title!r})")
+        except RuntimeError as e:
+            log(f"  Failed to remove orphan {source_id}: {e}")
+            append_sync_log(f"FAILED to remove orphan {source_id}: {e}")
 
     update_metadata_source(notebook_id, manifest)
     save_manifest(manifest)
