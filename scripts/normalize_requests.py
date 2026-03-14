@@ -19,7 +19,6 @@ import os
 import re
 import shutil
 import sys
-from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -385,7 +384,6 @@ def process_folder(folder: str) -> list[str]:
         text = f.read()
 
     headers, _ = parse_frontmatter(text)
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     log(f"Normalizing {folder}...")
     normalized = normalize_email(folder)
@@ -397,13 +395,17 @@ def process_folder(folder: str) -> list[str]:
             continue
 
         out_slug = generate_request_filename(req)
+        org_slug = make_slug("", req.get("organization", "unknown"), include_date=False)
 
-        out_dir = os.path.join(REQUESTS_DIR, today, out_slug)
-        if os.path.exists(out_dir):
-            out_dir = os.path.join(REQUESTS_DIR, today, f"{out_slug}-{i+1}")
+        out_dir = os.path.join(REQUESTS_DIR, org_slug, out_slug)
+        n = 1
+        while os.path.exists(out_dir):
+            out_dir = os.path.join(REQUESTS_DIR, org_slug, f"{out_slug}-{n}")
+            n += 1
 
         os.makedirs(out_dir, exist_ok=True)
-        out_path = os.path.join(out_dir, f"{out_slug}.md")
+        final_slug = os.path.basename(out_dir)
+        out_path = os.path.join(out_dir, f"{final_slug}.md")
 
         md = build_normalized_markdown(req, headers, seq=i + 1)
         with open(out_path, "w") as f:
