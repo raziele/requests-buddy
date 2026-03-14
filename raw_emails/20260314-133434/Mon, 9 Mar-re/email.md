@@ -1,10 +1,10 @@
 ---
-id: <CO1PR18MB4604F573E21A3813533809E0F279A@CO1PR18MB4604.namprd18.prod.outlook.com>
+id: <CO1PR18MB46049D30B1DA8B981891FB81F279A@CO1PR18MB4604.namprd18.prod.outlook.com>
 from: '"Goldberg, Rina" <Rina.Goldberg@jewishfederations.org>'
 subject: 'RE:'
-date: Mon, 9 Mar 2026 19:26:14 +0000
+date: Mon, 9 Mar 2026 19:25:57 +0000
 attachments:
-- "Emergency Educational Response During Operation \u201CRoaring Lion\u201D.pdf"
+- Dror Israel Request.pdf
 ---
 
 ## Content
@@ -13,4 +13,4 @@ attachments:
 
 ## Attachments
 
-- [Emergency Educational Response During Operation “Roaring Lion”.pdf](Emergency Educational Response During Operation “Roaring Lion”.pdf)
+- [Dror Israel Request.pdf](Dror Israel Request.pdf)
