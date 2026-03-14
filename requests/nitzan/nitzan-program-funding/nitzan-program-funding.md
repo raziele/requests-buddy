@@ -1,8 +1,15 @@
 ---
 id: REQ-Mon, 9 Mar-001
-source_email_id: <CA+FP07awUpBXeSkZ+wmyL8Uumf7JduPjgrs=pf=XJX6mcEbcsA@mail.gmail.com>
-date_received: Mon, 9 Mar 2026 14:53:45 +0200
+source_email_ids:
+  - <MN2PR18MB34246F7FD6C453FD1D3786269E79A@MN2PR18MB3424.namprd18.prod.outlook.com>
+  - <CA+FP07awUpBXeSkZ+wmyL8Uumf7JduPjgrs=pf=XJX6mcEbcsA@mail.gmail.com>
+dates_received:
+  - Mon, 9 Mar 2026 12:51:27 +0000
+  - Mon, 9 Mar 2026 14:53:45 +0200
 status: new
+merged_from:
+  - requests/nitzan/nitzan-parent-coaching-idf-reservists-wives/nitzan-parent-coaching-idf-reservists-wives.md
+  - requests/nitzan/nitzan-parent-coaching-idf-reservists-wives-1/nitzan-parent-coaching-idf-reservists-wives-1.md
 ---
 
 # Nitzan — Program Funding
@@ -16,8 +23,8 @@ status: new
 | **Contact Email** | shifra@nitzancenter.org |
 | **Contact Phone** | — |
 | **Website** | — |
-| **Original Date** | Mon, Mar 9, 2026 |
-| **Forwarded By** | "Broady, Tamar" <tbrody@jewishphilly.org> |
+| **Original Date** | 2026-03-09 (Mon, Mar 9, 2026) |
+| **Forwarded By** | "Lichtig, Ofer" <Ofer.Lichtig@jewishfederations.org>; "Broady, Tamar" <tbrody@jewishphilly.org> |
 
 ## Classification
 
@@ -26,42 +33,45 @@ status: new
 | **Request Type** | program_funding |
 | **Urgency** | medium |
 | **Sector** | trauma_support, women, community_resilience |
-| **Target Population** | IDF reservists' wives (100 participants); de-facto single mothers during the prolonged mobilization |
+| **Target Population** | IDF reservists' wives (100 participants); de-facto single mothers during prolonged mobilization; functioning as de facto single mothers and their children |
 | **Geographic Focus** | Nationwide (Israel) |
 | **Language** | mixed |
 
 ## The Ask
 
-Nitzan requests support for a Parent Coaching program for 100 IDF reservists' wives. After two and a half years of war, these women are emotionally depleted and experiencing erosion of parental authority while functioning as de-facto single mothers. Nitzan proposes to offer its evidence-based E.C.C. (Emotional Cognitive Coaching) program—12 sessions per participant, delivered online by professional staff—at no cost to the mothers, to strengthen resilience, parental authority, and family dynamics. Total project cost is NIS 600,000 (1,200 coaching hours).
+Nitzan requests funding to extend its Parent Coaching program (E.C.C. method) to 100 wives of IDF reservists at no charge. After two and a half years of war, these women are emotionally depleted and struggling with parental authority and family stability. The program would provide each participant with 12 weekly coaching sessions (1,200 hours total), delivered online via Zoom by Nitzan's professional staff, to strengthen resilience, parental authority, and family dynamics. Nitzan proposes its evidence-based E.C.C. (Emotional Cognitive Coaching) program at no cost to the mothers. Total project cost is NIS 600,000.
 
 **Funding Requested:** NIS 600,000
 
 **Funding Breakdown:**
-- Total coaching hours (1,200 hours): NIS 600,000
-- Per mother (12 sessions): NIS 6,000
-- Per private online session (Zoom): NIS 500
+- Private online coaching session via Zoom: NIS 500
+- Cost per mother (12 sessions): NIS 6,000
+- Total project (100 mothers): NIS 600,000
+- Total coaching hours: 1,200 hours
 
 ## Context & Background
 
-Nitzan is a parents and volunteers' association founded in 1964 that identifies, diagnoses, treats, and rehabilitates children, adolescents, and adults with learning disabilities and adaptation challenges. It operates 40 branches throughout Israel and serves approximately 50,000 individuals each year, with research-driven educational and emotional models.
+Nitzan is a parents and volunteers' association founded in 1964 that identifies, diagnoses, treats, and rehabilitates children, adolescents, and adults with learning disabilities, adaptation challenges, and functional difficulties. It operates 40 branches throughout Israel and serves approximately 50,000 individuals each year; over one million Israelis have benefited from its services. Its work is research-driven, combining professional assessment, tailored intervention, and continuous support from early childhood through labor market integration.
 
-After two and a half years of war, IDF reservists' wives are exhausted and depleted of emotional resilience. They have been functioning as de-facto single mothers, carrying immense worry for their partners' safety while shielding their children from the realities of war. This has led to erosion of parental authority and instability within the family unit. Nitzan's Parent Coaching program using the E.C.C. (Emotional Cognitive Coaching) method—developed by Dr. Maly Danino, CEO of Nitzan—is already implemented successfully for parents in Kiryat Shmona. The method focuses on strengthening the parent through self-reflection, recognition of strengths and weaknesses, and understanding of hindering behavioral patterns; research shows improved maternal emotion regulation, better family climate, and better academic, social, and emotional functioning among children.
+After two and a half years of war, IDF reservists' wives are exhausted and emotionally depleted. They have been functioning as de facto single mothers, carrying immense worry for their partners' safety while shielding their children from the harsh realities of war. This has led to erosion of parental authority and instability within the family unit. Nitzan already runs its Parent Coaching program successfully for parents of children in Kiryat Shmona and now seeks to offer the same support to reservists' wives.
 
-Nitzan seeks to offer the same program to 100 reservists' wives free of charge: 12 weekly sessions per participant, delivered online via Zoom by Nitzan's professional staff, to strengthen parental authority, improve family dynamics, and reinforce children's sense of capability and confidence. Support is requested to fund this initiative so that these women, who have carried an enormous burden throughout the war, are not left to face it alone.
+The program uses the Emotional Cognitive Coaching (E.C.C.) method developed by Dr. Maly Danino, CEO of Nitzan. It is a short-term intervention in three stages—emotional exploration, insight development, and action—that strengthens the parent through self-reflection, recognition of strengths and weaknesses, and understanding of hindering behavioral patterns. Research has shown that mothers who participated improved their ability to regulate their children's negative emotions and that family climate improved, with better academic, social, and emotional functioning among children (reduction in aggression and reclusion). Nitzan seeks to offer the same program to 100 reservists' wives free of charge so that these women, who have carried an enormous burden throughout the war, are not left to face it alone.
 
 ## Attachments
 
 | Filename | Description |
 |---|---|
-| Nitzan for the IDF Reservists' Wives.docx | Project proposal describing Nitzan, the need among reservists' wives, the E.C.C. Parent Coaching response, and budget (NIS 600,000 for 1,200 coaching hours). |
+| Nitzan for the IDF Reservists' Wives.docx | Project proposal describing Nitzan, the need among reservists' wives, the E.C.C. Parent Coaching method, and budget (NIS 600,000 for 100 mothers / 1,200 coaching hours). |
 
 ## Extracted Data
 
 ### Nitzan for the IDF Reservists' Wives.docx
 
-**Monday, 20 Adar 5786 — March 9, 2026**
+**Date:** Monday, 20 Adar 5786 / March 9, 2026
 
-**Nitzan for the IDF Reservists' Wives**
+**Title:** Nitzan for the IDF Reservists' Wives
+
+---
 
 #### About Nitzan
 
@@ -71,11 +81,15 @@ Nitzan's work is research-driven, with educational and emotional models combinin
 
 Nitzan operates 40 branches throughout Israel and provides services to approximately 50,000 individuals each year. Over the years, more than one million Israelis have benefited from the organization's services.
 
+---
+
 #### The Need
 
 After two and a half years of war, IDF reservists' wives are exhausted, almost depleted of their emotional resilience. They have been functioning as de-facto single mothers throughout this period, carrying immense worry and anxiety for the safety of their loved ones while simultaneously trying to shield their children from the harsh realities of war.
 
 These women are experiencing erosion of parental authority and instability within the family unit. Nitzan seeks to offer them one of its flagship programs, Parent Coaching. This program is currently being implemented with success for Kiryat Shmona's children's parents.
+
+---
 
 #### The Response
 
@@ -87,21 +101,28 @@ Research has shown that mothers who participated in this process improved their 
 
 Against this background, we seek to offer the program to 100 IDF reservists' wives, free of charge. The program will include a 12-session coaching process, providing practical tools to strengthen parental authority, improve family dynamics, and reinforce children's sense of capability and confidence. Sessions will take place on a weekly basis and will be run by Nitzan's experienced professional staff.
 
+---
+
 #### Budget and Requested Support
 
-- Cost of a private online coaching session via Zoom: **NIS 500**
-- Total coaching hours for the project: **1,200 hours**
-- Cost per mother (12 sessions): **NIS 6,000**
-- **Total project cost: NIS 600,000**
+We invite you to support this unique initiative.
+
+| Item | Amount |
+|------|--------|
+| Cost of a private online coaching session via Zoom | NIS 500 |
+| Total coaching hours for project | 1,200 hours |
+| Cost per mother (12 sessions) | NIS 6,000 |
+| Total project cost (100 mothers) | NIS 600,000 |
 
 This is an opportunity to support one of the pillars of wartime Israeli society. These remarkable women, who suddenly found themselves functioning almost as single mothers while enabling their partners to focus on defending the State of Israel and the Jewish people, have carried and continue to carry an enormous burden. We must not leave them to face it alone. We invite you to join us in providing the support they so urgently need in these challenging times. We would be grateful for any assistance you can offer toward this important initiative.
 
-Respectfully,
+---
 
-Shifra Stroosky
-Deputy Director General, Management and Education
+**Respectfully,**
+
+Shifra Stroosky  
+Deputy Director General, Management and Education  
 shifra@nitzancenter.org
-
 
 ## Internal Notes
 
