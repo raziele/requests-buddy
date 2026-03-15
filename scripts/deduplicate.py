@@ -4,18 +4,22 @@
 import hashlib
 import json
 import os
+import re
+import shutil
 import sys
 from datetime import datetime, timezone
 from glob import glob
 
 sys.path.insert(0, os.path.dirname(__file__))
 
+from normalize_requests import generate_request_filename
 from utils import (
     cursor_agent_run,
     git,
     git_commit_and_push,
     gh_pr_create,
     log,
+    make_slug,
     parse_frontmatter,
 )
 
@@ -59,6 +63,35 @@ def get_new_files(marker_path: str) -> tuple[list[str], list[str]]:
     return new_files, existing_files
 
 
+def _extract_json_array(text: str) -> list | None:
+    """Extract a JSON array from an LLM response, tolerating surrounding prose and code fences."""
+    # Try the whole response first
+    try:
+        result = json.loads(text.strip())
+        if isinstance(result, list):
+            return result
+    except json.JSONDecodeError:
+        pass
+    # Find the first [...] block in the text (handles fenced + prose responses)
+    match = re.search(r'\[[\s\S]*\]', text)
+    if match:
+        try:
+            result = json.loads(match.group())
+            if isinstance(result, list):
+                return result
+        except json.JSONDecodeError:
+            pass
+    return None
+
+
+def _file_hash(path: str) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def summarize_file(path: str, full: bool = False) -> dict:
     """Read a request file and return a summary dict."""
     with open(path) as f:
@@ -68,9 +101,9 @@ def summarize_file(path: str, full: bool = False) -> dict:
 
     summary = {
         "file": path,
-        "from": meta.get("from", ""),
-        "subject": meta.get("subject", ""),
-        "date": meta.get("date", ""),
+        "organization": meta.get("organization", meta.get("from", "")),
+        "date_received": meta.get("date_received", meta.get("date", "")),
+        "subject": meta.get("subject", meta.get("summary", "")),
     }
 
     if full:
@@ -101,18 +134,9 @@ def _detect_duplicates_batch(new_summaries: list[dict], existing_summaries: list
 
     response = cursor_agent_run(prompt, cwd=PROJECT_ROOT)
 
-    text = response.strip()
-    if text.startswith("```"):
-        lines = text.splitlines()
-        text = "\n".join(lines[1:-1])
-
-    try:
-        groups = json.loads(text)
-    except json.JSONDecodeError:
+    groups = _extract_json_array(response)
+    if groups is None:
         log(f"Failed to parse LLM response as JSON:\n{response}")
-        return []
-
-    if not isinstance(groups, list):
         return []
 
     return [g for g in groups if isinstance(g, list) and len(g) >= 2]
@@ -139,10 +163,13 @@ def detect_duplicates(new_summaries: list[dict], existing_summaries: list[dict])
     return all_groups
 
 
-def merge_group(group_files: list[str]) -> tuple[str, str]:
+def merge_group(group_files: list[str]) -> tuple[str, list[str]]:
     """Use Cursor agent to merge a group of duplicate files into one unified document.
 
-    Returns (merged_markdown, suggested_filename).
+    Writes the merged result to requests/org-slug/slug/slug.md, copies attachments
+    (deduped by hash), and removes the source directories.
+
+    Returns (new_md_path, removed_dirs).
     """
     documents_block = ""
     for path in group_files:
@@ -150,20 +177,111 @@ def merge_group(group_files: list[str]) -> tuple[str, str]:
             documents_block += f"=== {path} ===\n{f.read()}\n\n"
 
     prompt = load_prompt("merge-duplicates", documents=documents_block)
-
     merged = cursor_agent_run(prompt, cwd=PROJECT_ROOT)
 
-    # Strip markdown code fences if present
     text = merged.strip()
     if text.startswith("```"):
         lines = text.splitlines()
         text = "\n".join(lines[1:-1])
 
-    short_hash = hashlib.sha256("|".join(sorted(group_files)).encode()).hexdigest()[:8]
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    filename = f"{today}-merged-{short_hash}.md"
+    # Derive destination path from merged content
+    meta, body = parse_frontmatter(text)
+    # If the merged frontmatter yields "unknown", fall back to the first non-"unknown"
+    # org slug already present in the source file paths (requests/org-slug/req-slug/slug.md)
+    org_slug = make_slug("", meta.get("organization", "unknown"), include_date=False)
+    if org_slug == "unknown":
+        for src in group_files:
+            candidate = src.replace("\\", "/").split("/")[1]
+            if candidate and candidate != "unknown":
+                org_slug = candidate
+                break
+    req = {"organization": meta.get("organization", org_slug), "summary": body[:500]}
+    slug = generate_request_filename(req)
 
-    return text, filename
+    dest_org_dir = os.path.join(REQUESTS_DIR, org_slug)
+    dest_slug = slug
+    n = 1
+    while os.path.exists(os.path.join(dest_org_dir, dest_slug)):
+        dest_slug = f"{slug}-{n}"
+        n += 1
+    dest_dir = os.path.join(dest_org_dir, dest_slug)
+    dest_md = os.path.join(dest_dir, f"{dest_slug}.md")
+
+    os.makedirs(dest_dir, exist_ok=True)
+    with open(dest_md, "w") as f:
+        f.write(text)
+
+    # Copy attachments from all source dirs, dedup by content hash
+    existing_hashes: set[str] = set()
+    for group_md in group_files:
+        src_dir = os.path.dirname(group_md)
+        for fname in sorted(os.listdir(src_dir)):
+            if fname.endswith(".md"):
+                continue
+            src = os.path.join(src_dir, fname)
+            if not os.path.isfile(src):
+                continue
+            h = _file_hash(src)
+            if h in existing_hashes:
+                log(f"    Skipping duplicate attachment (same hash): {fname}")
+                continue
+            dst_name = fname
+            stem, ext = os.path.splitext(fname)
+            k = 1
+            while os.path.exists(os.path.join(dest_dir, dst_name)):
+                dst_name = f"{stem}-{k}{ext}"
+                k += 1
+            shutil.copy2(src, os.path.join(dest_dir, dst_name))
+            existing_hashes.add(h)
+
+    # Remove source dirs
+    removed_dirs = [os.path.dirname(p) for p in group_files]
+    for src_dir in removed_dirs:
+        shutil.rmtree(src_dir)
+
+    return dest_md, removed_dirs
+
+
+def _detect_within_org_duplicates(files: list[str]) -> list[list[str]]:
+    """Detect duplicates within each org among a list of files.
+
+    Groups files by org slug (requests/org-slug/req-slug/slug.md) and runs
+    detect-duplicates-within-org for any org with 2+ files. This catches
+    duplicates that were all added in the same batch (no existing files to
+    compare against in the cross-org pass).
+    """
+    by_org: dict[str, list[str]] = {}
+    for f in files:
+        parts = f.replace("\\", "/").split("/")
+        try:
+            idx = parts.index("requests")
+            org = parts[idx + 1] if idx + 1 < len(parts) else "unknown"
+        except ValueError:
+            org = "unknown"
+        by_org.setdefault(org, []).append(f)
+
+    all_groups: list[list[str]] = []
+    for org, org_files in sorted(by_org.items()):
+        if len(org_files) < 2:
+            continue
+        log(f"  Within-org dedup: {org} ({len(org_files)} file(s))")
+        summaries = [summarize_file(f, full=True) for f in org_files]
+        prompt = load_prompt(
+            "detect-duplicates-within-org",
+            requests=json.dumps(summaries, indent=2, ensure_ascii=False),
+        )
+        try:
+            response = cursor_agent_run(prompt, cwd=PROJECT_ROOT)
+        except RuntimeError as e:
+            log(f"  {org}: agent error — {e}; skipping")
+            continue
+        groups = _extract_json_array(response)
+        if groups is None:
+            log(f"  {org}: failed to parse response; skipping")
+            continue
+        all_groups.extend(g for g in groups if isinstance(g, list) and len(g) >= 2)
+
+    return all_groups
 
 
 def update_marker():
@@ -174,6 +292,15 @@ def update_marker():
         f.write(sha)
 
 
+def _commit_marker(message: str):
+    """Commit and push the marker file; log a warning if push fails (e.g. local runs)."""
+    current_branch = git("rev-parse", "--abbrev-ref", "HEAD")
+    try:
+        git_commit_and_push([MARKER_FILE], message, branch=current_branch)
+    except Exception as e:
+        log(f"Warning: could not push marker update ({e}). Marker written locally.")
+
+
 def main():
     log("Starting deduplication run...")
 
@@ -182,7 +309,7 @@ def main():
     if not new_files:
         log("No new files since last dedup run.")
         update_marker()
-        git_commit_and_push([MARKER_FILE], "dedup: update marker (no new files)")
+        _commit_marker("dedup: update marker (no new files)")
         return
 
     log(f"Found {len(new_files)} new file(s) and {len(existing_files)} existing file(s).")
@@ -190,13 +317,24 @@ def main():
     new_summaries = [summarize_file(f, full=True) for f in new_files]
     existing_summaries = [summarize_file(f, full=False) for f in existing_files]
 
-    log("Detecting duplicates via LLM...")
+    log("Detecting duplicates via LLM (cross-org)...")
     groups = detect_duplicates(new_summaries, existing_summaries)
+
+    log("Detecting duplicates within each org...")
+    within_org_groups = _detect_within_org_duplicates(new_files)
+
+    # Merge both group lists, deduplicating by file-set identity
+    seen: set[frozenset] = {frozenset(g) for g in groups}
+    for g in within_org_groups:
+        key = frozenset(g)
+        if key not in seen:
+            seen.add(key)
+            groups.append(g)
 
     if not groups:
         log("No duplicates found.")
         update_marker()
-        git_commit_and_push([MARKER_FILE], "dedup: update marker (no duplicates found)")
+        _commit_marker("dedup: update marker (no duplicates found)")
         return
 
     log(f"Found {len(groups)} duplicate group(s).")
@@ -218,26 +356,21 @@ def main():
             continue
 
         log(f"  Merging group {i}: {valid_files}")
-        merged_text, filename = merge_group(valid_files)
+        dest_md, removed_dirs = merge_group(valid_files)
 
-        merged_path = os.path.join(REQUESTS_DIR, filename)
-        with open(merged_path, "w") as f:
-            f.write(merged_text)
+        # Stage removed dirs and new file
+        git("add", "-u", REQUESTS_DIR)
+        git("add", dest_md)
 
-        for old_file in valid_files:
-            os.remove(old_file)
-            git("add", old_file)
+        dest_slug = os.path.basename(os.path.dirname(dest_md))
+        files_list = ", ".join(os.path.basename(os.path.dirname(f)) for f in valid_files)
+        git("commit", "-m", f"dedup: merge group {i} — {files_list} -> {dest_slug}")
 
-        git("add", merged_path)
-
-        files_list = ", ".join(os.path.basename(f) for f in valid_files)
-        git("commit", "-m", f"dedup: merge group {i} — {files_list} -> {filename}")
-
-        all_removed.extend(valid_files)
-        all_created.append(merged_path)
+        all_removed.extend(removed_dirs)
+        all_created.append(dest_md)
 
         pr_body_lines.append(f"### Group {i}")
-        pr_body_lines.append(f"Merged into `{filename}`:")
+        pr_body_lines.append(f"Merged into `{os.path.relpath(dest_md, PROJECT_ROOT)}`:")
         for f in valid_files:
             pr_body_lines.append(f"- `{f}`")
         pr_body_lines.append("")
@@ -247,7 +380,7 @@ def main():
         git("checkout", "main")
         git("branch", "-D", branch)
         update_marker()
-        git_commit_and_push([MARKER_FILE], "dedup: update marker (no valid merges)")
+        _commit_marker("dedup: update marker (no valid merges)")
         return
 
     git("push", "-u", "origin", branch)
@@ -259,7 +392,7 @@ def main():
 
     git("checkout", "main")
     update_marker()
-    git_commit_and_push([MARKER_FILE], f"dedup: update marker after {pr_url}")
+    _commit_marker(f"dedup: update marker after {pr_url}")
 
     log("Deduplication complete.")
 
