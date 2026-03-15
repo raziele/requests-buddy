@@ -503,7 +503,7 @@ def _create_pr(dry_run: bool = False) -> str | None:
 def main():
     parser = argparse.ArgumentParser(description="Deduplicate requests/")
     parser.add_argument(
-        "--phase", choices=["orgs", "unknown", "requests"],
+        "--phase", choices=["orgs", "unknown", "requests", "pr"],
         help="Run a single phase only (default: all)",
     )
     parser.add_argument("--dry-run", action="store_true")
@@ -518,7 +518,7 @@ def main():
     if args.phase in (None, "requests"):
         phase_requests(args.dry_run)
 
-    if not args.dry_run and args.phase is None:
+    if args.phase in (None, "pr"):
         _create_pr(args.dry_run)
 
     log("Done.")
