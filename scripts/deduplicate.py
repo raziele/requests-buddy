@@ -25,17 +25,21 @@ import json
 import os
 import re
 import shutil
+import re
+import shutil
 import sys
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(__file__))
 
 from normalize_requests import generate_request_filename
+from normalize_requests import generate_request_filename
 from utils import (
     cursor_agent_run,
     gh_pr_create,
     git,
     log,
+    make_slug,
     make_slug,
     parse_frontmatter,
 )
@@ -465,16 +469,45 @@ def _create_pr(dry_run: bool = False) -> str | None:
     short_hash = hashlib.sha256(today.encode()).hexdigest()[:6]
     branch = f"dedup/{today}-{short_hash}"
 
-    try:
-        git("checkout", "-b", branch)
-    except RuntimeError:
-        log(f"Branch {branch} already exists; aborting PR phase")
-        return None
+    git("checkout", "-b", branch)
 
-    git("add", "-A", REQUESTS_DIR)
-    status = git("status", "--porcelain")
-    if not status:
-        log("No changes to commit.")
+    all_removed = []
+    all_created = []
+    pr_body_lines = ["## Merged Duplicate Requests\n"]
+
+    for i, group in enumerate(groups, 1):
+        valid_files = [f for f in group if os.path.exists(f)]
+        if len(valid_files) < 2:
+            log(f"  Group {i}: not enough valid files, skipping.")
+            continue
+
+        log(f"  Merging group {i}: {valid_files}")
+        merged_text, filename = merge_group(valid_files)
+
+        merged_path = os.path.join(REQUESTS_DIR, filename)
+        with open(merged_path, "w") as f:
+            f.write(merged_text)
+
+        for old_file in valid_files:
+            os.remove(old_file)
+            git("add", old_file)
+
+        git("add", merged_path)
+
+        files_list = ", ".join(os.path.basename(f) for f in valid_files)
+        git("commit", "-m", f"dedup: merge group {i} — {files_list} -> {filename}")
+
+        all_removed.extend(valid_files)
+        all_created.append(merged_path)
+
+        pr_body_lines.append(f"### Group {i}")
+        pr_body_lines.append(f"Merged into `{filename}`:")
+        for f in valid_files:
+            pr_body_lines.append(f"- `{f}`")
+        pr_body_lines.append("")
+
+    if not all_created:
+        log("No valid merges were performed.")
         git("checkout", "main")
         git("branch", "-D", branch)
         return None
