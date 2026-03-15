@@ -92,6 +92,19 @@ def _file_hash(path: str) -> str:
     return h.hexdigest()
 
 
+def _attachment_hashes(md_path: str) -> list[str]:
+    """Return sorted SHA-256 hashes of all non-.md files in the same directory."""
+    folder = os.path.dirname(md_path)
+    hashes = []
+    for fname in sorted(os.listdir(folder)):
+        if fname.endswith(".md"):
+            continue
+        fpath = os.path.join(folder, fname)
+        if os.path.isfile(fpath):
+            hashes.append(_file_hash(fpath))
+    return sorted(hashes)
+
+
 def summarize_file(path: str, full: bool = False) -> dict:
     """Read a request file and return a summary dict."""
     with open(path) as f:
@@ -104,6 +117,7 @@ def summarize_file(path: str, full: bool = False) -> dict:
         "organization": meta.get("organization", meta.get("from", "")),
         "date_received": meta.get("date_received", meta.get("date", "")),
         "subject": meta.get("subject", meta.get("summary", "")),
+        "attachment_hashes": _attachment_hashes(path),
     }
 
     if full:
