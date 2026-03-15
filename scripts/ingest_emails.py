@@ -215,7 +215,7 @@ def process_message(msg_stub: dict, label_id: str, run_dir: str) -> tuple[str, l
     date = headers.get("date", "")
     body = decode_body(msg.get("payload", {}))
 
-    slug = make_slug(date, subject)
+    slug = msg_id
     folder = os.path.join(run_dir, slug)
     os.makedirs(folder, exist_ok=True)
 
