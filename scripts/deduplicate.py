@@ -476,8 +476,9 @@ def _git_commit_if_changes(paths: list[str], message: str, dry_run: bool = False
     if dry_run:
         log(f"  [dry-run] Would commit: {message}")
         return False
-    for p in paths:
-        git("add", p)
+    # Use -A so deletions (shutil.rmtree'd dirs) are staged alongside new files.
+    # On a dedicated dedup branch there are no unrelated changes to accidentally include.
+    git("add", "-A")
     status = git("status", "--porcelain")
     if not status:
         return False
@@ -494,7 +495,7 @@ def _checkout_dedup_branch() -> str | None:
     try:
         git("checkout", "-b", branch)
     except RuntimeError:
-        # Branch already exists — reuse it (e.g. running phases individually)
+        # Branch already exists — reuse it (e.g. each phase step in a single job)
         log(f"Branch {branch} already exists; switching to it")
         git("checkout", branch)
     return branch
@@ -512,6 +513,12 @@ def _create_pr(branch: str | None, dry_run: bool = False) -> str | None:
 
     if branch is None:
         branch = git("rev-parse", "--abbrev-ref", "HEAD")
+
+    new_commits = git("log", "main..HEAD", "--oneline", check=False)
+    if not new_commits:
+        log("No new commits vs main; nothing to PR.")
+        git("checkout", "main", check=False)
+        return None
 
     git("push", "-u", "origin", branch, "--force-with-lease")
 
