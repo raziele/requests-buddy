@@ -115,7 +115,7 @@ Keeps a Google NotebookLM notebook in sync with the entire `requests/` folder. A
 3. **Discover syncable files** — Recursively walks `requests/` and collects all `.md` files and PDF attachments.
 4. **Load manifest** — `logs/notebooklm-sources.json` maps each file path to its NotebookLM source ID, tracking what's already synced.
 5. **Delta sync**:
-   - **New files** — uploaded as sources to the notebook via `notebooklm-py`
+   - **New files** — uploaded as sources to the notebook via [`notebooklm-py`](https://github.com/drengskapur/notebooklm-py)
    - **Stale files** — files whose content has changed since last sync are removed and re-uploaded
    - **Orphan sources** — sources in NotebookLM that no longer have a corresponding file are removed
 6. **Metadata source** — A special source is updated with the current sync timestamp and a summary of the sync operation.
@@ -215,11 +215,28 @@ gh auth login
 npm install -g @googleworkspace/cli
 ```
 
-**Python dependencies and Playwright** (for NotebookLM browser automation):
+**Python dependencies** (includes `notebooklm-py` for NotebookLM automation):
 
 ```bash
 uv sync
-uv run playwright install chromium
+```
+
+`notebooklm-py` ([github.com/drengskapur/notebooklm-py](https://github.com/drengskapur/notebooklm-py)) is a Python client for NotebookLM. It drives the notebook API to add and remove sources:
+
+```python
+from notebooklm import NotebookLM
+
+nlm = NotebookLM()
+notebook = nlm.get_notebook("your-notebook-id")
+
+# Add a source
+notebook.add_source("path/to/file.md")
+
+# List current sources
+sources = notebook.list_sources()
+
+# Remove a source by ID
+notebook.remove_source(source_id)
 ```
 
 ### 2. Clone and run first-time setup
