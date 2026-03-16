@@ -5,6 +5,7 @@ Recursively discovers .md files and attachment files (PDFs, images) under
 requests/ and uploads them as NotebookLM sources.
 """
 
+import argparse
 import json
 import os
 import subprocess
@@ -19,7 +20,8 @@ from utils import git_commit_and_push, log
 REQUESTS_DIR = "requests"
 MANIFEST_FILE = "logs/notebooklm-sources.json"
 SYNC_LOG_FILE = "logs/notebooklm-sync.log"
-SYNCABLE_EXTENSIONS = {".md", ".pdf", ".png", ".jpg", ".jpeg", ".gif", ".webp"}
+MD_ONLY_EXTENSIONS = {".md"}
+ALL_EXTENSIONS = {".md", ".pdf", ".png", ".jpg", ".jpeg", ".gif", ".webp"}
 
 
 def get_notebook_id() -> str:
@@ -127,17 +129,27 @@ def update_metadata_source(notebook_id: str, manifest: dict[str, str]):
         log(f"Failed to update metadata source: {e}")
 
 
-def discover_syncable_files() -> set[str]:
+def discover_syncable_files(extensions: set[str]) -> set[str]:
     """Recursively walk requests/ and return paths with syncable extensions."""
     files: set[str] = set()
     for dirpath, _, filenames in os.walk(REQUESTS_DIR):
         for fname in filenames:
-            if os.path.splitext(fname)[1].lower() in SYNCABLE_EXTENSIONS:
+            if os.path.splitext(fname)[1].lower() in extensions:
                 files.add(os.path.join(dirpath, fname))
     return files
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--all-files",
+        action="store_true",
+        help="Sync all supported file types (PDF, images) in addition to .md files.",
+    )
+    args = parser.parse_args()
+
+    extensions = ALL_EXTENSIONS if args.all_files else MD_ONLY_EXTENSIONS
+
     notebook_id = get_notebook_id()
     manifest = load_manifest()
 
@@ -146,7 +158,7 @@ def main():
     live_sources = list_notebook_sources(notebook_id)
     log(f"  Notebook has {len(live_sources)} source(s).")
 
-    repo_files = discover_syncable_files()
+    repo_files = discover_syncable_files(extensions)
     manifest_files = {k for k in manifest if k != "__sync_metadata__"}
 
     new_files = repo_files - manifest_files
