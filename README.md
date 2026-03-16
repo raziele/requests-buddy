@@ -1,5 +1,9 @@
 # Requests Buddy
 
+## Why
+This pipleine consolidates NGO fund requests and index them, allowing philantropic funds and donors to find requests easily using a NotebookLM interface.
+
+## What is it
 Automated pipeline that ingests email requests from Gmail, normalizes them with AI, deduplicates, and syncs everything to Google NotebookLM — orchestrated by GitHub Actions.
 
 ## Pipeline Overview
