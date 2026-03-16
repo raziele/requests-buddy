@@ -509,6 +509,7 @@ def _create_pr(branch: str | None, dry_run: bool = False) -> str | None:
     if dry_run:
         log("[dry-run] Would push and create PR")
         return None
+    return branch
 
     if branch is None:
         branch = git("rev-parse", "--abbrev-ref", "HEAD")
