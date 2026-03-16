@@ -494,8 +494,9 @@ def _checkout_dedup_branch() -> str | None:
     try:
         git("checkout", "-b", branch)
     except RuntimeError:
-        log(f"Branch {branch} already exists; aborting")
-        return None
+        # Branch already exists — reuse it (e.g. running phases individually)
+        log(f"Branch {branch} already exists; switching to it")
+        git("checkout", branch)
     return branch
 
 
