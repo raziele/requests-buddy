@@ -221,22 +221,17 @@ npm install -g @googleworkspace/cli
 uv sync
 ```
 
-`notebooklm-py` ([github.com/drengskapur/notebooklm-py](https://github.com/drengskapur/notebooklm-py)) is a Python client for NotebookLM. It drives the notebook API to add and remove sources:
+[`notebooklm-py`](https://github.com/drengskapur/notebooklm-py) is a Python client and CLI for NotebookLM. It's used by this project to add and remove sources, and can also be used directly to query the notebook — for example, to pull a summary of all ingested requests into a CSV:
 
-```python
-from notebooklm import NotebookLM
+```bash
+# Generate a data table from the notebook (no install needed — uv fetches on the fly)
+uv run --with=notebooklm-py notebooklm generate data-table "summarize all requests in the notebook"
 
-nlm = NotebookLM()
-notebook = nlm.get_notebook("your-notebook-id")
+# Download the generated table as a CSV
+uv run --with=notebooklm-py notebooklm download data-table ./data.csv
 
-# Add a source
-notebook.add_source("path/to/file.md")
-
-# List current sources
-sources = notebook.list_sources()
-
-# Remove a source by ID
-notebook.remove_source(source_id)
+# Open the CSV in visidata for quick exploration
+uv run --with=visidata vd data.csv
 ```
 
 ### 2. Clone and run first-time setup
