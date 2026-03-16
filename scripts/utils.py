@@ -186,8 +186,10 @@ def gh_pr_create(title: str, body: str, base: str = "main") -> str:
     """Create a pull request via gh CLI and return the PR URL."""
     result = subprocess.run(
         ["gh", "pr", "create", "--title", title, "--body", body, "--base", base],
-        capture_output=True, text=True, check=True,
+        capture_output=True, text=True, check=False,
     )
+    if result.returncode != 0:
+        raise RuntimeError(f"gh pr create failed: {result.stderr}")
     return result.stdout.strip()
 
 
