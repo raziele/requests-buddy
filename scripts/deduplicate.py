@@ -516,7 +516,7 @@ def _create_pr(branch: str | None, dry_run: bool = False) -> str | None:
         log("No commits to push; skipping PR.")
         return None
 
-    git("push", "-u", "origin", branch)
+    git("push", "-u", "origin", branch, "--force-with-lease")
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     pr_url = None
