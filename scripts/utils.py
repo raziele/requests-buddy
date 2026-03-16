@@ -144,7 +144,7 @@ def git(*args: str, check: bool = True) -> str:
     """Run a git command and return stdout."""
     result = subprocess.run(
         ["git", *args],
-        capture_output=True, text=True, check=check,
+        capture_output=True, text=True, check=False,
     )
     if check and result.returncode != 0:
         raise RuntimeError(f"git {' '.join(args)} failed:\n{result.stderr}")
