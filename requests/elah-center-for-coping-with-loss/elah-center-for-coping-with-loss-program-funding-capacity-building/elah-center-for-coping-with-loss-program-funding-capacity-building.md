@@ -3,9 +3,12 @@ id: REQ-Mon, 9 Mar-001
 source_email_id: <BY5PR02MB6196C2986A3FB63B95571843AF79A@BY5PR02MB6196.namprd02.prod.outlook.com>
 date_received: Mon, 9 Mar 2026 13:28:30 +0000
 status: new
+merged_from:
+  - requests/elah-center-for-coping-with-loss/elah-center-national-welfare-supervision-training-program/elah-center-national-welfare-supervision-training-program.md
+  - requests/elah-center-for-coping-with-loss/elah-center-therapeutic-support-war-affected/elah-center-therapeutic-support-war-affected.md
 ---
 
-# Elah Center for Coping with Loss (מרכז אלה להתמודדות נפשית עם אובדן) — Program Funding
+# Elah Center for Coping with Loss (מרכז אלה להתמודדות נפשית עם אובדן) — Program Funding & Capacity Building
 
 ## Quick Reference
 
@@ -23,20 +26,24 @@ status: new
 
 | Field | Value |
 |---|---|
-| **Request Type** | program_funding |
-| **Urgency** | medium |
-| **Sector** | trauma_support, healthcare, elderly, shared_society |
-| **Target Population** | Individuals affected by the war who fall outside government-funded assistance: mothers and partners of combat soldiers, female lone soldiers, bereaved commanders, close friends of fallen soldiers and civilians, second-degree family of fallen (Jewish and Arab), family of wounded or traumatized soldiers, first-line emergency personnel; elderly and homebound elderly including Holocaust survivors; Arab community in Israel (culturally adapted services) |
+| **Request Type** | program_funding, capacity_building |
+| **Urgency** | high |
+| **Sector** | trauma_support, community_resilience, healthcare, elderly, shared_society |
+| **Target Population** | (1) War-affected individuals outside government-funded assistance: mothers and partners of combat soldiers, female lone soldiers, bereaved commanders, close friends of fallen soldiers and civilians, second-degree family of fallen (Jewish and Arab), family of wounded or traumatized soldiers, first-line emergency personnel; elderly and homebound elderly including Holocaust survivors; Arab community in Israel (culturally adapted services). (2) Welfare workers (עובדי רווחה) in municipal social services departments, regional councils, and local authorities across Israel. |
 | **Geographic Focus** | Nationwide Israel; Arab community services via clinic in Kfar Kanna |
 | **Language** | mixed |
 
 ## The Ask
 
+**1. Program funding (therapeutic support)**  
 Elah Center seeks philanthropic funding to provide therapeutic support for war-affected individuals who are not eligible for government assistance or for whom state frameworks are inadequate. The request covers five program areas: (1) support groups for grief and trauma (two therapists per group, 12–40 sessions); (2) individual therapy for grief and trauma (20-session packages); (3) social-therapeutic groups for the elderly (90-minute weekly sessions); (4) in-home individual therapy for homebound elderly; and (5) group and individual therapy for the Arab community via the Kfar Kanna clinic. All programs use qualified therapists and are designed to strengthen resilience, reduce isolation, and support emotional recovery.
+
+**2. Capacity building (welfare workers)**  
+Elah Center requests funding to expand a national supervision and training program for welfare workers in municipal social services. Following the escalation with Iran and Hezbollah, the Center identified an urgent new need to support frontline welfare staff who face secondary trauma, compassion fatigue, and overwhelming caseloads. The program offers ongoing group supervision, individual guidance, short workshops, and enrichment lectures on loss, trauma, and self-care. Elah recently held a Zoom support meeting for approximately 500 Jerusalem municipal welfare workers and seeks to continue and scale this service in partnership with local and government bodies.
 
 **Funding Requested:** Not specified
 
-**Funding Breakdown:**
+**Funding breakdown (therapeutic programs):**
 - Support group (12 sessions, 2 therapists): NIS 36,000
 - Individual therapy package (20 sessions): NIS 6,900
 - Elderly social-therapeutic group (20 sessions): NIS 30,000
@@ -46,11 +53,11 @@ Elah Center seeks philanthropic funding to provide therapeutic support for war-a
 
 ## Context & Background
 
-Since the outbreak of the Iron Swords War, the Israeli government has expanded psychological assistance to direct victims, and philanthropy has added substantial support. Nevertheless, many individuals continue to fall between the cracks—either ineligible for government funding or poorly served by existing frameworks. For these populations, the Elah Center provides tailored therapeutic support funded by donations.
+Elah Center has operated for 45 years in trauma, bereavement, loss, and life-crisis care across Israel, with a professional team of some 600 practitioners. One way the organization strengthens societal resilience is by identifying and providing responses both for first-circle victims and for those in wider circles.
 
-Elah has 45 years of experience and operates nationwide with professional therapists and infrastructure. The Center runs a clinic in Kfar Kanna with more than 50 Arabic-speaking therapists, offering culturally adapted individual and group therapy in clinics or clients' homes. For the elderly and Holocaust survivors, Elah has provided trauma-informed mental health care since 1979, with growing demand for in-home, relationship-based care.
+**Therapeutic programs:** Since the outbreak of the Iron Swords War, the government has expanded psychological assistance to direct victims, and philanthropy has added substantial support. Many individuals still fall between the cracks—ineligible for government funding or poorly served by existing frameworks. Elah provides tailored therapeutic support for these populations, funded by donations. The Center runs a clinic in Kfar Kanna with more than 50 Arabic-speaking therapists, offering culturally adapted individual and group therapy in clinics or clients' homes. For the elderly and Holocaust survivors, Elah has provided trauma-informed mental health care since 1979, with growing demand for in-home, relationship-based care. The five program types address distinct gaps; unit costs are specified in NIS. The only missing component for scaling these responses is funding.
 
-The five program types address distinct gaps: support groups and individual therapy for war-affected individuals (e.g., mothers of combat soldiers, bereaved commanders, second-degree bereaved); social-therapeutic and in-home therapy for the elderly; and group and individual therapy for the Arab community. Unit costs are specified in NIS (e.g., NIS 3,000 per support group session with two therapists, NIS 345 per individual session, NIS 1,500 per elderly group session). The only missing component for scaling these responses is funding; Elah seeks partners to raise resources and build a more just and resilient society.
+**Welfare supervision and training:** In the current period, Elah proposes a nationwide response focused on strengthening and supporting welfare workers in social services departments in municipalities, regional councils, and local authorities. These workers face heavy caseloads, serve diverse populations, are exposed to extreme cases, and must provide creative responses with limited budgets in a socially, economically, and security-wise challenging reality. Since October 2023, Israel has been in prolonged conflict, creating unprecedented emotional and social strain. With the escalation and war with Iran, more people are affected and the pressure on welfare workers is increasing. Prolonged exposure places workers at real risk of vicarious trauma, secondary traumatization, and compassion fatigue. The proposed program includes ongoing group supervision, individual guidance for workers, short-term workshops, and enrichment lectures on topics such as loss, trauma, and self-care. Elah has provided this type of service over the past year with great success and requests support to continue and expand it in collaboration with local authorities and government bodies. Strengthening frontline professionals is essential to maintaining Israel's societal resilience and ensuring continuity of care for citizens who need it more than ever.
 
 ## Attachments
 
@@ -123,23 +130,25 @@ Elah Center possesses the professional knowledge, therapists, and infrastructure
 
 ### מרכז אלה - הצעה לתוכנית ליווי והדרכה עבור עובדי רווחה.pdf
 
-# הצעה לתוכנית לליווי והדרכה עבור עובדי ועובדות רווחה במחלקות לשירותים חברתיים
+הצעה לתוכנית לליווי והדרכה עבור עובדי ועובדות רווחה במחלקות לשירותים חברתיים
 
-עמותת מרכז אלה פועלת עשרות שנים ועוסקת בטיפול במצבי טראומה, שכול, אובדן ומשברי חיים, ברחבי הארץ. הצוות המקצועי בעמותה כולל כ-600 אנשי מקצוע מנוסים מתחומי הטיפול והליווי הרגשי, הפועלים מתוך מחויבות עמוקה לחוסן החברתי ולבריאות הנפש בישראל.
+עמותת מרכז אלה פועלת עשרות שנים ועוסקת בטיפול במצבי טראומה, שכול, אובדן ומשברי חיים, בכל רחבי הארץ. הצוות המקצועי בעמותה כולל כ-600 אנשי מקצוע מנוסים מתחומי הטיפול והליווי הרגשי הפועלים מתוך מחויבות עמוקה לחוסן החברתי ולבריאות הנפש בישראל.
 
-אחת הדרכים שלנו כעמותה לפעול להגברת החוסן היא על ידי איתור והמצאת מענים הן לנפגעים מהמעגל הראשון והן לנפגעים במעגלים הרחבים יותר. מכאן, ברצוננו להציע בתקופה זו מענה ארצי שעיקרו חיזוק ותמיכה בעובדי הרווחה במחלקות לשירותים החברתיים בעיריות, במועצות האזוריות וברשויות המקומיות.
+אחת הדרכים שלנו כעמותה לפעול להגברת החוסן היא על ידי איתור והמצאת מענים הן לנפגעים מהמעגל הראשון והן לנפגעים במעגלים הרחבים יותר. מכאן, ברצוננו להציע בתקופה זו מענה ארצי שעיקרו חיזוק ותמיכה בעובדי הרווחה במחלקות לשירותים החברתיים בעיריות, במועצות משלים האזוריות וברשויות המקומיות.
 
-עובדים אלו מתמודדים עם עומסים רבים ומטפלים באוכלוסיות שונות ומגוונות. הם נחשפים למקרי קצה ונדרשים למענים יצירתיים בהיעדר תקציבים ובמציאות חברתית כלכלית וביטחונית מאתגרת. מאז אוקטובר 2023 מדינת ישראל בלחימה מתמשכת, אשר יצרה עומס רגשי וחברתי חסר תקדים. לאור ההסלמה והמלחמה עם איראן, נוספים עוד ועוד נפגעים, והעומסים על עובדי הרווחה רק מתגברים. חשיפה מתמשכת זו מעמידה את העובדים בסיכון לחוות טראומה עקיפה, טראומטיזציה משנית ותשישות חמלה.
+עובדים אלו מתמודדים עם עומסים רבים ומטפלים באוכלוסיות שונות ומגוונות. הם נחשפים למקרי קצה ונדרשים למענים יצירתיים בהיעדר תקציבים ובמציאות חברתית כלכלית וביטחונית מאתגרת מאין כמותה. הדבר נכון בימים של שגרה אך מקבל משנה תוקף בשעת מלחמה. מצויה מדינת ישראל בלחימה מתמשכת, אשר יצרה עומס רגשי וחברתי חסר תקדים 2023 מאז אוקטובר על אזרחי המדינה. כעת, לאור ההסלמה והמלחמה עם אירן, נוספים עוד ועוד נפגעים, והעומסים על עובדי הרווחה רק מתגברים. חשיפה מתמשכת זו מעמידה את העובדים בסיכון של ממש לחוות טראומה עקיפה, טראומטיזציה משנית ותשישות חמלה.
 
-**המענים שאנו מבקשים להציע:**
-- הדרכות קבוצתיות מתמשכות
-- ליווי אישי והדרכות פרטניות לעובדים
-- סדנאות קצרות טווח ו/או הרצאות העשרה בנושא אובדן, טראומה, שמירה עצמית וכיו"ב
+המענים שאנו מבקשים להציע במסגרת התכנית כוללים:
+- מתמשכות הדרכות קבוצתיות
+- ליווי אישי לעובדים הדרכות פרטניות
+- מספר מפגשים המשלבים בין חוויה להעברת ידע ומתן כלים סדנאות קצרות טווח לעובדים בנושא אובדן, טראומה, שמירה עצמית וכיו"ב. הרצאות העשרה
 
 לסיכום, עמותת מרכז אלה מבקשת לפעול בשיתוף פעולה עם הרשויות המקומיות וגורמים ממשלתיים על מנת להעמיד מערך תמיכה ייעודי ומקיף לעובדי הרווחה במחלקות לשירותים החברתיים. חיזוקם של אנשי המקצוע בחזית החברתית הוא תנאי הכרחי לשמירה על חוסנה של החברה הישראלית בתקופה מורכבת זו ולהבטחת שימור רציפות המענים לאזרחים הזקוקים להם יותר מתמיד. סיפקנו שירות מסוג זה במהלך השנה האחרונה בהצלחה רבה, ואנו מבקשים להמשיך ולהעניק אותו.
 
-בני לייזר, מנכ"ל – 052-3589919 | CEO@elah.org.il | www.elah.org.il
+כמנכ"ל עמותת מרכז אלה, אני פונה אליך באופן אישי ומבקש את תמיכתך הנדיבה, שתאפשר לנו להמשיך ולפעול לטובת הגברת החוסן החברתי תוך חיזוק עובדי הרווחה הנושאים על כתפיהם אחריות כבדה עבור כלל החברה הישראלית בשעה מורכבת זו.
 
+בברכה, בני לייזר, מנכ"ל
+פרטי קשר: בני לייזר, מנכ"ל | 052-3589919 | CEO@elah.org.il | www.elah.org.il
 
 ## Internal Notes
 
