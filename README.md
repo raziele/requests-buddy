@@ -10,8 +10,8 @@ Gmail inbox
     ▼ (every hour)
 ┌─────────────────────────────────────────────┐
 │  Process 1: Ingest Emails                   │
-│  raw_emails/<ts>/<slug>/email.md            │
-│  branch: ingest/<ts>                        │
+│  raw_emails/<timestamp>/<slug>/email.md            │
+│  branch: ingest/<timestamp>                        │
 └───────────────────┬─────────────────────────┘
                     │ push to ingest/* triggers
                     ▼
@@ -34,6 +34,17 @@ Gmail inbox
 │  branch: dedup/<date> → opens PR for review │
 └─────────────────────────────────────────────┘
 ```
+
+### Steps at a Glance
+
+| Process | Trigger | Reads from | Writes to | Merge |
+|---|---|---|---|---|
+| 1 — Ingest Emails | Every hour (cron) | Gmail inbox | `raw_emails/<timestamp>/` + branch `ingest/<timestamp>` | — |
+| 2 — Normalize Requests | Push to `ingest/*` | `raw_emails/<timestamp>/` | `requests/<org>/<req>/` | Auto-merges to `main` |
+| 3 — Sync NotebookLM | Push to `main` (touching `requests/**`) | `requests/` | NotebookLM notebook + `logs/` | — |
+| 4 — Deduplicate | Daily 06:00 UTC (cron) | `requests/` | `requests/` (merged files) + branch `dedup/<date>` | Manual review PR |
+
+All processes can also be triggered manually via `workflow_dispatch` in the GitHub Actions UI.
 
 ---
 
@@ -81,7 +92,7 @@ Takes each raw email folder from Process 1 and converts it into a structured, AI
    - Attachments list with descriptions
    - Extracted Data (full PDF/image content per attachment)
 5. **Error recovery** — The script handles LLM failures: truncated JSON is repaired, repeated output patterns are detected and trimmed, and a `--fallback` mode captures raw agent output if parsing fails entirely.
-6. **PR creation** — Once all folders in the run are normalized, a PR is created from the `ingest/<ts>` branch into `main` and auto-merged (squash).
+6. **PR creation** — Once all folders in the run are normalized, a PR is created from the `ingest/<timestamp>` branch into `main` and auto-merged (squash).
 
 ### Accessing Results
 
@@ -162,17 +173,51 @@ The workflow is split into four sequential GitHub Actions jobs, each running one
 
 ### Prerequisites
 
-- **Node.js 18+**
-- **uv** — [install](https://docs.astral.sh/uv/getting-started/installation/) (Python 3.12+ is installed automatically)
-- **GitHub CLI** (`gh`) — authenticated with `gh auth login`
-- **Cursor account** — with an API key (used for AI normalization and deduplication)
+- **Cursor account** with an API key — used for AI normalization and deduplication
 - **Google Cloud project** with the Gmail API enabled
 - **Google NotebookLM** account with an existing notebook
 
 ### 1. Install CLI tools
 
+**uv** (Python package manager — installs Python 3.12+ automatically):
+
 ```bash
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+**GitHub CLI** (`gh`):
+
+```bash
+# macOS
+brew install gh
+
+# Linux (Debian/Ubuntu)
+sudo apt install gh
+
+# Windows
+winget install --id GitHub.cli
+```
+
+Authenticate after installing:
+
+```bash
+gh auth login
+```
+
+**Google Workspace CLI** (`gws`) — for Gmail access:
+
+```bash
+# Requires Node.js 18+. Install Node first if needed: https://nodejs.org/
 npm install -g @googleworkspace/cli
+```
+
+**Python dependencies and Playwright** (for NotebookLM browser automation):
+
+```bash
 uv sync
 uv run playwright install chromium
 ```
@@ -276,7 +321,7 @@ GitHub Actions secrets also include:
   sync-notebooklm.yml       # Process 3: on push to main → requests/ → NotebookLM
   deduplicate.yml           # Process 4: daily cron — detect & merge duplicates → open PR
 scripts/
-  ingest_emails.py          # Process 1: fetch Gmail → raw_emails/<ts>/<slug>/
+  ingest_emails.py          # Process 1: fetch Gmail → raw_emails/<timestamp>/<slug>/
   normalize_requests.py     # Process 2: normalize raw emails → requests/
   sync_notebooklm.py        # Process 3: NotebookLM sync
   deduplicate.py            # Process 4: AI deduplication (--phase orgs|unknown|requests|pr)
@@ -297,28 +342,6 @@ logs/
   notebooklm-sources.json   # Manifest mapping file paths to NotebookLM source IDs
   notebooklm-sync.log       # Timestamped sync history
 ```
-
----
-
-## Troubleshooting
-
-### "Error 403: access_denied" or "app is being tested, only developer-approved testers"
-
-Your GCP OAuth app is in **Testing** mode. Only accounts listed as **Test users** can sign in.
-
-**Fix:** In [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **OAuth consent screen** → **Test users** → **Add users** → add the Gmail address you use for `gws auth login`. Then try again.
-
-### "Google hasn't verified this app"
-
-Expected when the app is in testing mode. Click **Advanced** → **Go to \<app\> (unsafe)** to continue. Safe for personal use.
-
-### Ingest runs but Normalize never triggers
-
-Pushes made with the default `GITHUB_TOKEN` from a workflow **do not** trigger other workflows (GitHub prevents recursive runs). Add a [Personal Access Token](https://github.com/settings/tokens) with `repo` scope as the repository secret **REPO_ACCESS_TOKEN**. The ingest workflow uses it for checkout and push so that the push triggers the Normalize workflow. If the secret is missing, ingest still runs but normalize must be triggered manually via `workflow_dispatch`.
-
-### NotebookLM sync fails with credential error
-
-The `NOTEBOOKLM_CREDENTIALS` secret holds a base64-encoded browser session. Sessions expire. Re-run `./scripts/setup.sh` to refresh the session and re-upload the secret.
 
 ---
 
