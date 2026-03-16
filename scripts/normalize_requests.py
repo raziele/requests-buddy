@@ -395,7 +395,7 @@ def process_folder(folder: str) -> list[str]:
             continue
 
         out_slug = generate_request_filename(req)
-        org_slug = make_slug("", req.get("organization", "unknown"), include_date=False)
+        org_slug = make_slug("", req.get("organization") or "unknown", include_date=False)
 
         out_dir = os.path.join(REQUESTS_DIR, org_slug, out_slug)
         n = 1
