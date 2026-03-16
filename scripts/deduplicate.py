@@ -513,11 +513,6 @@ def _create_pr(branch: str | None, dry_run: bool = False) -> str | None:
     if branch is None:
         branch = git("rev-parse", "--abbrev-ref", "HEAD")
 
-    unpushed = git("log", f"origin/main..HEAD", "--oneline", check=False)
-    if not unpushed:
-        log("No commits to push; skipping PR.")
-        return None
-
     git("push", "-u", "origin", branch, "--force-with-lease")
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -529,6 +524,11 @@ def _create_pr(branch: str | None, dry_run: bool = False) -> str | None:
             f"🤖 Generated with requests-buddy dedup workflow",
         )
         log(f"Created PR: {pr_url}")
+    except RuntimeError as e:
+        if "already exists" in str(e):
+            log("PR already exists; skipping creation.")
+        else:
+            raise
     finally:
         git("checkout", "main")
 
