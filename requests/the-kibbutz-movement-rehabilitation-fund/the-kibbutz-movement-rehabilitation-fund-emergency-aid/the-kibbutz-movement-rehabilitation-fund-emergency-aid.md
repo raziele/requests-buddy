@@ -1,8 +1,17 @@
 ---
-id: REQ-Tue, 10 Ma-001
-source_email_id: <DM5PR18MB23124C8D30BC9E69430CFA2AFE46A@DM5PR18MB2312.namprd18.prod.outlook.com>
-date_received: Tue, 10 Mar 2026 06:07:03 +0000
+id:
+  - REQ-Fri, 6 Mar-001
+  - REQ-Tue, 10 Ma-001
+source_email_id:
+  - <PH0PR19MB50207B13AF97A96EBE15D243D47AA@PH0PR19MB5020.namprd19.prod.outlook.com>
+  - <DM5PR18MB23124C8D30BC9E69430CFA2AFE46A@DM5PR18MB2312.namprd18.prod.outlook.com>
+date_received:
+  - Fri, 6 Mar 2026 14:48:42 +0000
+  - Tue, 10 Mar 2026 06:07:03 +0000
 status: new
+merged_from:
+  - requests/the-kibbutz-movement-rehabilitation-fund/kibbutz-movement-rehabilitation-fund-emergency-shelters-northern-kibbutzim/kibbutz-movement-rehabilitation-fund-emergency-shelters-northern-kibbutzim.md
+  - requests/the-kibbutz-movement-rehabilitation-fund/kibbutz-movement-rehabilitation-fund-emergency-shelters-northern-communities/kibbutz-movement-rehabilitation-fund-emergency-shelters-northern-communities.md
 ---
 
 # The Kibbutz Movement Rehabilitation Fund — Emergency Aid
@@ -17,22 +26,22 @@ status: new
 | **Contact Phone** | — |
 | **Website** | — |
 | **Original Date** | Thursday, 5 March 2026 |
-| **Forwarded By** | "Berman, Dina" <dina@juf.org.il> |
+| **Forwarded By** | Barak Loozon <BarakL@jewishfed.org>; "Berman, Dina" <dina@juf.org.il> (two separate forwards) |
 
 ## Classification
 
 | Field | Value |
 |---|---|
 | **Request Type** | emergency_aid |
-| **Urgency** | high |
-| **Sector** | community_resilience, trauma_support, elderly, youth |
-| **Target Population** | Kibbutz residents along the northern border and Hula Valley; families with children in public shelters; elderly members; youth and teenagers |
-| **Geographic Focus** | Northern Israel — 27 kibbutzim along the northern border and in the Hula Valley |
+| **Urgency** | critical / high (sources differ: one critical, one high) |
+| **Sector** | community_resilience, trauma_support, elderly, youth, shared_society |
+| **Target Population** | Kibbutz residents in 27 northern border and Hula Valley kibbutzim; families with children in or spending extended time in public shelters; elderly members; youth and teenagers; local leadership and community role holders |
+| **Geographic Focus** | Northern Israel — 27 kibbutzim along the northern border and in the Hula Valley (without adequate protected rooms per Home Front Command). Context: 22 kibbutzim in the Western Negev severely damaged on Oct 7; 19 northern kibbutzim previously evacuated; 8 in the central Hula Valley remained under constant threat. |
 | **Language** | en |
 
 ## The Ask
 
-The Kibbutz Movement Rehabilitation Fund is requesting emergency funding to support northern kibbutz communities facing renewed security escalation. The request has two components: (1) equipping 27 public shelters with Emergency Shelter Kits (mattresses, seating, first aid, fans, Wi-Fi, children's activity kits) at $94,500 total, and (2) a Community Emergency Support Program across the same 27 kibbutzim ($35,000 each, $945,000 total) for leadership support, cultural activities, elderly care, and youth programming in protected spaces. Total request is $1,039,500 to improve safety, dignity, and resilience while families remain under missile threat.
+The Kibbutz Movement Rehabilitation Fund is requesting emergency funding to support northern kibbutz communities facing renewed security escalation and missile threats. The request has two components: (1) equipping 27 public shelters with Emergency Shelter Kits (mattresses, seating, first aid, fans, Wi-Fi, children's activity kits) at $94,500 total, and (2) a Community Emergency Support Program across the same 27 kibbutzim ($35,000 each, $945,000 total) for leadership support, cultural activities, elderly care, and youth programming in protected spaces. Total request is $1,039,500 to improve safety, dignity, and resilience while families remain under missile threat and communities face ongoing security uncertainty.
 
 **Funding Requested:** $1,039,500
 
@@ -52,7 +61,7 @@ The Fund is asking partners worldwide to support two urgent efforts: (1) Emergen
 
 | Filename | Description |
 |---|---|
-| Emergency Support for Kibbutz Communities.pdf | Proposal with Fund background, shelter kit contents and cost ($3,500/kit), community support budget ($35,000/kibbutz), total request $1,039,500, and impact summary |
+| Emergency Support for Kibbutz Communities.pdf | Proposal with Fund background, shelter kit contents and cost ($3,500/kit), community support budget ($35,000/kibbutz), total request $1,039,500, and impact summary. Three-page proposal with background on the Fund and Oct 7 impact, Emergency Shelter Kit contents and budget ($94,500), Community Emergency Support activities and budget ($945,000), total ask $1,039,500, and expected impact. |
 
 ## Extracted Data
 
@@ -85,7 +94,7 @@ Today, amid the renewed escalation with Iran and continued missile threats, thou
 
 ## Immediate Need: Public Shelter Emergency Kits (Northern Border)
 
-Due to the escalation in northern Israel, public shelters are currently housing large numbers of families. The Israeli Home Front Command's Northern Protection Program has not yet been completed, leaving 27 kibbutzim along the border and in the Hula Valley without adequate protected rooms (Mamad). As a result, families—many with children—are spending long periods in public shelters that lack basic equipment and infrastructure.
+Due to the escalation in northern Israel, public shelters are currently housing large numbers of families. The Israeli Home Front Command's Northern Protection Program has not yet been completed, leaving **27 kibbutzim** along the border and in the Hula Valley without adequate protected rooms (Mamad). As a result, families—many with children—are spending long periods in public shelters that lack basic equipment and infrastructure.
 
 The Kibbutz Movement Rehabilitation Fund seeks donor support to provide Emergency Shelter Kits to these communities. These kits will ensure that families forced to remain in shelters can do so with basic safety, dignity, and essential services.
 
@@ -154,7 +163,6 @@ With donor support, the Kibbutz Movement Rehabilitation Fund will:
 ## Our Commitment
 
 The Kibbutz Movement Rehabilitation Fund remains fully committed to standing beside Israel's kibbutzim and neighboring communities along the country's borders. As long as the need exists, the Fund will continue to mobilize resources, coordinate support, and ensure that these communities can recover, rebuild, and thrive again.
-
 
 ## Internal Notes
 
