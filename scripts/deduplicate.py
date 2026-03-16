@@ -219,6 +219,10 @@ def phase_orgs(dry_run: bool = False) -> int:
                     os.rmdir(variant_dir)
                 except OSError:
                     log(f"  Warning: could not remove {variant_dir} (not empty)")
+                _git_commit_if_changes(
+                    [canonical_dir, variant_dir],
+                    f"dedup(orgs): merge {variant} -> {canonical}",
+                )
                 merged += 1
 
     log(f"Phase 1 done: merged {merged} variant org(s)")
@@ -290,6 +294,10 @@ def phase_unknown(dry_run: bool = False) -> int:
         if not dry_run:
             os.makedirs(dest_org_dir, exist_ok=True)
             shutil.move(req_dir, os.path.join(dest_org_dir, dest_name))
+            _git_commit_if_changes(
+                [req_dir, os.path.join(dest_org_dir, dest_name)],
+                f"dedup(unknown): {req_name} -> {org_slug}/{dest_name}",
+            )
             moved += 1
 
     if not dry_run:
@@ -372,8 +380,15 @@ def _merge_group(group_files: list[str], dry_run: bool = False) -> str | None:
             shutil.copy2(src, os.path.join(dest_dir, dst_name))
             existing_hashes.add(h)
 
-    for path in group_files:
-        shutil.rmtree(os.path.dirname(path))
+    source_dirs = [os.path.dirname(p) for p in group_files]
+    source_names = [os.path.basename(d) for d in source_dirs]
+    for src_dir in source_dirs:
+        shutil.rmtree(src_dir)
+
+    _git_commit_if_changes(
+        source_dirs + [dest_dir],
+        f"dedup(requests): merge {source_names} -> {dest_slug} [{org_slug}]",
+    )
 
     return dest_md
 
@@ -453,35 +468,57 @@ def phase_requests(dry_run: bool = False) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Phase 4: PR
+# Git helpers (incremental commits)
 # ---------------------------------------------------------------------------
 
-def _create_pr(dry_run: bool = False) -> str | None:
+def _git_commit_if_changes(paths: list[str], message: str, dry_run: bool = False) -> bool:
+    """Stage the given paths and commit if anything changed. Returns True if committed."""
     if dry_run:
-        log("[dry-run] Would create PR")
-        return None
+        log(f"  [dry-run] Would commit: {message}")
+        return False
+    for p in paths:
+        git("add", p)
+    status = git("status", "--porcelain")
+    if not status:
+        return False
+    git("commit", "-m", message)
+    log(f"  Committed: {message}")
+    return True
 
+
+def _checkout_dedup_branch() -> str | None:
+    """Create and checkout a timestamped dedup branch. Returns branch name, or None on conflict."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     short_hash = hashlib.sha256(today.encode()).hexdigest()[:6]
     branch = f"dedup/{today}-{short_hash}"
-
     try:
         git("checkout", "-b", branch)
     except RuntimeError:
-        log(f"Branch {branch} already exists; aborting PR phase")
+        log(f"Branch {branch} already exists; aborting")
+        return None
+    return branch
+
+
+# ---------------------------------------------------------------------------
+# Phase 4: PR
+# ---------------------------------------------------------------------------
+
+def _create_pr(branch: str | None, dry_run: bool = False) -> str | None:
+    if dry_run:
+        log("[dry-run] Would push and create PR")
         return None
 
-    git("add", "-A", REQUESTS_DIR)
-    status = git("status", "--porcelain")
-    if not status:
-        log("No changes to commit.")
-        git("checkout", "main")
-        git("branch", "-D", branch)
+    if branch is None:
+        branch = git("rev-parse", "--abbrev-ref", "HEAD")
+
+    unpushed = git("log", f"origin/main..HEAD", "--oneline", check=False)
+    if not unpushed:
+        log("No commits to push; skipping PR.")
         return None
 
-    git("commit", "-m", f"dedup: org merge + request dedup ({today})")
     git("push", "-u", "origin", branch)
 
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     pr_url = None
     try:
         pr_url = gh_pr_create(
@@ -509,6 +546,14 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
+    # Create the dedup branch before any phase makes changes, so incremental
+    # commits land on it rather than on main.
+    branch = None
+    if not args.dry_run and args.phase != "pr":
+        branch = _checkout_dedup_branch()
+        if branch is None:
+            return
+
     if args.phase in (None, "orgs"):
         phase_orgs(args.dry_run)
 
@@ -519,7 +564,7 @@ def main():
         phase_requests(args.dry_run)
 
     if args.phase in (None, "pr"):
-        _create_pr(args.dry_run)
+        _create_pr(branch, args.dry_run)
 
     log("Done.")
 
