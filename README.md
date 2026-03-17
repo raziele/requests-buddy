@@ -219,6 +219,18 @@ gh auth login
 npm install -g @googleworkspace/cli
 ```
 
+**Cursor Agent CLI** (`agent`) — for AI normalization and deduplication:
+
+```bash
+curl -fsSL https://cursor.com/install | bash
+```
+
+After installing, verify with:
+
+```bash
+agent --version
+```
+
 **Python dependencies** (includes `notebooklm-py` for NotebookLM automation):
 
 ```bash
