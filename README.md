@@ -1,5 +1,25 @@
 # Requests Buddy
 
+## Table of Contents
+
+- [Why](#why)
+- [What is it](#what-is-it)
+- [Pipeline Overview](#pipeline-overview)
+- [Process 1: Ingest Emails](#process-1-ingest-emails)
+- [Process 2: Normalize Requests](#process-2-normalize-requests)
+- [Process 3: Sync NotebookLM](#process-3-sync-notebooklm)
+- [Process 4: Deduplicate](#process-4-deduplicate)
+- [How to Start](#how-to-start)
+  - [Prerequisites](#prerequisites)
+  - [1. Install CLI tools](#1-install-cli-tools)
+  - [2. Clone and run first-time setup](#2-clone-and-run-first-time-setup)
+  - [3. Verify](#3-verify)
+  - [4. Done](#4-done)
+- [Running Scripts Locally](#running-scripts-locally)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Updating Credentials](#updating-credentials)
+
 ## Why
 This pipleine consolidates NGO fund requests and index them, allowing philantropic funds and donors to find requests easily using a NotebookLM interface.
 
