@@ -1,11 +1,15 @@
 ---
 id: REQ-Mon, 9 Mar-001
-source_email_id: <BY5PR02MB6196C2986A3FB63B95571843AF79A@BY5PR02MB6196.namprd02.prod.outlook.com>
-date_received: Mon, 9 Mar 2026 13:28:30 +0000
+source_email_id:
+  - <BY5PR02MB6196C2986A3FB63B95571843AF79A@BY5PR02MB6196.namprd02.prod.outlook.com>
+  - <PH0PR19MB5020ECE2475F7B5CECAF4BF0D47AA@PH0PR19MB5020.namprd19.prod.outlook.com>
+date_received:
+  - Mon, 9 Mar 2026 13:28:30 +0000
+  - Fri, 6 Mar 2026 20:18:33 +0000
 status: new
 merged_from:
-  - requests/elah-center-for-coping-with-loss/elah-center-national-welfare-supervision-training-program/elah-center-national-welfare-supervision-training-program.md
-  - requests/elah-center-for-coping-with-loss/elah-center-therapeutic-support-war-affected/elah-center-therapeutic-support-war-affected.md
+  - requests/elah-center-for-coping-with-loss/elah-center-for-coping-with-loss-program-funding-capacity-building/elah-center-for-coping-with-loss-program-funding-capacity-building.md
+  - requests/elah-center-for-coping-with-loss/elah-center-social-worker-supervision-support-program/elah-center-social-worker-supervision-support-program.md
 ---
 
 # Elah Center for Coping with Loss (מרכז אלה להתמודדות נפשית עם אובדן) — Program Funding & Capacity Building
@@ -14,22 +18,22 @@ merged_from:
 
 | Field | Value |
 |---|---|
-| **Organization** | Elah Center for Coping with Loss (מרכז אלה להתמודדות נפשית עם אובדן) |
-| **Contact** | Benny Leiser (בני לייזר) — CEO (מנכ"ל) |
-| **Contact Email** | ceo@elah.org.il |
+| **Organization** | Elah Center for Coping with Loss / Merkaz Elah (מרכז אלה להתמודדות נפשית עם אובדן) |
+| **Contact** | Benny Leiser / Bennie Leezer (בני לייזר) — CEO (מנכ"ל) |
+| **Contact Email** | ceo@elah.org.il / CEO@elah.org.il |
 | **Contact Phone** | 052-3589919 |
-| **Website** | https://www.elah.org.il |
-| **Original Date** | 2026-03-08 |
-| **Forwarded By** | Yoav Raban <raban@jewishdetroit.org> |
+| **Website** | https://www.elah.org.il / www.elah.org.il |
+| **Original Date** | 2026-03-08; Fri, 6 Mar 2026 20:18:33 +0000 |
+| **Forwarded By** | Yoav Raban <raban@jewishdetroit.org>; Barak Loozon <BarakL@jewishfed.org> |
 
 ## Classification
 
 | Field | Value |
 |---|---|
 | **Request Type** | program_funding, capacity_building |
-| **Urgency** | high |
+| **Urgency** | high (one source: medium) |
 | **Sector** | trauma_support, community_resilience, healthcare, elderly, shared_society |
-| **Target Population** | (1) War-affected individuals outside government-funded assistance: mothers and partners of combat soldiers, female lone soldiers, bereaved commanders, close friends of fallen soldiers and civilians, second-degree family of fallen (Jewish and Arab), family of wounded or traumatized soldiers, first-line emergency personnel; elderly and homebound elderly including Holocaust survivors; Arab community in Israel (culturally adapted services). (2) Welfare workers (עובדי רווחה) in municipal social services departments, regional councils, and local authorities across Israel. |
+| **Target Population** | (1) **Therapeutic programs:** War-affected individuals outside government-funded assistance: mothers and partners of combat soldiers, female lone soldiers, bereaved commanders, close friends of fallen soldiers and civilians, second-degree family of fallen (Jewish and Arab), family of wounded or traumatized soldiers, first-line emergency personnel; elderly and homebound elderly including Holocaust survivors; Arab community in Israel (culturally adapted services). (2) **Capacity building:** Welfare workers / social workers (עובדי רווחה) in municipal social services departments, regional councils, and local authorities across Israel. |
 | **Geographic Focus** | Nationwide Israel; Arab community services via clinic in Kfar Kanna |
 | **Language** | mixed |
 
@@ -38,10 +42,12 @@ merged_from:
 **1. Program funding (therapeutic support)**  
 Elah Center seeks philanthropic funding to provide therapeutic support for war-affected individuals who are not eligible for government assistance or for whom state frameworks are inadequate. The request covers five program areas: (1) support groups for grief and trauma (two therapists per group, 12–40 sessions); (2) individual therapy for grief and trauma (20-session packages); (3) social-therapeutic groups for the elderly (90-minute weekly sessions); (4) in-home individual therapy for homebound elderly; and (5) group and individual therapy for the Arab community via the Kfar Kanna clinic. All programs use qualified therapists and are designed to strengthen resilience, reduce isolation, and support emotional recovery.
 
-**2. Capacity building (welfare workers)**  
-Elah Center requests funding to expand a national supervision and training program for welfare workers in municipal social services. Following the escalation with Iran and Hezbollah, the Center identified an urgent new need to support frontline welfare staff who face secondary trauma, compassion fatigue, and overwhelming caseloads. The program offers ongoing group supervision, individual guidance, short workshops, and enrichment lectures on loss, trauma, and self-care. Elah recently held a Zoom support meeting for approximately 500 Jerusalem municipal welfare workers and seeks to continue and scale this service in partnership with local and government bodies.
+**2. Capacity building (welfare / social workers)**  
+Elah Center requests funding and partnership to expand a national supervision and training program for welfare workers / social workers in municipal social services. Following the escalation with Iran and Hezbollah, the Center identified an urgent need to support frontline welfare staff who face secondary trauma, compassion fatigue, and overwhelming caseloads. The program offers ongoing group supervision, individual supervision and personal support, short workshops, and enrichment lectures on loss, trauma, and self-care. Elah recently held a Zoom support meeting for approximately 500 Jerusalem municipal welfare workers and seeks to continue and scale this service in partnership with local and government bodies.
 
 **Funding Requested:** Not specified
+
+**Non-Financial Ask:** Collaboration with local authorities and governmental bodies to establish dedicated support within the described framework for welfare/social workers.
 
 **Funding breakdown (therapeutic programs):**
 - Support group (12 sessions, 2 therapists): NIS 36,000
@@ -57,14 +63,15 @@ Elah Center has operated for 45 years in trauma, bereavement, loss, and life-cri
 
 **Therapeutic programs:** Since the outbreak of the Iron Swords War, the government has expanded psychological assistance to direct victims, and philanthropy has added substantial support. Many individuals still fall between the cracks—ineligible for government funding or poorly served by existing frameworks. Elah provides tailored therapeutic support for these populations, funded by donations. The Center runs a clinic in Kfar Kanna with more than 50 Arabic-speaking therapists, offering culturally adapted individual and group therapy in clinics or clients' homes. For the elderly and Holocaust survivors, Elah has provided trauma-informed mental health care since 1979, with growing demand for in-home, relationship-based care. The five program types address distinct gaps; unit costs are specified in NIS. The only missing component for scaling these responses is funding.
 
-**Welfare supervision and training:** In the current period, Elah proposes a nationwide response focused on strengthening and supporting welfare workers in social services departments in municipalities, regional councils, and local authorities. These workers face heavy caseloads, serve diverse populations, are exposed to extreme cases, and must provide creative responses with limited budgets in a socially, economically, and security-wise challenging reality. Since October 2023, Israel has been in prolonged conflict, creating unprecedented emotional and social strain. With the escalation and war with Iran, more people are affected and the pressure on welfare workers is increasing. Prolonged exposure places workers at real risk of vicarious trauma, secondary traumatization, and compassion fatigue. The proposed program includes ongoing group supervision, individual guidance for workers, short-term workshops, and enrichment lectures on topics such as loss, trauma, and self-care. Elah has provided this type of service over the past year with great success and requests support to continue and expand it in collaboration with local authorities and government bodies. Strengthening frontline professionals is essential to maintaining Israel's societal resilience and ensuring continuity of care for citizens who need it more than ever.
+**Welfare / social worker supervision and training:** Social workers in Israel's municipal social service departments serve diverse populations, face heavy workloads, are exposed to extreme cases, and must provide creative responses with limited budgets in a socially, economically, and security-wise challenging reality. Since October 2023 Israel has been in prolonged conflict, creating unprecedented emotional and social strain. With the escalation and war with Iran, more people are affected and the pressure on welfare workers is increasing. Prolonged exposure places workers at real risk of vicarious trauma, secondary traumatization, and compassion fatigue. The proposed program includes ongoing group supervision, individual guidance for workers, short-term workshops (experiential elements, knowledge sharing, practical tools), and enrichment lectures on topics such as loss, trauma, and self-care. Elah has provided this type of service over the past year with great success and requests support to continue and expand it in collaboration with local authorities and government bodies. Strengthening frontline professionals is essential to maintaining Israel's societal resilience and ensuring continuity of care for citizens who need it more than ever.
 
 ## Attachments
 
 | Filename | Description |
 |---|---|
 | Project proposals Elah Center for Coping with Loss 2026.pdf | Summary of five therapeutic programs (support groups, individual therapy, elderly groups, homebound elderly, Arab community) with per-session and package costs in NIS. |
-| מרכז אלה - הצעה לתוכנית ליווי והדרכה עבור עובדי רווחה.pdf | Proposal for national supervision and training program for municipal welfare workers. |
+| Proposal for a Program of Support and Supervision for Social Workers (2).pdf | English program proposal for social worker support and supervision. |
+| מרכז אלה - הצעה לתוכנית ליווי והדרכה עבור עובדי רווחה.pdf | Hebrew proposal for national supervision and training program for municipal welfare workers (עובדי רווחה); same content as English version. |
 
 ## Extracted Data
 
@@ -125,6 +132,24 @@ All programs support the emotional processing of participants' unique experience
 ## Conclusion
 
 Elah Center possesses the professional knowledge, therapists, and infrastructure required to provide this support nationwide. The only missing component is funding. We hope you will be our partner in raising resources to provide this response and build a more just and resilient society.
+
+---
+
+### Proposal for a Program of Support and Supervision for Social Workers (2).pdf
+
+**Focus:** Strengthening and supporting social workers in municipal social service departments in Israel's cities, regional councils, and local authorities. Context: war since October 2023; escalation and war with Iran; risk of vicarious trauma, secondary traumatization, compassion fatigue.
+
+**Elah Center:** Specializes in trauma, bereavement, loss; operates nationwide; ~600 professionals in therapy and emotional support.
+
+**Program components:**
+- Ongoing group supervision sessions
+- Individual supervision and personal support for staff
+- Short-term workshops (focused series: experiential elements, knowledge sharing, practical tools)
+- Educational lectures (bereavement, trauma, self-care, related subjects)
+
+**Contact:** Bennie Leezer, CEO | 052-3589919 | CEO@elah.org.il | www.elah.org.il
+
+**Sign-off:** Request for generous support to strengthen social resilience by supporting social workers; collaboration with local authorities and governmental bodies.
 
 ---
 
