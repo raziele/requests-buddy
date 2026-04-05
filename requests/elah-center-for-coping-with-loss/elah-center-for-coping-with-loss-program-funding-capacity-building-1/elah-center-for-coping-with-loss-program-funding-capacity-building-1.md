@@ -1,9 +1,17 @@
 ---
-id: REQ-Mon, 9 Mar-001
-source_email_id: <BY5PR02MB6196C2986A3FB63B95571843AF79A@BY5PR02MB6196.namprd02.prod.outlook.com>
-date_received: Mon, 9 Mar 2026 13:28:30 +0000
+id:
+  - REQ-Mon, 9 Mar-001
+  - REQ-Fri, 6 Mar-003
+source_email_id:
+  - <BY5PR02MB6196C2986A3FB63B95571843AF79A@BY5PR02MB6196.namprd02.prod.outlook.com>
+  - <PH0PR19MB5020ECE2475F7B5CECAF4BF0D47AA@PH0PR19MB5020.namprd19.prod.outlook.com>
+date_received:
+  - Mon, 9 Mar 2026 13:28:30 +0000
+  - Fri, 6 Mar 2026 20:18:33 +0000
 status: new
 merged_from:
+  - requests/elah-center-for-coping-with-loss/elah-center-for-coping-with-loss-program-funding-capacity-building/elah-center-for-coping-with-loss-program-funding-capacity-building.md
+  - requests/elah-center-for-coping-with-loss/elah-center-social-worker-supervision-support-program/elah-center-social-worker-supervision-support-program.md
   - requests/elah-center-for-coping-with-loss/elah-center-national-welfare-supervision-training-program/elah-center-national-welfare-supervision-training-program.md
   - requests/elah-center-for-coping-with-loss/elah-center-therapeutic-support-war-affected/elah-center-therapeutic-support-war-affected.md
 ---
@@ -14,34 +22,43 @@ merged_from:
 
 | Field | Value |
 |---|---|
-| **Organization** | Elah Center for Coping with Loss (מרכז אלה להתמודדות נפשית עם אובדן) |
-| **Contact** | Benny Leiser (בני לייזר) — CEO (מנכ"ל) |
-| **Contact Email** | ceo@elah.org.il |
+| **Organization** | Elah Center for Coping with Loss (מרכז אלה להתמודדות נפשית עם אובדן); also referenced as Elah Center (Merkaz Elah / מרכז אלה) |
+| **Contact** | Benny Leiser (בני לייזר) — CEO (מנכ"ל); same person also spelled “Bennie Leezer” in one source |
+| **Contact Email** | ceo@elah.org.il (also given as CEO@elah.org.il) |
 | **Contact Phone** | 052-3589919 |
-| **Website** | https://www.elah.org.il |
-| **Original Date** | 2026-03-08 |
-| **Forwarded By** | Yoav Raban <raban@jewishdetroit.org> |
+| **Website** | https://www.elah.org.il (also www.elah.org.il) |
+| **Original Date / Thread** | Content dated 2026-03-08 (therapeutic/capacity bundle); emails received Mon, 9 Mar 2026 13:28:30 +0000 and Fri, 6 Mar 2026 20:18:33 +0000 |
+| **Forwarded By** | Yoav Raban \<raban@jewishdetroit.org\>; Barak Loozon \<BarakL@jewishfed.org\> (separate forward of welfare-worker proposal) |
 
 ## Classification
 
 | Field | Value |
 |---|---|
 | **Request Type** | program_funding, capacity_building |
-| **Urgency** | high |
+| **Urgency** | high (combined therapeutic + welfare program thread, REQ-Mon, 9 Mar-001); medium (welfare-worker–only thread, REQ-Fri, 6 Mar-003) — see **Source differences** below |
 | **Sector** | trauma_support, community_resilience, healthcare, elderly, shared_society |
-| **Target Population** | (1) War-affected individuals outside government-funded assistance: mothers and partners of combat soldiers, female lone soldiers, bereaved commanders, close friends of fallen soldiers and civilians, second-degree family of fallen (Jewish and Arab), family of wounded or traumatized soldiers, first-line emergency personnel; elderly and homebound elderly including Holocaust survivors; Arab community in Israel (culturally adapted services). (2) Welfare workers (עובדי רווחה) in municipal social services departments, regional councils, and local authorities across Israel. |
+| **Target Population** | (1) War-affected individuals outside government-funded assistance: mothers and partners of combat soldiers, female lone soldiers, bereaved commanders, close friends of fallen soldiers and civilians, second-degree family of fallen (Jewish and Arab), family of wounded or traumatized soldiers, first-line emergency personnel; elderly and homebound elderly including Holocaust survivors; Arab community in Israel (culturally adapted services). (2) Welfare / social workers (עובדי רווחה) in municipal social services departments, regional councils, and local authorities across Israel. |
 | **Geographic Focus** | Nationwide Israel; Arab community services via clinic in Kfar Kanna |
 | **Language** | mixed |
+
+## Source differences
+
+- **Urgency:** One intake classified the combined ask as **high**; a separate forward of the social-worker supervision program alone was classified **medium**.
+- **Contact spelling:** “Benny Leiser” / Hebrew בני לייזר vs. “Bennie Leezer” in the English PDF summary for the same CEO and phone/email.
+- **Welfare-worker Zoom scale:** REQ-Mon, 9 Mar-001 notes a Zoom support meeting for approximately **500** Jerusalem municipal welfare workers; REQ-Fri, 6 Mar-003 does not mention that figure.
+- **Non-financial ask (welfare thread):** REQ-Fri, 6 Mar-003 explicitly lists collaboration with local authorities and government as a **non-financial** ask; the combined document states the same partnership goal throughout.
 
 ## The Ask
 
 **1. Program funding (therapeutic support)**  
 Elah Center seeks philanthropic funding to provide therapeutic support for war-affected individuals who are not eligible for government assistance or for whom state frameworks are inadequate. The request covers five program areas: (1) support groups for grief and trauma (two therapists per group, 12–40 sessions); (2) individual therapy for grief and trauma (20-session packages); (3) social-therapeutic groups for the elderly (90-minute weekly sessions); (4) in-home individual therapy for homebound elderly; and (5) group and individual therapy for the Arab community via the Kfar Kanna clinic. All programs use qualified therapists and are designed to strengthen resilience, reduce isolation, and support emotional recovery.
 
-**2. Capacity building (welfare workers)**  
-Elah Center requests funding to expand a national supervision and training program for welfare workers in municipal social services. Following the escalation with Iran and Hezbollah, the Center identified an urgent new need to support frontline welfare staff who face secondary trauma, compassion fatigue, and overwhelming caseloads. The program offers ongoing group supervision, individual guidance, short workshops, and enrichment lectures on loss, trauma, and self-care. Elah recently held a Zoom support meeting for approximately 500 Jerusalem municipal welfare workers and seeks to continue and scale this service in partnership with local and government bodies.
+**2. Capacity building (welfare / social workers)**  
+Elah Center requests funding to expand a national supervision and training program for welfare workers in municipal social services. Following the escalation with Iran and Hezbollah, the Center identified an urgent need to support frontline welfare staff who face secondary trauma, compassion fatigue, and overwhelming caseloads. The program offers ongoing group supervision, individual guidance, short workshops, and enrichment lectures on loss, trauma, and self-care. Elah recently held a Zoom support meeting for approximately 500 Jerusalem municipal welfare workers and seeks to continue and scale this service in partnership with local and government bodies.
 
 **Funding Requested:** Not specified
+
+**Non-financial ask (from social-worker supervision thread):** Collaboration with local authorities and governmental bodies to establish dedicated support within the supervision/training framework.
 
 **Funding breakdown (therapeutic programs):**
 - Support group (12 sessions, 2 therapists): NIS 36,000
@@ -64,7 +81,8 @@ Elah Center has operated for 45 years in trauma, bereavement, loss, and life-cri
 | Filename | Description |
 |---|---|
 | Project proposals Elah Center for Coping with Loss 2026.pdf | Summary of five therapeutic programs (support groups, individual therapy, elderly groups, homebound elderly, Arab community) with per-session and package costs in NIS. |
-| מרכז אלה - הצעה לתוכנית ליווי והדרכה עבור עובדי רווחה.pdf | Proposal for national supervision and training program for municipal welfare workers. |
+| מרכז אלה - הצעה לתוכנית ליווי והדרכה עבור עובדי רווחה.pdf | Proposal for national supervision and training program for municipal welfare workers (Hebrew); shared across both threads; one source’s Hebrew title also references the war with Iran. |
+| Proposal for a Program of Support and Supervision for Social Workers (2).pdf | English program proposal for social worker support and supervision (from REQ-Fri, 6 Mar-003 thread). |
 
 ## Extracted Data
 
@@ -149,6 +167,28 @@ Elah Center possesses the professional knowledge, therapists, and infrastructure
 
 בברכה, בני לייזר, מנכ"ל
 פרטי קשר: בני לייזר, מנכ"ל | 052-3589919 | CEO@elah.org.il | www.elah.org.il
+
+### Proposal for a Program of Support and Supervision for Social Workers (2).pdf
+
+**Focus:** Strengthening and supporting social workers in municipal social service departments in Israel's cities, regional councils, and local authorities. Context: war since October 2023; escalation and war with Iran; risk of vicarious trauma, secondary traumatization, compassion fatigue.
+
+**Elah Center:** Specializes in trauma, bereavement, loss; operates nationwide; ~600 professionals in therapy and emotional support.
+
+**Program components:**
+- Ongoing group supervision sessions
+- Individual supervision and personal support for staff
+- Short-term workshops (focused series: experiential elements, knowledge sharing, practical tools)
+- Educational lectures (bereavement, trauma, self-care, related subjects)
+
+**Contact:** Bennie Leezer, CEO | 052-3589919 | CEO@elah.org.il | www.elah.org.il
+
+**Sign-off:** Request for generous support to strengthen social resilience by supporting social workers; collaboration with local authorities and governmental bodies.
+
+### מרכז אלה - הצעה לתוכנית ליווי והדרכה עבור עובדי רווחה.pdf (summary from REQ-Fri, 6 Mar-003)
+
+**Hebrew version of same proposal (alternate title line in that intake):** הצעה לתוכנית לליווי והדרכה עבור עובדי ועובדות רווחה במחלקות לשירותים חברתיים | מלחמה עם איראן
+
+**Content (summary):** Elah Center works nationwide in trauma, bereavement, loss; ~600 professionals. Social workers face heavy loads, diverse populations, exposure to extreme cases, creative solutions despite budget constraints; war has intensified pressures and risk of vicarious trauma and compassion fatigue. Program: group supervision, individual support, short-term workshops, enrichment lectures. Request to collaborate with local authorities and government; service provided successfully in the past year; request for support to continue. **בברכה, בני לייזר, מנכ"ל.** Contact details as above.
 
 ## Internal Notes
 
