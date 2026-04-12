@@ -58,7 +58,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          curl https://cursor.com/install -fsS | bash
+          curl -fsSL https://cursor.com/install -o /tmp/cursor-install.sh
+          echo "8b28450c32f41590b8dd1c9c94a358f7a76330e182fab067732b0c1ca453a04f  /tmp/cursor-install.sh" | sha256sum -c -
+          bash /tmp/cursor-install.sh
           uv sync
 
       - name: Configure git
@@ -83,10 +85,8 @@ jobs:
         run: |
           BASE_BRANCH="${{ github.event.repository.default_branch }}"
           git fetch origin "$BASE_BRANCH"
-          pr_url=$(gh pr create \
+          gh pr create \
             --title "${{ steps.normalize.outputs.pr_title }}" \
             --body-file .github_pr_body.txt \
             --base "$BASE_BRANCH" \
-            --head ${{ steps.params.outputs.branch }})
-          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
-          gh pr merge "$pr_url" --squash --delete-branch
+            --head ${{ steps.params.outputs.branch }}

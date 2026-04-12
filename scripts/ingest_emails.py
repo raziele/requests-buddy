@@ -133,7 +133,7 @@ def extract_attachments(msg: dict, dest_dir: str) -> list[str]:
     filenames = []
 
     for part in msg.get("payload", {}).get("parts", []):
-        filename = part.get("filename")
+        filename = os.path.basename(part.get("filename") or "")
         if not filename:
             continue
 
@@ -155,6 +155,9 @@ def extract_attachments(msg: dict, dest_dir: str) -> list[str]:
             os.makedirs(dest_dir, exist_ok=True)
             content = base64.urlsafe_b64decode(raw)
             filepath = os.path.join(dest_dir, filename)
+            if not os.path.realpath(filepath).startswith(os.path.realpath(dest_dir) + os.sep):
+                log(f"  Skipping unsafe attachment filename: {filename}")
+                continue
             with open(filepath, "wb") as f:
                 f.write(content)
             filenames.append(filename)

@@ -53,7 +53,10 @@ jobs:
         run: uv sync
 
       - name: Install Cursor
-        run: curl https://cursor.com/install -fsS | bash
+        run: |
+          curl -fsSL https://cursor.com/install -o /tmp/cursor-install.sh
+          echo "8b28450c32f41590b8dd1c9c94a358f7a76330e182fab067732b0c1ca453a04f  /tmp/cursor-install.sh" | sha256sum -c -
+          bash /tmp/cursor-install.sh
 
       - name: Configure git
         run: |
@@ -87,7 +90,10 @@ jobs:
         run: uv sync
 
       - name: Install Cursor
-        run: curl https://cursor.com/install -fsS | bash
+        run: |
+          curl -fsSL https://cursor.com/install -o /tmp/cursor-install.sh
+          echo "8b28450c32f41590b8dd1c9c94a358f7a76330e182fab067732b0c1ca453a04f  /tmp/cursor-install.sh" | sha256sum -c -
+          bash /tmp/cursor-install.sh
 
       - name: Configure git
         run: |
@@ -121,7 +127,10 @@ jobs:
         run: uv sync
 
       - name: Install Cursor
-        run: curl https://cursor.com/install -fsS | bash
+        run: |
+          curl -fsSL https://cursor.com/install -o /tmp/cursor-install.sh
+          echo "8b28450c32f41590b8dd1c9c94a358f7a76330e182fab067732b0c1ca453a04f  /tmp/cursor-install.sh" | sha256sum -c -
+          bash /tmp/cursor-install.sh
 
       - name: Configure git
         run: |

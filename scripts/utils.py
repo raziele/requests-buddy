@@ -89,7 +89,6 @@ def cursor_agent_run(
         "--model", "auto",
         "--output-format", "text",
         "--trust",
-        "--force",
         "-p",
         prompt,
     ]
