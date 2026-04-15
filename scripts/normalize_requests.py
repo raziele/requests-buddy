@@ -198,30 +198,17 @@ def normalize_email(folder: str) -> list[dict]:
     file_paths = _folder_file_paths(folder)
     rel_paths = [os.path.relpath(p, PROJECT_ROOT) for p in file_paths]
 
-    # Output file: written by agent, read by us, deleted before commit
-    output_path = os.path.join(folder, "normalized.json")
-    rel_output_path = os.path.relpath(output_path, PROJECT_ROOT)
-
-    # Compose the prompt: system prompt + file references + output path
+    # Compose the prompt: system prompt + file references + stdout output instruction
     file_refs = "\n".join(f"- ./{p}" for p in rel_paths)
     message = (
         f"{system_prompt}\n\n"
         f"## Files to analyze\n\n{file_refs}\n\n"
-        f"## Output file\n\nWrite the JSON to: ./{rel_output_path}"
+        f"## Output\n\nWrite ONLY the JSON object to stdout. Do not write any files."
     )
 
     try:
         log(f"  Running Cursor agent on {len(rel_paths)} file(s)...")
-        cursor_agent_run(message, cwd=PROJECT_ROOT)
-
-        if not os.path.exists(output_path):
-            log(f"  Cursor agent did not write output file: {output_path}")
-            return fallback
-
-        with open(output_path) as f:
-            raw = f.read()
-        os.unlink(output_path)
-        log(f"  Deleted temp file: {output_path}")
+        raw = cursor_agent_run(message, cwd=PROJECT_ROOT)
 
         parsed = _parse_normalize_response(raw)
         if parsed:

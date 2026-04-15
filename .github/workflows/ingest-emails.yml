@@ -34,6 +34,7 @@ jobs:
         run: |
           mkdir -p /tmp/gws
           echo '${{ secrets.GWS_CREDENTIALS }}' > /tmp/gws/credentials.json
+          chmod 600 /tmp/gws/credentials.json
         env:
           GWS_CREDENTIALS: ${{ secrets.GWS_CREDENTIALS }}
 
