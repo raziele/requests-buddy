@@ -85,8 +85,9 @@ jobs:
         run: |
           BASE_BRANCH="${{ github.event.repository.default_branch }}"
           git fetch origin "$BASE_BRANCH"
-          gh pr create \
+          pr_url=$(gh pr create \
             --title "${{ steps.normalize.outputs.pr_title }}" \
             --body-file .github_pr_body.txt \
             --base "$BASE_BRANCH" \
-            --head ${{ steps.params.outputs.branch }}
+            --head ${{ steps.params.outputs.branch }})
+          gh pr merge "$pr_url" --squash --delete-branch
